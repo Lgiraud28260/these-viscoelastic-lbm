@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conclusion — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '5.' + (n + 24) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li class="current"><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><h1>Conclusion</h1></header><p>The purpose of this work was the realization of a simple model
+reproducing a viscoelastic behavior. The addition of quasi-conserved
+quantities to the existing lattice Boltzmann model has indeed allowed
+the reproduction at large scale of a behavior very close to that of
+Jeffreys-type fluids. These quantities allow, indeed, the memorization
+of the stresses to which the fluid is subjected, and the fact that they
+are relaxed with a very long time allows this memory to be preserved
+over a comparable range of time. We have built two models with isotropic
+characteristics thanks to the study of the macroscopic equations
+obtained through a Chapman-Enskog expansion in two extreme cases
+(infinite relaxation time and small relaxation time). The method based
+on the dispersion equation has guaranteed us, numerically and
+symbolically, that the extension of these extreme cases to the general
+cases (very long relaxation time) was carried out without loss of the
+isotropy character. We thus have an eleven-velocity model and a
+fifteen-velocity isotropic viscoelastic model. We have given a direction
+of proof allowing us to recover the constitutive equations. This proof
+is based on the Chapman-Enskog expansion but takes into account the fact
+that when a mode is relaxed with a very long time, it is always far from
+its equilibrium state. We then deduced that our fluid followed a
+constitutive law close to that of a Jeffreys fluid, thus confirming the
+results of the numerical simulations performed.</p>
+<p>The preceding study nevertheless remains incomplete. Let us mention a
+few points that would deserve deeper investigation. Our model may, for
+example, serve as a basis for the construction of more complex models,
+with nonlinear characteristics different from those presented in
+appendix B.</p>
+<p>We can, in fact, build a model in which the viscosity depends on the
+elementary invariants of the strain rate tensor. We will then be able to
+build models in which the fluids can have a shear-thinning
+(<span><em>shear thinning</em></span>) behavior or else a
+shear-thickening type (<span><em>shear thickening</em></span>). Added to
+the temporal effects, these effects will allow us to build a
+White-Metzner-type model [<a href="#ref-WM">2</a>]. It has already been
+proposed [<a href="#ref-Einat">26</a>] to include an additional
+non-Newtonian behavior in Boltzmann models by varying the shear
+viscosity as a function of the local shear of the fluid. It is indeed
+possible to modify the numerical value of an eigenvalue between two time
+steps, with the eigenvalues being required to lie between 0 and 2, but
+with reservations about the stability of the model. One can therefore
+easily include a power-law-type law or a Carreau-Yasuda law [<a
+href="#ref-carreau">4</a>] [<a href="#ref-yasuda">5</a>] in a lattice
+Boltzmann model. In the case of the viscoelastic model, the shear
+viscosity is no longer controlled by a single eigenvalue, but by two
+eigenvalues. It appears, nevertheless, that the eigenvalue called <span
+class="math inline">\(\lambda_\gamma\)</span>, when chosen small, will
+largely dominate the value of the viscosity. This amounts in the
+fifteen-velocity model to making the following assumption: <span
+class="math display">\[\begin{equation}
+\nu_0({\dot \gamma})\approx c_{\perp}^2\left({1\over
+\lambda_\gamma({\dot \gamma})}-{1\over 2}
+\right)\approx c_{\perp}^2\, {1\over \lambda_\gamma({\dot \gamma})},
+\end{equation}\]</span> where <span class="math inline">\({\dot
+\gamma}\)</span> is related to the strain rate tensor by: <span
+class="math display">\[\begin{equation}
+{\dot \gamma}=\sqrt{{1\over 2}\mbox{Tr}\left( {\dot D}^2\right)}.
+\end{equation}\]</span></p>
+<p>It is then important to note that varying <span
+class="math inline">\(\lambda_\gamma\)</span> creates non-negligible
+temporal effects. If one refers to the constitutive equations with the
+Jeffreys fluid approximation and with <span
+class="math inline">\(\lambda_\gamma\ll 1\)</span>, one then finds the
+following constitutive law: <span
+class="math display">\[\begin{equation}
+{\mathbf{\sigma}}+\frac{\nu_0({\dot
+    \gamma})}{c_{\perp}^2}\,\frac{\partial\,{\mathbf{\sigma}}}{\partial
+t}=-\rho\,
+\nu_0({\dot \gamma})\left({\dot{\mathbf{D}}}
++\frac{\nu_\infty}{c_{\perp}^2}
+  \,\frac{\partial\,{\mathbf{\dot D}}}{\partial t}   \right).
+\end{equation}\]</span></p>
+<p>This law is very close to the non-convective White-Metzner law [<a
+href="#ref-WM">2</a>], if one neglects the term <span
+class="math inline">\(\frac{\nu_\infty}{c_{\perp}^2}
+\,\frac{\partial\,{\mathbf{\dot D}}} {\partial t}\)</span>.</p>
+<p>As an example, we have carried out a uniformly accelerated Poiseuille
+flow. If one waits a sufficiently long time, the time-derivative terms
+will be negligible, and the fluid will then behave as a viscous fluid,
+and we will thus have the possibility of checking that the velocity
+profiles correspond well to those expected. In this example, we have
+chosen a shear-thinning fluid, whose velocity profile is given in
+figure <a href="#pseudo-plastique">5.3</a>. The viscosity being
+described in the <span> <em>lattice units</em></span> by: <span
+class="math display">\[\begin{equation}
+\nu_0({\dot \gamma})=3 \times 10^{-3}\cdot {\dot \gamma}^{-{3\over 4}}.
+\end{equation}\]</span></p>
+<figure id="pseudo-plastique">
+<img src="figures/pseudo-plast.svg" />
+<figcaption>Figure 5.3: Example of a velocity profile of a
+shear-thinning fluid</figcaption>
+</figure>
+<p>Other more complex problems can be envisaged, such as the mixing of
+fluids whose behaviors may or may not be viscoelastic. The addition of
+an additional fluid can be realized by the method described in [<a
+href="#ref-Guns">27</a>] for immiscible fluids. Indeed, one doubles the
+number of populations and adds an interaction between the two fluids
+allowing the simulation of a surface tension. For miscible fluids, one
+can simply add a single additional scalar representing the proportion of
+one of the constituents (appendix C). In the same way, certain simple
+thermal effects can be added through the introduction of an additional
+scalar quantity such as energy.</p>
+<p>A three-dimensional model is perfectly conceivable and is, moreover,
+already under development. The problem to be solved for this type of
+model is to make isotropic the additional “Laplacian”-type term in our
+constitutive equations. Which is nevertheless paradoxical since this
+term does not appear in the Jeffreys equation and we are seeking to
+minimize it, or even neglect it.</p>
+<p>Finally, the introduction of non-trace-preserving objective
+derivatives is possible by adding a coupling between the new viscous
+modes and an energy-type scalar. The latter will then represent the
+trace of the viscoelastic stress tensor.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-WM"><span class="refnum">[2]</span> J.L. White and A.B. Metzner, <span><em>J. Appl. Polym.
+Sci.</em></span>, <span><strong>7</strong></span>, 1963,
+pp. 1867-1889. <a class="refall" href="bibliography.html#ref-WM" title="In the full bibliography">↗</a></li>
+<li id="ref-carreau"><span class="refnum">[4]</span> P.J. Carreau, Ph.D. Thesis, University of Wisconsin,
+Madison (1968) <a class="refall" href="bibliography.html#ref-carreau" title="In the full bibliography">↗</a></li>
+<li id="ref-yasuda"><span class="refnum">[5]</span> K. Yasuda, Ph.D. Thesis, M.I.T. (1979) <a class="refall" href="bibliography.html#ref-yasuda" title="In the full bibliography">↗</a></li>
+<li id="ref-Einat"><span class="refnum">[26]</span> E. Aharonov and D. Rothman, “Non-Newtonian flow
+(through porous media): a Lattice Boltzmann method”, <span><em>Geophys.
+Res. Lett.</em></span>, Vol. 20, 1993, pp. 679–682 <a class="refall" href="bibliography.html#ref-Einat" title="In the full bibliography">↗</a></li>
+<li id="ref-Guns"><span class="refnum">[27]</span> A.K. Gunstensen , Ph.D. Thesis, M.I.T. (1992) <a class="refall" href="bibliography.html#ref-Guns" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="part3-chapter5.html"><span>Previous</span>Constitutive equation</a><a class="next" href="appendix-a.html"><span>Next</span>Definitions on Viscoelasticity</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

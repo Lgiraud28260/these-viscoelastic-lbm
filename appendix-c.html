@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introduction of a Passive Scalar - Modeling of Miscible Fluids — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => 'C.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li class="current"><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+<ul>
+<li><a href="#c.1presentation-of-the-model"
+id="toc-c.1presentation-of-the-model"><span class="secnum">C.1</span> Presentation of the
+model</a></li>
+<li><a href="#c.2simulations"
+id="toc-c.2simulations"><span class="secnum">C.2</span> Simulations</a></li>
+</ul>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Appendix C</p><h1>Introduction of a Passive Scalar - Modeling of Miscible Fluids</h1></header><h1 id="c.1presentation-of-the-model"><span class="secnum">C.1</span> Presentation of the
+model</h1>
+<p>The modeling of miscible fluids has already been introduced in the
+past [<a href="#ref-FLEKKOY">33</a>] by considering two distinct fluids
+<span class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span>. The trick then used was to consider on
+the one hand the fluid made of <span class="math inline">\(A+B\)</span>
+and on the other hand the one made of <span
+class="math inline">\(A-B\)</span>. While the fluid <span
+class="math inline">\(A+B\)</span> is treated as a classical fluid with
+conservation of mass and momentum, the fluid <span
+class="math inline">\(A-B\)</span> is considered as a fluid possessing
+only conservation of mass, its momentum being relaxed with a time
+constant <span class="math inline">\(\tau_D\)</span>. The diffusion of
+one fluid into the other is then characterized by the diffusion
+coefficient <span class="math inline">\(\displaystyle D=c_s^2\left(
+\tau_D-\frac{1}{2}\right)\)</span>. The major drawback of this method is
+the memory space required for its operation. Indeed, it requires twice
+as much memory to model the mixing of two fluids, and the problem
+becomes even more tricky when a third fluid is introduced.</p>
+<p>A more efficient method has been introduced for lattice gases [<a
+href="#ref-LOWE">43</a>], and involves only one scalar per grid point.
+This scalar represents the concentration of the fluid at point <span
+class="math inline">\(r\)</span> of the considered space and at time
+<span class="math inline">\(t\)</span>, denoted <span
+class="math inline">\(C(r,t)\)</span>. The evolution of this
+concentration is described by the following equation: <span
+class="math display">\[\begin{equation}
+\label{diff-gsr}
+C(r,t+1)=\alpha {C(r,t)\over
+\rho(r,t)}+\sum_{i=1}^b{(n_i(r-c_i,t)-\alpha/b)\, C(r-c_i,t)
+\over \rho(r-c_i,t)}.
+\end{equation}\]</span> The number <span
+class="math inline">\(\alpha\)</span> can be interpreted as the
+probability that the fluid concentration remains identical at the next
+time step at the same space point <span
+class="math inline">\(r\)</span>. The second term on the right-hand side
+of equation (<a href="#mjx-eqn:diff-gsr">C.1</a>) is interpreted as the
+probability that the concentration propagates in the other directions
+<span class="math inline">\(c_i\)</span> of the lattice at time <span
+class="math inline">\(t+1\)</span>. The quantity <span
+class="math inline">\(n(r,t)\)</span> quantifies the presence or absence
+of a particle at point <span class="math inline">\(r\)</span> at time
+<span class="math inline">\(t\)</span>, and <span
+class="math inline">\(b\)</span> the number of discrete directions of
+the lattice. This equation can be transcribed for the case of lattice
+Boltzmann gases as: <span class="math display">\[\begin{equation}
+\label{DIFFB}
+C(r,t+1)=\alpha C(r,t)+\sum_{i=0}^b{\left({{\tilde N}_i^{(0)}(r,t)\over
+\rho}
+-t_p\, \alpha\right) }C(r-c_i,t),
+\end{equation}\]</span> where <span class="math inline">\({\tilde
+N}_i^{(0)}(r,t)\)</span> denotes the linear part of the equilibrium
+quantity <span class="math inline">\(N_i^{(0)}(r,t)\)</span> whose
+expression was given in chapter <a href="part1-chapter3.html">3</a> of
+the first part for the two-dimensional nine-velocity model and in
+chapter 4 for the three-dimensional nineteen-velocity model. We will
+therefore have: <span class="math display">\[\begin{equation}
+{\tilde N}_i^{(0)}(r,t)=t_p\,\rho\,\left(1+{j_\alpha\,c_{i\alpha} \over
+c_s^2}\right),
+\end{equation}\]</span> the coefficients <span
+class="math inline">\(t_p\)</span> then depend on the model, and for the
+nine-velocity model we have: <span
+class="math display">\[\begin{equation}
+t_0={3 - 5 c_s^2\over 3}\qquad t_1={c_s^2\over 3} \quad\mbox{and}\quad
+t_2={c_s^
+2\over 12},
+\end{equation}\]</span> and for the nineteen-velocity model, we have:
+<span class="math display">\[\begin{equation}
+t_0=1- 2 c_s^2 \qquad t_1={c_s^2\over 6} \quad\mbox{and}\quad
+t_2={c_s^2\over 12
+}.
+\end{equation}\]</span> The remarkable relations for the coefficients
+<span class="math inline">\(t_p\)</span> on these two lattices are:
+<span class="math display">\[\begin{equation}
+\sum_{i=0}^b{t_p}=1,\quad\sum_{i=0}^b{t_p\,
+c_{i\alpha}}=0,\quad\sum_{i=0}^b{t_p\, c_{i\alpha}c_{i
+\beta}}=c_s^2\,\delta_{\alpha\beta}\mbox{ and }
+\end{equation}\]</span> <span class="math display">\[\begin{equation}
+\sum_{i=0}^b{t_p\,
+c_{i\alpha}c_{i\beta}c_{i\gamma}}=0,\quad\sum_{i=0}^b{t_p\,
+c_{i\alpha}c_
+{i\beta}c_{i\gamma}c_{i\delta} }={c_s^2\over
+3}\left(\delta_{\alpha\beta}
+\delta_{\gamma\delta}+  \delta_{\alpha\gamma} \delta_{\beta\delta}
++\delta_{\alpha\delta}  \delta_{\beta\gamma}   \right).
+\end{equation}\]</span></p>
+<p>Taking these relations into account and performing a second-order
+Taylor expansion in space and first-order in time of equation (<a
+href="#mjx-eqn:DIFFB">C.2</a>), one easily obtains the macroscopic
+evolution equation of the concentration, called the advection-diffusion
+equation: <span class="math display">\[\begin{equation}
+\label{ADVEC-DIFF}
+{\partial C \over \partial t}+{\mathbf{u}}\cdot\nabla C=D \,\Delta C,
+\end{equation}\]</span> where <span
+class="math inline">\(u=\sum_{i=0}^b{N_i\,c_i}/\rho\)</span> is the
+local velocity of the carrier fluid and <span
+class="math inline">\(D\)</span> the diffusion coefficient given by:
+<span class="math display">\[\begin{equation}
+D=c_s^2\,\left({1-\alpha\over 2}\right).
+\end{equation}\]</span></p>
+<h1 id="c.2simulations"><span class="secnum">C.2</span> Simulations</h1>
+<p>We define the Peclet number, <span
+class="math inline">\(P_e\)</span>, as the ratio between the convective
+time and the diffusive time of our system: <span
+class="math display">\[\begin{equation}
+P_e=\frac{u\,L}{D},
+\end{equation}\]</span> where <span class="math inline">\(u\)</span> and
+<span class="math inline">\(L\)</span> are respectively a characteristic
+velocity and length of the system.</p>
+<p>First, let us consider a very small Peclet number, and in the limit
+zero. The numerical simulation we will perform is identical to that
+described in Flekk<span>ø</span>y’s thesis [<a
+href="#ref-FLEKKOY">33</a>]. It concerns the study of the diffusion of a
+concentration wave over time, given by: <span
+class="math display">\[\begin{equation}
+C(r,t)=\frac{C_{max.}}{2}\,\left(1+e^{-D\,k^2\,t}\sin
+\left(k(x-ut)\right)  \right).
+\end{equation}\]</span> We can then measure <span
+class="math inline">\(D\)</span>, and in the case of zero Peclet, <span
+class="math inline">\(u=0\)</span>, we obtain the graph of figure <a
+href="#fig-diff-pe0">C.1</a> where the abscissa is the value of the
+theoretical diffusion coefficient and the ordinate its measured value as
+well as the line <span class="math inline">\(y=x\)</span>. We then
+obtain an excellent agreement between the predicted value and the
+simulation over a very wide range of diffusion values. The maximum
+relative error observed for this simulation is less than <span
+class="math inline">\(1.0\times10^{-5}\)</span> for <span
+class="math inline">\(D=1.0\times10^{-8}\)</span>.</p>
+<figure id="fig-diff-pe0">
+<img src="figures/diffpe0.svg" />
+<figcaption>Figure C.1: Comparison measurements-theory for the diffusion
+coefficient D at zero Peclet</figcaption>
+</figure>
+<p>When the Peclet number is not zero, the previous curve becomes less
+good and depends on the value of the advection velocity, <span
+class="math inline">\(u\)</span>, parallel to the wave vector, through
+its square. One can then realize that our model, in the same way as that
+of Flekk<span>ø</span>y, is not Galilean invariant at every order of
+precision. The actual diffusion coefficient can then be estimated as:
+<span class="math display">\[\begin{equation}
+\label{corec}
+D=c_s^2\,\left({1-\alpha\over 2}\right)\,-\frac{u^2}{2.0}.
+\end{equation}\]</span> This formula remains valid over a wide range of
+diffusion values; thus in figure <a href="#fig-diff-penonul">C.2</a>, we
+have plotted on this graph only the diffusions giving a relative error
+less than <span class="math inline">\(0.01\)</span> compared to the
+value given by (<a href="#mjx-eqn:corec">C.12</a>), for an advection
+velocity <span class="math inline">\(u=0.05\)</span>.</p>
+<figure id="fig-diff-penonul">
+<img src="figures/penonul.svg" />
+<figcaption>Figure C.2: Comparison Measurements-Theory for the diffusion
+coefficient D at non-zero Peclet, <span
+class="math inline">\(u=0.05\)</span></figcaption>
+</figure>
+<p>One can note that this kind of correction is of a higher order than
+the order used to perform a Chapman-Enskog expansion. Equation (<a
+href="#mjx-eqn:ADVEC-DIFF">C.8</a>) thus remains valid at the order at
+which the remainder of our fluid’s behavior is considered. This model is
+therefore Galilean invariant at this order of precision.</p>
+<p>In conclusion, this method gives results of the same order of
+precision as Flekk<span>ø</span>y’s method, while allowing a very
+appreciable memory saving, especially in three dimensions. The passive
+scalar <span class="math inline">\(C(r,t)\)</span> can also represent a
+temperature. One can then, for example, vary the speed of sound, or the
+viscosity, in the fluid as a function of <span
+class="math inline">\(C\)</span>, and thus model fluids in which the
+temperature plays an active role. By this method, one can also study
+mixtures of viscoelastic fluids with characteristics differentiated by
+the values of <span class="math inline">\(C\)</span>.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-FLEKKOY"><span class="refnum">[33]</span> E.G. Flekk<span>ø</span>y Ph.D. Thesis (1993) Oslo-
+Norway. <a class="refall" href="bibliography.html#ref-FLEKKOY" title="In the full bibliography">↗</a></li>
+<li id="ref-LOWE"><span class="refnum">[43]</span> Lowe, C.P. and Frenkel, D., “The super long-time decay
+of velocity fluctuations in two-dimensional fluid,”
+<span><em>Physica</em> </span><span><strong>A</strong></span> 220, 1995,
+pp. 251-260. <a class="refall" href="bibliography.html#ref-LOWE" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="appendix-b.html"><span>Previous</span>Introduction of Objective Derivatives</a><a class="next" href="bibliography.html"><span>Next</span>Bibliography</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

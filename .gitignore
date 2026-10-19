@@ -1,0 +1,5 @@
+# Generation tools and intermediate LaTeX: kept local (the repo contains the site only)
+tools/
+README.md
+figures/.*.hash
+.DS_Store

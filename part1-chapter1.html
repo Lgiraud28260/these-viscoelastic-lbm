@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lattice gases — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '1.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li class="current"><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+<ul>
+<li><a href="#characteristics-of-boolean-models"
+id="toc-characteristics-of-boolean-models"><span class="secnum">1.1</span> Characteristics of
+Boolean models</a></li>
+<li><a href="#hpp-model" id="toc-hpp-model"><span class="secnum">1.2</span> HPP model</a>
+<ul>
+<li><a href="#algorithmic-description"
+id="toc-algorithmic-description"><span class="secnum">1.2.1</span> Algorithmic description</a>
+<ul>
+<li><a href="#collisions"
+id="toc-collisions"><span class="secnum">1.2.1.1</span> Collisions</a></li>
+<li><a href="#propagation"
+id="toc-propagation"><span class="secnum">1.2.1.2</span> Propagation</a></li>
+</ul></li>
+<li><a href="#possibilities-and-limits-of-this-model"
+id="toc-possibilities-and-limits-of-this-model"><span class="secnum">1.2.2</span> Possibilities and
+limits of this model</a></li>
+</ul></li>
+<li><a href="#fhp-model" id="toc-fhp-model"><span class="secnum">1.3</span> FHP model</a>
+<ul>
+<li><a href="#algorithmic-description-1"
+id="toc-algorithmic-description-1"><span class="secnum">1.3.1</span> Algorithmic description</a>
+<ul>
+<li><a href="#collisions-1"
+id="toc-collisions-1"><span class="secnum">1.3.1.1</span> Collisions</a></li>
+<li><a href="#propagation-1"
+id="toc-propagation-1"><span class="secnum">1.3.1.2</span> Propagation</a></li>
+<li><a href="#boundary-conditions"
+id="toc-boundary-conditions"><span class="secnum">1.3.1.3</span> Boundary conditions</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#fchc-model" id="toc-fchc-model"><span class="secnum">1.4</span> FCHC model</a>
+<ul>
+<li><a href="#structure-of-the-fchc-lattice"
+id="toc-structure-of-the-fchc-lattice"><span class="secnum">1.4.1</span> Structure of the FCHC
+lattice</a>
+<ul>
+<li><a href="#velocity-vectors"
+id="toc-velocity-vectors"><span class="secnum">1.4.1.1</span> Velocity vectors</a></li>
+<li><a href="#projections"
+id="toc-projections"><span class="secnum">1.4.1.2</span> Projections</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#formalism" id="toc-formalism"><span class="secnum">1.5</span> Formalism</a></li>
+<li><a href="#microdynamic-equation"
+id="toc-microdynamic-equation"><span class="secnum">1.6</span> Microdynamic equation</a></li>
+<li><a href="#operateurbooleen" id="toc-operateurbooleen"><span class="secnum">1.7</span> Collision
+operator</a></li>
+<li><a href="#properties-of-the-collision-operator"
+id="toc-properties-of-the-collision-operator"><span class="secnum">1.8</span> Properties of the
+collision operator</a></li>
+<li><a href="#macroscopic-equations"
+id="toc-macroscopic-equations"><span class="secnum">1.9</span> Macroscopic equations</a></li>
+</ul>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part I · Foundations of the Lattice Boltzmann Method — Chapter 1</p><h1>Lattice gases</h1></header><p><span id="sec:gaz-sur-reseau"
+data-label="sec:gaz-sur-reseau"></span></p>
+<h1 id="characteristics-of-boolean-models"><span class="secnum">1.1</span> Characteristics of
+Boolean models</h1>
+<p>These models consist of indistinguishable particles moving
+synchronously on a regular lattice. Only the absence or presence of
+particles at a given site of the lattice matters here. One can therefore
+encode this type of model in a Boolean way, hence the generic name
+<span><em>Boolean lattice gas</em></span>.</p>
+<p>The main characteristics of this type of model are:</p>
+<dl>
+<dt>Regular lattice</dt>
+<dd>
+<p>The simulation space is discretized by a regular “crystalline”
+lattice of high symmetry.</p>
+</dd>
+<dt>Time discretization</dt>
+<dd>
+<p>At each time step, particles “jump” from one site to one of the
+neighboring sites through a set of discrete velocities.</p>
+</dd>
+<dt>Identical particles</dt>
+<dd>
+<p>The particles have identical mass and are indistinguishable.</p>
+</dd>
+<dt>Exclusion principle</dt>
+<dd>
+<p>Depending on the type of lattice used, a node is connected to a
+certain number of neighboring nodes. Several particles can thus coexist
+at a single node, but at most one per velocity.</p>
+</dd>
+<dt>Conservation of mass and momentum</dt>
+<dd>
+<p>The par­ti­cles located at a single node can interact while conserving
+mass (the number of particles) and momentum.</p>
+</dd>
+</dl>
+<h1 id="hpp-model"><span class="secnum">1.2</span> HPP model</h1>
+<p>The HPP model (named after its inventors Hardy, de Pazzis and Pomeau)
+ [<a href="#ref-HPP">14</a>] is historically the first Boolean lattice
+gas model (1973) attempting to reproduce hydrodynamics. As such it is
+interesting because it allows one to address the main characteristics of
+this class of models.</p>
+<h2 id="algorithmic-description"><span class="secnum">1.2.1</span> Algorithmic description</h2>
+<p>The lattice used is a square lattice, each node is therefore
+connected to four nearest neighbors.</p>
+<p>The evolution of the system can be decomposed into three main steps
+common to all lattice gas methods.</p>
+<ol>
+<li><p>Collisions</p></li>
+<li><p>Propagation</p></li>
+<li><p>Boundary conditions</p></li>
+</ol>
+<p>These three steps are carried out at each time step, and each time
+step consists of these three steps.</p>
+<h3 id="collisions"><span class="secnum">1.2.1.1</span> Collisions</h3>
+<p>This step is purely local and involves only the particles located at
+a single node. The goal is to make the particles interact while <span>
+<em>conserving mass and momentum</em></span>. On a square lattice the
+only possible interaction is the head-on collision of two particles.</p>
+<figure>
+<img src="figures/part1-chapter1-fig1.svg" />
+<figcaption>Figure 1.1: Possible collisions in HPP</figcaption>
+</figure>
+<p>This can be written in Boolean notation (taking as convention a
+numbering of the directions in the trigonometric (counterclockwise)
+sense)</p>
+<p><span class="math display">\[(1,0,1,0) \quad \Longleftrightarrow
+\quad (0,1,0,1)\]</span></p>
+<p>The other configurations do not interact and are therefore unchanged
+after the collision step.</p>
+<h3 id="propagation"><span class="secnum">1.2.1.2</span> Propagation</h3>
+<p>The particles present at each node “jump” toward the nearest node in
+their respective direction. This step is the only one that requires a
+temporal notion and communication between neighboring nodes. It is
+therefore the only step to modify when programming on a parallel
+machine. This makes these algorithms an ideal candidate for
+parallelization.</p>
+<h2 id="possibilities-and-limits-of-this-model"><span class="secnum">1.2.2</span> Possibilities and
+limits of this model</h2>
+<p>Although interesting from a theoretical point of view, particularly
+in statistical mechanics, this model poorly accounts for hydrodynamic
+phenomena. Indeed the spatial discretization imposed by the square
+lattice does not allow one to obtain isotropic macroscopic
+characteristics for the fluid.</p>
+<p>A large number of “spurious” (non-physical) quantities are conserved
+during the evolution of the system. In particular, due to the reduced
+number of interactions between particles, momentum is conserved on each
+row and each column. This conservation of momentum along the line
+parallel to the flow does not allow viscous dissipation, and it follows
+that the shear of the fluid does not damp along this axis, which makes
+impossible the simulation of a shear flow directed along an axis of the
+lattice.</p>
+<h1 id="fhp-model"><span class="secnum">1.3</span> FHP model</h1>
+<p>It was only in 1985 that these problems were solved by Frisch,
+Hasslacher and Pomeau, simply by changing the structure of the lattice
+used. A triangular mesh, often called <span><em>hexagonal
+lattice</em></span>, restored isotropy and allowed one to recover the
+Navier-Stokes equations for a compressible fluid at low Mach number.
+This is due to the isotropy of a fourth-order tensor appearing in the
+derivation of hy­dro­dy­na­mics.</p>
+<h2 id="algorithmic-description-1"><span class="secnum">1.3.1</span> Algorithmic description</h2>
+<p>The evolution steps of the system are the same as for the HPP model.
+However, the triangular structure of the mesh allows many more
+combinations during the collision step and thus ensures the elimination
+of most of the spurious invariants of the HPP model. In addition, this
+increase in the number of degrees of freedom of the system allows one to
+decrease the kinematic viscosity of the simulated fluid.</p>
+<h3 id="collisions-1"><span class="secnum">1.3.1.1</span> Collisions</h3>
+<p>This model introduces a new notion, that of non-determinism of
+collisions. Indeed in the case where several combinations are possible,
+it is necessary for reasons of isotropy to choose one at random.</p>
+<figure id="collisionsenFHP">
+<img src="figures/collisionsenfhp.svg" />
+<figcaption>Figure 1.2: Example of collisions in FHP</figcaption>
+</figure>
+<h3 id="propagation-1"><span class="secnum">1.3.1.2</span> Propagation</h3>
+<p>This step is performed identically to the HPP model, but this time
+each node is connected to six neighbors.</p>
+<figure id="propagation">
+<p><img src="figures/fhp1.svg" alt="image" /> <img
+src="figures/fhp2.svg" alt="image" /></p>
+<figcaption>Figure 1.3: Example of propagation in FHP</figcaption>
+</figure>
+<h3 id="boundary-conditions"><span class="secnum">1.3.1.3</span> Boundary conditions</h3>
+<p>In general for lattice gas methods (Boolean or not), one can use
+three types of boundary conditions that allow one to avoid “losing”
+particles in the propagation step as in the previous figure:</p>
+<ul>
+<li><p>Periodic conditions</p>
+<p>This type of condition is obtained by reinjecting the particles
+leaving on one side of the simulation space onto the opposite side. This
+type of boundary condition is particularly simple to implement in this
+method.</p></li>
+<li><p>Particle injection</p>
+<p>To simulate a continuous flow from one edge to the other of the
+simulation space, one can “inject” particles, that is to say impose on
+the inlet and outlet edges a given distribution of particles. For
+example, the equilibrium distributions for a given velocity and
+density.</p></li>
+<li><p>Collisions with obstacles</p>
+<p>Here the idea is to make a node defined as an obstacle node interact
+with the incident particles. There are two main types of collisions:</p>
+<ul>
+<li><p>Specular reflection</p>
+<p>This type of condition corresponds to a perfectly non-adhering
+obstacle. The particle bounces on the obstacle, the angle of reflection
+remaining equal to the angle of incidence.</p>
+<figure>
+<img src="figures/speculaire.svg" />
+<figcaption>Figure 1.4: Specular reflection condition</figcaption>
+</figure></li>
+<li><p>Pure reflection (<span><em>Bounce-Back</em></span>)</p>
+<p>This type of condition corresponds to a perfectly adhering obstacle
+(zero-velocity condition at the boundary). It is sufficient to send an
+incident particle back in the opposite direction.</p>
+<figure>
+<img src="figures/bounce.svg" />
+<figcaption>Figure 1.5: Pure reflection condition
+(Bounce-Back)</figcaption>
+</figure></li>
+</ul></li>
+</ul>
+<h1 id="fchc-model"><span class="secnum">1.4</span> FCHC model</h1>
+<p>The models we have addressed so far are two-dimensional, one may ask
+the question of a possible three-dimensional extension of the model.</p>
+<p>The task is in fact to find a three-dimensional lattice possessing
+the right symmetry properties: the isotropy of the fourth-order tensors
+appearing in the derivation of the hydrodynamic equations.</p>
+<p>The only candidate would be a lattice made of dodecahedra or
+icosahedra  [<a href="#ref-WOLFI">13</a>], but it is impossible to find
+a regular tiling of space with them. An elegant solution was found by
+d’Humi<span>è</span>res, Lallemand and Frisch [<a
+href="#ref-HL">29</a>]. In four dimensions, the lattice made of Face
+Centered Hyper-Cubes (<span><em>Face Centered Hyper Cube</em></span>)
+possesses the right symmetry properties. It is then sufficient to use a
+four-dimensional lattice and project it into three dimensions. Nothing
+prevents, of course, projecting this model only into three dimensions;
+one can also project it into two dimensions, which allows one to have an
+underlying square lattice.</p>
+<h2 id="structure-of-the-fchc-lattice"><span class="secnum">1.4.1</span> Structure of the FCHC
+lattice</h2>
+<h3 id="velocity-vectors"><span class="secnum">1.4.1.1</span> Velocity vectors</h3>
+<p>In an FCHC lattice each of the nodes is connected to 24 neighbors.
+There are therefore for a given particle 24 possible velocity vectors.
+Their components are <span class="math display">\[\begin{eqnarray}
+(\pm 1,\pm 1,0,0) &amp; (\pm 1,0,\pm 1,0) &amp; (\pm 1,0,0,\pm 1)
+\nonumber \\
+(0,0,\pm 1,\pm 1) &amp; (0,\pm 1,0,\pm 1) &amp; (0,\pm 1,\pm 1,0)
+\nonumber
+\end{eqnarray}\]</span></p>
+<h3 id="projections"><span class="secnum">1.4.1.2</span> Projections</h3>
+<p>It is of course tricky to visualize a face-centered hypercube. One
+can however visualize its projection in three or two dimensions. The
+directions having the same first <span class="math inline">\(d\)</span>
+components superpose in <span
+class="math inline">\(d\)</span>-dimensional space.</p>
+<figure id="FCHCprojeteen3D">
+<img src="figures/fchcprojeteen3d.svg" />
+<figcaption>Figure 1.6: FCHC lattice projected in 3D</figcaption>
+</figure>
+<p>The velocities printed in bold come from two velocities of the
+four-dimensional model and must be counted twice in the subsequent
+calculations to respect isotropy.</p>
+<figure id="FCHCprojeteen2D">
+<img src="figures/fchcprojeteen2d.svg" />
+<figcaption>Figure 1.7: FCHC lattice projected in 2D</figcaption>
+</figure>
+<p>The median velocities <span class="math inline">\((1,2,3,5)\)</span>
+as well as the <span class="math inline">\(0\)</span> velocity will be
+counted four times because they come from four projections of velocity
+vectors of the four-dimensional lattice. On the other hand, the diagonal
+directions will be counted only once.</p>
+<h1 id="formalism"><span class="secnum">1.5</span> Formalism</h1>
+<p>It is important to note that all these models differ only in the
+shape of the lattice used. A distinction is made between cubic lattices
+and hexagonal lattices. To distinguish them, the following generic
+notation has been proposed [<a href="#ref-BGK">35</a>]:
+<span><strong>DnQb</strong></span> where <span
+class="math inline">\(n\)</span> is the dimension of space and b the
+number of velocities. For our part, we will denote the different models,
+when there is a risk of confusion, according to the type of lattice, the
+dimension and the norm of their velocities by:
+<span><strong>DnTl1.l2..</strong></span> where <span
+class="math inline">\(n\)</span> still denotes the dimension of space, T
+is now the type of lattice used, C for cubic lattices and H for
+hexagonal lattices. The quantities l1,l2,...lm denote the square of the
+norm of the different velocity vectors. We will thus have the model
+D2C1.2, previously denoted D2Q9, the zero-modulus velocity always being
+counted by default. The FCHC lattice can also be denoted D4C1-, the “-”
+sign indicating that it does not possess a zero-norm velocity. All
+models based on these lattices possess the same evolution algorithm. The
+propagation and boundary condition phases are almost identical. Only the
+possible collision combinations vary.</p>
+<p>This allows one to create a formalism common to all Boolean lattice
+gas models.</p>
+<h1 id="microdynamic-equation"><span class="secnum">1.6</span> Microdynamic equation</h1>
+<ul>
+<li><p>Let <span class="math inline">\(C = \left\{\vec{c}_{i}, i \in (1
+\dots b)\right\}\)</span> be the set of all possible velocity vectors
+for a particle on a given lattice. For example for FHP (D2Q6 or
+D2H1-)</p>
+<p><span class="math display">\[C = \left\{\vec{c}_{i} = (\cos i\pi/3,
+\sin i\pi/3), i \in (1 \dots
+6)\right\}\]</span></p></li>
+<li><p>Let <span class="math inline">\(n_{i}(\vec{x}, t)\)</span> be a
+Boolean variable encoding the presence or absence of a particle in
+direction <span class="math inline">\(i\)</span> at node <span
+class="math inline">\(\vec{x}\)</span> at time <span
+class="math inline">\(t\)</span>.</p></li>
+<li><p>Let <span class="math inline">\({\mathbf{n}}(\vec{x},t) =
+\{n_{i}(\vec{x}, t), i \in (1 \dots b)\}\)</span> be the variable
+describing the state of a node.</p></li>
+</ul>
+<p>The microdynamic evolution equation of the system including
+collisions and propagation can then be written</p>
+<p><span class="math display">\[\begin{equation}
+\label{evolutionbooleenne}
+n_{i}(\vec{x}+\vec{c}_i, t + 1) = n_{i}(\vec{x}, t) +
+\Delta_i\left[{\mathbf{n}}(\vec{x},
+t)\right].
+\end{equation}\]</span></p>
+<h1 id="operateurbooleen"><span class="secnum">1.7</span> Collision operator</h1>
+<p>The operator <span class="math inline">\(\Delta\)</span> describes
+the modification of the value of each of the quantities <span
+class="math inline">\(n_{i}\)</span> due to collisions.</p>
+<p>For example, for the three-body collision of the FHP model (figure <a
+href="#collisionsenFHP">1.2</a>) <span
+class="math display">\[\begin{eqnarray}
+\Delta_i^{(3)} &amp; = &amp;
+n_{i+1}n_{i+3}n_{i+5}(1-n_{i})(1-n_{i+2})(1-n_{i+4})- \nonumber
+\\
+&amp;&amp; n_in_{i+2}n_{i+4}(1-n_{i+1})(1-n_{i+3})(1-n_{i+5}), \nonumber
+\end{eqnarray}\]</span></p>
+<p>where the index <span class="math inline">\(i\)</span> is taken
+modulo 6 when it varies cyclically in the interval <span
+class="math inline">\([1:6]\)</span>.</p>
+<p>One can note that it is in fact only an algebraic transcription of a
+sequence of logical operations (AND = <span
+class="math inline">\(\times\)</span>, OR = <span
+class="math inline">\(+\)</span>, NOT = <span
+class="math inline">\((1-x)\)</span>) describing the collision
+conditions.</p>
+<p>The complete collision operator <span
+class="math inline">\(\Delta\)</span> will be constituted by the sum of
+elementary operators describing, like <span
+class="math inline">\(\Delta_i^{(3)}\)</span>, a particular collision
+configuration.</p>
+<h1 id="properties-of-the-collision-operator"><span class="secnum">1.8</span> Properties of the
+collision operator</h1>
+<p>The evolution equation (<a
+href="#mjx-eqn:evolutionbooleenne">1.1</a>) must satisfy the
+conservation principles.</p>
+<ul>
+<li><p>Conservation of mass</p>
+<p>The number of particles must be conserved. That is <span
+class="math display">\[\begin{equation}
+\sum_i n_i(\vec{x}+\vec{c}_i,t+1)=\sum_i n_i(\vec{x},t)
+\end{equation}\]</span> which constitutes the mass conservation equation
+of the lattice gas. This implies</p>
+<p><span class="math display">\[\begin{equation}
+\sum_i \Delta_i({\mathbf{n}})=0.
+\end{equation}\]</span></p></li>
+<li><p>Conservation of momentum</p>
+<p>In the same way,</p>
+<p><span class="math display">\[\begin{equation}
+\sum_i \vec{c}_i n_i(\vec{x}+\vec{c}_i,t+1)=\sum_i \vec{c}_i
+n_i(\vec{x},t),
+\end{equation}\]</span></p>
+<p>which constitutes the momentum conservation equation of the lattice
+gas. This implies</p>
+<p><span class="math display">\[\begin{equation}
+\sum_i \vec{c}_i \Delta_i({\mathbf{n}})=0.
+\end{equation}\]</span></p></li>
+</ul>
+<h1 id="macroscopic-equations"><span class="secnum">1.9</span> Macroscopic equations</h1>
+<p>One can derive, through a multi-scale expansion, from the
+conservation relations, the macroscopic equations that govern the
+behavior of the fluid [<a href="#ref-FHHLPR">22</a>]. The technique is
+then identical to the one we will present for the lattice Boltzmann
+equation in the remainder of this thesis. It allows one to demonstrate,
+at second order of precision with respect to a small parameter, that
+these macroscopic equations differ from the Navier-Stokes equations only
+in that they do not respect the principle of Galilean invariance.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-WOLFI"><span class="refnum">[13]</span> S. Wolfram, “Cellular automaton fluids 1: basic
+theory”, <span><em>J. Stat. Phys.</em></span>, Vol. 45, 1986,
+pp. 471-526. <a class="refall" href="bibliography.html#ref-WOLFI" title="In the full bibliography">↗</a></li>
+<li id="ref-HPP"><span class="refnum">[14]</span> J.O. Hardy, O. de Pazzis and Y. Pomeau, “Molecular
+dynamics of a classical lattice gas transport properties and time
+corelation functions”, <span><em>Phys. Rev. A</em>
+</span><span><strong>13</strong></span>, (1976) pp. 1949-1961. <a class="refall" href="bibliography.html#ref-HPP" title="In the full bibliography">↗</a></li>
+<li id="ref-FHHLPR"><span class="refnum">[22]</span> U. Frisch, D. d’Humi<span>è</span>res, B. Hasslacher,
+P. Lallemand, Y. Pomeau, J.P. Rivet, “Lattice gas hydrodynamics in 2 and
+3 dimensions”, <span><em>Complex Systems</em></span>
+<span><strong>1</strong></span> (1987) pp. 648-707 <a class="refall" href="bibliography.html#ref-FHHLPR" title="In the full bibliography">↗</a></li>
+<li id="ref-HL"><span class="refnum">[29]</span> D. d’Humi<span>è</span>res, P. Lallemand and U. Frisch
+“Lattice Gas Models for 3-D Hydrodynamics”,
+<span><em>Europhys.Lett.</em></span> 2 (4) pp. 291-297 (1986) <a class="refall" href="bibliography.html#ref-HL" title="In the full bibliography">↗</a></li>
+<li id="ref-BGK"><span class="refnum">[35]</span> Y.H. Qian, D. d’Humi<span>è</span>res,and P.
+Lallemand, “Lattice BGK Models for Navier-Stokes Equation,”
+<span><em>Europhysics Letters</em></span>, Vol. 17(6), 1992,
+pp. 479–484. <a class="refall" href="bibliography.html#ref-BGK" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="introduction.html"><span>Previous</span>General Introduction</a><a class="next" href="part1-chapter2.html"><span>Next</span>Lattice Boltzmann gases</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

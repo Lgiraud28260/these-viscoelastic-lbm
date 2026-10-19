@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introduction of Objective Derivatives — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => 'B.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li class="current"><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Appendix B</p><h1>Introduction of Objective Derivatives</h1></header><p>In Appendix A, we found that the derivatives of second-order tensors
+we had to consider in the constitutive equations were necessarily of the
+objective type, that is, these derivatives must be independent of the
+motion of the observer. The introduction of objective derivatives into
+the constitutive equation of our fluid requires the introduction of
+nonlinear terms in the equilibrium quantities. But we must first make
+the following remark; since the beginning of our study, we have
+considered that the stress tensor we were manipulating was a symmetric
+traceless tensor. However, among the objective derivatives, the
+convective derivative does not preserve the trace. It cannot therefore
+be integrated in our models because we cannot, in their current state,
+represent tensors having a non-zero trace. On the other hand, the
+Jaumann derivative is the only convective derivative that preserves the
+trace and is given by: <span class="math display">\[\begin{equation}
+{\mathcal{W}}_{[1]}^J={D\,{\mathcal{W}}\over D t}+{1\over
+  2}\left({\mathcal{W}}\cdot\Omega+\Omega^T \cdot{\mathcal{W}}\right).
+\end{equation}\]</span></p>
+<p>It is then easy to demonstrate that, to obtain Jaumann derivatives in
+the constitutive equation, it is necessary to also introduce Jaumann
+derivatives into the conservation and pseudo-conservation equations of
+our models. Thus, for the eleven-velocity model, these five equations
+were, according to chapter <a href="part3-chapter5.html">5</a> of the
+last part of this manuscript: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_t\rho\,+\,\partial_xj_x+\partial_yj_y=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_x+\partial_x\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left( \partial_x
+  H_{xx}+\partial_yH_{xy}\right)=\nu_\infty\,\Delta
+j_x+\xi_\infty\,\partial_x\left(\partial_xj_x+\partial_yj_y
+\right)\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_y+\partial_y\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left(
+\partial_xH_{xy}-\partial_yH_{xx}\right)=\nu_\infty\,\Delta
+j_y+\xi_\infty\,\partial_y\left(\partial_xj_x+\partial_yj_y
+\right)\nonumber\\
+&amp;&amp;\hspace{-0.5in}
+H_{xx}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\partial_tH_{xx}+\rho\,\frac{1}{\lambda_\gamma}{\dot
+D}_{xx}^*- {D_\infty
+  \over \lambda_\gamma}\,\Delta H_{xx}=0, \nonumber\\
+&amp;&amp;\hspace{-0.5in}
+H_{xy}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\partial_tH_{xy}+\rho\,\frac{1}{\lambda_\gamma}{\dot
+D}_{xy}^*- {D_\infty
+  \over \lambda_\gamma} \,\Delta H_{xy}=0. \nonumber
+\end{eqnarray}\]</span> To obtain these equations, we had chosen: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;S^{(0)}_{xx}=0,\qquad\quad S^{(0)}_{xy}=0,\quad
+e^{(0)}=c_s^2\rho\nonumber\\
+&amp;&amp;q^{(0)}_x=-\frac{j_x}{2}\quad\mbox{and}\quad
+q^{(0)}_y=-\frac{j_y}{2}.\nonumber
+\end{eqnarray}\]</span></p>
+<p>If we now take: <span class="math display">\[\begin{eqnarray}
+&amp;\displaystyle
+S^{(0)}_{xx}=\frac{j_x^2-j_y^2}{\rho(1-4\,c_{\perp}^2)},&amp;\displaystyle
+S^{(0)}_{xy}=\frac{j_xj_y}{\rho(1-2\,c_{\perp}^2)},\qquad
+\displaystyle e^{(0)}=c_s^2\rho+\frac{(j_x^2+j_y^2)}{2\rho},\nonumber\\
+&amp;\hspace{-0.5in}\displaystyle
+q^{(0)}_x=-\frac{j_x}{2}-\frac{3}{2}\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\,\left(\frac{j_xH_{xx}}{\rho}-\frac{j_y
+    H_{xy}}{\rho} \right)&amp;\mbox{and
+  }\displaystyle
+q^{(0)}_y=-\frac{j_y}{2}+\frac{3}{2}\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\,\left(\frac{j_xH_{xy}}{\rho}+\frac{j_yH_{xx}}{\rho}
+\right),\nonumber
+\end{eqnarray}\]</span> we then obtain: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}{D\over Dt}\rho+\rho \left(\partial_x{j_x\over
+\rho}+\partial_y{j_y\over \rho}\right)=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}{D\over
+Dt}j_x+\partial_x\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left( \partial_x
+  H_{xx}+\partial_yH_{xy}\right)=\nu_\infty\,\Delta
+j_x+\xi_\infty\,\partial_x\left(\partial_xj_x+\partial_yj_y
+\right)\nonumber\\
+&amp;&amp;\hspace{-0.5in}{D\over
+Dt}j_y+\partial_y\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left(
+\partial_xH_{xy}-\partial_yH_{xx}\right)=\nu_\infty\,\Delta
+j_y+\xi_\infty\,\partial_y\left(\partial_xj_x+\partial_yj_y
+\right)\nonumber\\
+&amp;&amp;\hspace{-0.5in}
+H_{xx}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,{D\over
+Dt}H_{xx}+\rho\,\frac{1}{\lambda_\gamma}{\dot D}_{xx}^*- {D_\infty
+  \over \lambda_\gamma}\,\Delta
+H_{xx}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\left(\partial_y\frac{j_xH_{xy}}{\rho}
+-\partial_x\frac{j_yH_{xy}}{\rho} \right)=0, \nonumber\\
+&amp;&amp;\hspace{-0.5in}
+H_{xy}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,{D\over
+Dt}H_{xy}+\rho\,\frac{1}{\lambda_\gamma}{\dot D}_{xy}^*- {D_\infty
+  \over \lambda_\gamma} \,\Delta
+H_{xy}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\left(\partial_x\frac{j_yH_{xx}}{\rho}-\partial_y\frac{j_xH_{xx}}{\rho}\right)=0.
+\nonumber
+\end{eqnarray}\]</span></p>
+<p>We have thus introduced a material derivative in the equations, but
+we have also introduced additional terms, which turn out to be
+isotropic, and which will couple nonlinearly the two modes <span
+class="math inline">\(H_{xx}\)</span> and <span
+class="math inline">\(H_{xy}\)</span>. The idea here is to give a
+non-zero equilibrium value to the new modes of type <span
+class="math inline">\(P\)</span>. But no solution has been found to
+replace these terms by those of the Jaumann derivative; the number of
+free parameters of the system is insufficient.</p>
+<p>On the other hand, it is possible to do so in the fifteen-velocity
+model, by choosing the following equilibrium values and taking up again
+the notations we had used at that time: <span
+class="math display">\[\begin{eqnarray}
+&amp;\hspace{-0.5in}\displaystyle S^{(0)}_{xx}=0,&amp;\displaystyle
+S^{(0)}_{xy}=0,\qquad
+\displaystyle e^{(0)}=c_s^2\rho+\frac{(j_x^2+j_y^2)}{2\rho},\nonumber\\
+&amp;\hspace{-0.5in}\displaystyle q_{x1}^{(0)}=\kappa_1j_x-{1\over
+3}\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\,\left(-11\frac{j_xP_{xx}}{\rho}+2\frac{j_y
+    P_{xy}}{\rho} \right),&amp;\displaystyle q_{y1}^{(0)}=\kappa_1j_y-{1
+\over 3}\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\,\left(2\frac{j_x
+    P_{xy}}{\rho}+11\frac{j_yP_{xx}}{\rho} \right), \nonumber\nonumber\\
+&amp;\hspace{-0.5in}\displaystyle q_{x2}^{(0)}=\kappa_2j_x+{7\over
+6}\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\,\left(\frac{j_xP_{xx}}{\rho}-\frac{j_y
+    P_{xy}}{\rho} \right),&amp;\displaystyle
+q_{y2}^{(0)}=\kappa_2j_y-{7\over 6}\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\,\left(\frac{j_x
+    P_{xy}}{\rho}+\frac{j_yP_{xx}}{\rho} \right),\nonumber\\
+&amp;\hspace{-0.5in}\displaystyle H_{xx}^{(0)}={1\over
+2c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)}\left(j_x^2-j_y^2\right),&amp;\mbox{and }\quad\displaystyle
+H_{xy}^{(0)}={1\over c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)}j_x\,j_y,\nonumber
+\end{eqnarray}\]</span> with: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;H_{xx}=\kappa\,P_{xx},\nonumber\\
+&amp;&amp;H_{xy}=\kappa\,P_{xy},\nonumber
+\end{eqnarray}\]</span> the dynamical equations become: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}{D\over Dt}\rho+\rho \left(\partial_x{j_x\over
+\rho}+\partial_y{j_y\over \rho}\right)=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}{D\over
+Dt}j_x+\partial_x\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left( \partial_x
+  H_{xx}+\partial_yH_{xy}\right)=\nu_\infty\,\Delta
+j_x+\xi_\infty\,\partial_x\left(\partial_xj_x+\partial_yj_y
+\right)\nonumber\\
+&amp;&amp;\hspace{-0.5in}{D\over
+Dt}j_y+\partial_y\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left(
+\partial_xH_{xy}-\partial_yH_{xx}\right)=\nu_\infty\,\Delta
+j_y+\xi_\infty\,\partial_y\left(\partial_xj_x+\partial_yj_y
+\right)\nonumber\\
+&amp;&amp;\hspace{-0.5in}
+H_{xx}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\, H_{xx\,[1]}^J
++\rho\,\frac{1}{\lambda_\gamma}{\dot D}_{xx}^*- {D_\infty
+  \over \lambda_\gamma}\,\Delta H_{xx}=0, \nonumber\\
+&amp;&amp;\hspace{-0.5in}
+H_{xy}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,H_{xy\,[1]}^J
++\rho\,\frac{1}{\lambda_\gamma}{\dot D}_{xy}^*- {D_\infty
+  \over \lambda_\gamma} \,\Delta H_{xy}=0. \nonumber
+\end{eqnarray}\]</span></p>
+<p>We then have as constitutive equation of our fluid: <span
+class="math display">\[\begin{equation}
+{\mathbf{\sigma}}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,{\mathbf{\sigma}}_{[1]}^J
+=-\rho\, \nu_0  \left({\dot{\mathbf{D}}}^*+\frac{\nu_\infty}{\nu_0}
+  \,\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\, {\mathbf{\dot
+D}}^{*J}_{[1]}
+\right)\,+\,\frac{D_\infty}{\lambda_\gamma}\,\Delta {\mathbf{\sigma} }.
+\end{equation}\]</span></p>
+<p>In conclusion, the eleven-velocity model does not allow modeling
+Jaumann derivatives; on the other hand, the fifteen-velocity model has
+sufficient free parameters to model this type of derivative.</p><nav class="pager"><a class="prev" href="appendix-a.html"><span>Previous</span>Definitions on Viscoelasticity</a><a class="next" href="appendix-c.html"><span>Next</span>Introduction of a Passive Scalar - Modeling of Miscible Fluids</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

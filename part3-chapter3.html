@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Isotropic fifteen-velocity model — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '3.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li class="current"><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+<ul>
+<li><a href="#presentation-of-the-model"
+id="toc-presentation-of-the-model"><span class="secnum">3.1</span> Presentation of the
+model</a></li>
+<li><a href="#the-15-velocity-model"
+id="toc-the-15-velocity-model"><span class="secnum">3.2</span> The 15-velocity model</a></li>
+<li><a href="#the-quasi-elastic-15-velocity-model"
+id="toc-the-quasi-elastic-15-velocity-model"><span class="secnum">3.3</span> The quasi-elastic
+15-velocity model</a></li>
+<li><a href="#the-viscous-15-velocity-model"
+id="toc-the-viscous-15-velocity-model"><span class="secnum">3.4</span> The viscous 15-velocity
+model</a></li>
+<li><a href="#the-viscoelastic-15-velocity-model"
+id="toc-the-viscoelastic-15-velocity-model"><span class="secnum">3.5</span> The viscoelastic
+15-velocity model</a></li>
+</ul>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method — Chapter 3</p><h1>Isotropic fifteen-velocity model</h1></header><p>This model is based on a thirteen-velocity model. To familiarize
+ourselves with this lattice, we will first build a viscous (Newtonian)
+model, then we will add internal variables to model the viscoelastic
+aspects.</p>
+<h1 id="presentation-of-the-model"><span class="secnum">3.1</span> Presentation of the model</h1>
+<p>The thirteen-velocity model based on the lattice defined in figure <a
+href="#d2q13reseau">3.1</a> can be identified by the list of
+eigenvectors of the collision matrix as well as by its eigenvalues:
+<span class="math display">\[\begin{eqnarray}
+{\mathbf{e}}_{0}
+&amp;=&amp;\left(\phantom{1}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}
+\phantom{1}1,\phantom{-} \phantom{1}1,\phantom{-}
+\phantom{1}1,\phantom{-} \phantom{1}1,
+\phantom{-} \phantom{1}1,\phantom{-} \phantom{1}1,\phantom{-}
+\phantom{1}1,\phantom{-} \phantom{1}1\right)/\sqrt{13} \nonumber\\
+{\mathbf{e}}_{1}
+&amp;=&amp;\left(\phantom{1}0,\phantom{-}1,\phantom{-}0,-1,\phantom{-}0,\phantom{-}
+\phantom{1}1,\,\,\,-1,\,\,\,-1,\phantom{-} \phantom{1}1,
+\phantom{-} \phantom{1}2,\phantom{-} \phantom{1}0,\,\,\,-2,\phantom{-}
+\phantom{1}0\right)/\sqrt{14} \nonumber\\
+{\mathbf{e}}_{2}
+&amp;=&amp;\left(\phantom{1}0,\phantom{-}0,\phantom{-}1,\phantom{-}0,-1,\phantom{-}
+\phantom{1}1,\phantom{-} \phantom{1}1,\,\,\,-1,\,\,\,-1,
+\phantom{-} \phantom{1}0,\phantom{-} \phantom{1}2,\phantom{-}
+\phantom{1}0,\,\,\,-2\right)/\sqrt{14} \nonumber\\
+{\mathbf{e}}_{3}&amp;=&amp;\left(28,\;15,\;15,\;15,\;15,\phantom{-}
+\phantom{1}2,\phantom{-} \phantom{1}2,\phantom{-}
+\phantom{1}2,\phantom{-} \phantom{1}2,
+-24,-24,-24,-24\right)/2\sqrt{1001}\nonumber\\
+{\mathbf{e}}_{4}&amp;=&amp;\left(\phantom{1}0,\phantom{-}1,-1,\phantom{-}1,-1,\phantom{-}
+\phantom{1}0,\phantom{-} \phantom{1}0,\phantom{-}
+\phantom{1}0,\phantom{-} \phantom{1}0,\phantom{-} \phantom{1}4,
+\,\,\,-4,\phantom{-} \phantom{1}4,\,\,\,-4\right)/2\sqrt{17}\nonumber\\
+{\mathbf{e}}_{5}&amp;=&amp;\left(\phantom{1}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}
+\phantom{1}1,\,\,\,-1,\phantom{-} \phantom{1}1,\,\,\,-1,
+\phantom{-} \phantom{1}0,\phantom{-} \phantom{1}0,\phantom{-}
+\phantom{1}0,\phantom{-} \phantom{1}0\right)/2\nonumber\\
+{\mathbf{e}}_{6}&amp;=&amp;\left(\phantom{1}4,-2,-2,-2,-2,\phantom{-}
+\phantom{1}1,\phantom{-} \phantom{1}1,\phantom{-}
+\phantom{1}1,\phantom{-} \phantom{1}1,
+\phantom{-} \phantom{1}0,\phantom{-} \phantom{1}0,\phantom{-}
+\phantom{1}0,\phantom{-} \phantom{1}0\right)/6\nonumber\\
+{\mathbf{e}}_{7}&amp;=&amp;\left(28,\phantom{-}4,\phantom{-}4,\phantom{-}4,\phantom{-}4,-20,-20,-20,-20,
+\phantom{-} \phantom{1}9,\phantom{-} \phantom{1}9,\phantom{-}
+\phantom{1}9,\phantom{-} \phantom{1}9\right)/6\sqrt{77}\nonumber\\
+{\mathbf{e}}_{8}&amp;=&amp;\left(\phantom{1}0,-2,\phantom{-}0,\phantom{-}2,\phantom{-}0,\phantom{-}
+\phantom{1}1,\,\,\,-1,\,\,\,-1,\phantom{-} \phantom{1}1,
+\phantom{-} \phantom{1}0,\phantom{-} \phantom{1}0,\phantom{-}
+\phantom{1}0,\phantom{-} \phantom{1}0\right)/2\sqrt{3}\nonumber\\
+{\mathbf{e}}_{9}
+&amp;=&amp;\left(\phantom{1}0,\phantom{-}0,-2,\phantom{-}0,\phantom{-}2,\phantom{-}
+\phantom{1}1,\phantom{-} \phantom{1}1,\,\,\,-1,\,\,\,-1,
+\phantom{-} \phantom{1}0,\phantom{-} \phantom{1}0,\phantom{-}
+\phantom{1}0,\phantom{-} \phantom{1}0\right)/2\sqrt{3}\nonumber\\
+{\mathbf{e}}_{10}
+&amp;=&amp;\left(\phantom{1}0,-2,\phantom{-}0,\phantom{-}2,\phantom{-}0,\,\,\,-2,\phantom{-}
+\phantom{1}2,\phantom{-} \phantom{1}2,\,\,\,-2,
+\phantom{-} \phantom{1}3,\phantom{-} \phantom{1}0,\,\,\,-3,\phantom{-}
+\phantom{1}0\right)/\sqrt{42}\nonumber\\
+{\mathbf{e}}_{11}
+&amp;=&amp;\left(\phantom{1}0,\phantom{-}0,-2,\phantom{-}0,\phantom{-}2,\,\,\,-2,\,\,\,-2,\phantom{-}
+\phantom{1}2,\phantom{-} \phantom{1}2,
+\phantom{-} \phantom{1}0,\phantom{-} \phantom{1}3,\phantom{-}
+\phantom{1}0,\,\,\,-3\right)/\sqrt{42}\nonumber\\
+{\mathbf{e}}_{12}
+&amp;=&amp;\left(\phantom{1}0,-4,\phantom{-}4,-4,\phantom{-}4,\phantom{-}
+\phantom{1}0,\phantom{-} \phantom{1}0,\phantom{-}
+\phantom{1}0,\phantom{-} \phantom{1}0,
+\phantom{-} \phantom{1}1,\,\,\,-1,\phantom{-}
+\phantom{1}1,\,\,\,-1\right)/2\sqrt{17}\nonumber
+\end{eqnarray}\]</span> for which one can choose the corresponding
+eigenvalues <span class="math display">\[\begin{equation}
+\left\{ 0,0,0,\lambda_e,\lambda_\nu,\lambda&#39;_\nu, \lambda_\sigma,
+\lambda_\sigma,
+\lambda_\chi,\lambda_\chi,\lambda_\chi&#39;,\lambda_\chi&#39;,\lambda_z  \right\}.
+\end{equation}\]</span> One can note that the vectors <span
+class="math inline">\({\mathbf{e}}_{4}\)</span> and <span
+class="math inline">\({\mathbf{e}}_{5}\)</span> are proportional to the
+standard vectors <span class="math inline">\(Q_{xx}\)</span> and <span
+class="math inline">\(Q_{xy}\)</span>, where <span
+class="math inline">\(Q_{i\,\alpha\beta}=c_{i\,\alpha}c_{i\,\beta}-c_i^2/2\,
+\delta_{\alpha\beta}\)</span> is the symmetric traceless tensor linked
+to the viscous stress tensor, which is why the modes <span
+class="math inline">\(S_{xx}\)</span> and <span
+class="math inline">\(S_{xy}\)</span> associated with them will be
+linked to the components of this tensor.</p>
+<p>One can also note that this type of lattice allows one to obtain
+associated tensors that are isotropic up to order six.</p>
+<figure id="d2q13reseau">
+<img src="figures/d2q13reseau.svg" />
+<figcaption>Figure 3.1: The thirteen-velocity lattice</figcaption>
+</figure>
+<p>We can now write the equations coming from the Chapman-Enskog
+expansion for the first and second orders. One then notices that it is
+advantageous to set, for the variables expressed in the new basis: <span
+class="math display">\[\begin{eqnarray}
+\label{defmom}
+\phantom{+}\widehat{N}_{0}=\rho/\sqrt{13}\,,\quad&amp;\phantom{+}\widehat{N}_{1}=j_x/\sqrt{14}\,,&amp;\quad\phantom{+}\widehat{N}_{2}=
+j_y/\sqrt{14}\nonumber\\
+\phantom{+}\widehat{N}_{3}=\sqrt{{13 \over 77}}\left({14 \over
+    13}\rho-e\right)\,,\quad&amp;\phantom{+}\widehat{N}_{4}=S_{xx}/2
+\sqrt{5},&amp;\quad\phantom{+}\widehat{N}_{5}=
+    S_{xy}/2\nonumber\\
+\phantom{+}\widehat{N}_{6}=S_1/6\,,\quad&amp;\phantom{+}\widehat{N}_{7}=S_2/6\sqrt{77}\,,&amp;\quad\phantom{+}\widehat{N}_{8}=
+q_{x1}/2\sqrt{3}\nonumber\\
+\phantom{+}\widehat{N}_{9}=q_{y1}/2\sqrt{3}\,,\quad&amp;\phantom{+}\widehat{N}_{10}=q_{x2}/\sqrt{42}\,,
+&amp;\quad\phantom{+}\widehat{N}_{11}=q_{y2}/\sqrt{42}\nonumber\\
+\phantom{+}\widehat{N}_{12}=T/2\sqrt{5}.\quad\nonumber&amp;
+\end{eqnarray}\]</span></p>
+<p>To recover the isotropic Navier-Stokes equations, the equilibrium
+values of the moments <span
+class="math inline">\(q^{(0)}_\alpha\)</span> can be chosen as: <span
+class="math display">\[\begin{eqnarray}
+&amp;q^{(0)}_{\alpha\,i}=\kappa_i j_\alpha,\quad \left\{\begin{array}{l}
+\alpha \in \{x,y\}\\
+i \in\{1,2\}
+\end{array}\right.\displaystyle\mbox{with }\kappa_1={15 \kappa -16 \over
+6}\displaystyle
+\mbox{ and } \kappa_2={21 \kappa -38 \over 12}
+\end{eqnarray}\]</span> where <span
+class="math inline">\(\kappa\)</span> is a free parameter of the model.
+If one chooses for the equation of state of the fluid <span
+class="math inline">\(P=c_s^2\,\rho\)</span>, where <span
+class="math inline">\(P\)</span> is the pressure, and if one wants a
+Galilean-invariant model, then one must have: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;S^{(0)}_{xx}=\frac{1}{\rho}\left( j_x^2-j_y^2 \right),\\
+&amp;&amp;S^{(0)}_{xy}=\frac{1}{\rho} j_xj_y,\\
+&amp;&amp;e^{(0)}=c_s^2 \rho+\frac{1}{2 \rho}\left( j_x^2+j_y^2
+\right),\\
+&amp;&amp;T^{(0)}=\frac{\theta}{ \rho}\left( j_x^2-j_y^2 \right),
+\end{eqnarray}\]</span> where <span class="math inline">\(c_s\)</span>
+and <span class="math inline">\(\theta\)</span> are also free parameters
+of the model while having <span
+class="math inline">\(c_s^2&lt;\kappa\)</span>. For simplicity reasons
+we will choose <span class="math display">\[\begin{eqnarray}
+&amp;&amp;S_1^{(0)}=\left(4+c_s^2\left( {19 \kappa \over 2}-{46 \over 3}
+\right)
+\right)\rho,\\
+&amp;&amp;S_2^{(0)}=\left(28+c_s^2\left( {77 \kappa \over 4}-{365 \over
+6} \right)
+\right)\rho.
+\end{eqnarray}\]</span> and <span
+class="math inline">\(\lambda_\nu=\lambda&#39;_\nu\)</span>, which gives
+for shear and bulk viscosity: <span
+class="math display">\[\nu=\frac{\kappa}{2}\left({1 \over
+\lambda_\nu}-{1 \over 2}\right),
+\mbox{\quad and \quad}
+\xi=\left(\kappa-c_s^2 \right)  \left({1 \over \lambda_e}-{1 \over 2}
+\right).\]</span> One can note that this model projects onto the
+nine-velocity model (D2Q9) when one chooses: <span
+class="math inline">\(\kappa=2/3\)</span>, <span
+class="math inline">\(c_s^2=1/3\)</span>, <span
+class="math inline">\(\theta=-4\)</span>, and if, in addition, the
+populations <span class="math inline">\(N_9\)</span> to <span
+class="math inline">\(N_{12}\)</span> are taken to be zero at <span
+class="math inline">\(t=0\)</span>.</p>
+<h1 id="the-15-velocity-model"><span class="secnum">3.2</span> The 15-velocity model</h1>
+<p>We have already seen that it was necessary to add two internal
+variables to the nine-velocity model to ensure an infinite viscosity for
+it, which leads us to consider now a fifteen-velocity model. We will
+therefore build the four viscous modes from the following eigenvectors:
+<span class="math display">\[\begin{eqnarray}
+{\tilde{\mathbf{Q}}_{xx}}&amp;=&amp;\left(\;\;\phantom{1}\phantom{-}
+\phantom{1}a,\phantom{1}\phantom{-}
+\phantom{1}0,\phantom{-}0,\phantom{-}1,-1,\phantom{-}1,-1,
+\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}4,-4,\phantom{-}4,-4\right),\nonumber\\
+{\tilde{\mathbf{Q}}_{xy}}&amp;=&amp;\left(\;\;\phantom{1}\phantom{-}
+\phantom{1}0,\phantom{1}\phantom{-}
+\phantom{1}b,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,
+\phantom{-}1,-1,\phantom{-}1,-1,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0\right),\nonumber\\
+{\tilde{\mathbf{Q}}_{xx}}^\bot&amp;=&amp;\left({-68/
+a},\phantom{1}\phantom{-}
+\phantom{1}0,\phantom{-}0,\phantom{-}1,-1,\phantom{-}1,-1,
+\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}4,-4,\phantom{-}4,-4\right),\nonumber\\
+{\tilde{\mathbf{Q}}_{xy}}^\bot&amp;=&amp;\left(\;\;\phantom{1}\phantom{-}
+\phantom{1}0,-4/
+b,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,
+\phantom{-}1,-1,\phantom{-}1,-1,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0\right),\nonumber
+\end{eqnarray}\]</span> which we have not normalized for readability
+reasons and where <span class="math inline">\(a\)</span> and <span
+class="math inline">\(b\)</span> are again parameters of the model.
+These eigenvectors will be associated with the eigenvalues: <span
+class="math display">\[\{\lambda_\nu,\lambda&#39;_\nu,\lambda_\gamma,\lambda_\gamma&#39;\}.\]</span></p>
+<h1 id="the-quasi-elastic-15-velocity-model"><span class="secnum">3.3</span> The quasi-elastic
+15-velocity model</h1>
+<p>If one places oneself in the case where the modes <span
+class="math inline">\(P_{\alpha\beta}\)</span> are strictly conserved,
+thus <span
+class="math inline">\(\lambda_\gamma=\lambda_\gamma&#39;=0\)</span>, one
+obtains a quasi-elastic model. After manipulation of the equations
+resulting from the Chapman-Enskog expansion, one obtains the following
+dynamic equations: <span class="math display">\[\begin{eqnarray}
+\label{cont}
+&amp;&amp;\partial_t\rho + \partial_xj_x+\partial_yj_y=0,\\
+\label{NSx}
+&amp;&amp;\partial_tj_x+\partial_xP+ {c_\perp^2 \over
+\kappa}\,(\partial_xP_{xx}+\partial_yP_{xy})\nonumber\\
+&amp;&amp;\phantom{\partial_tj_x}
+=\nu_\infty\,\Delta
+j_x+\xi_\infty\,\partial_x(\partial_xj_x+\partial_yj_y),\qquad\qquad\\
+\label{NSy}
+&amp;&amp;\partial_tj_y+\partial_yP+ {c_\perp^2 \over
+\kappa}\,(\partial_xP_{xy}-\partial_yP_{xx})
+\nonumber\\
+&amp;&amp;\phantom{\partial_tj_x}
+=\nu_\infty\,\Delta
+j_y+\xi_\infty\,\partial_y(\partial_xj_x+\partial_yj_y),\\
+&amp;&amp;\partial_tP_{xx}+ \kappa\,(\partial_xj_x-\partial_yj_y) =
+D_\infty \,\Delta P_{xx},\\
+\label{viscom}
+&amp;&amp;\partial_tP_{xy}+ \kappa\,(\partial_xj_y+\partial_yj_x) =
+D_\infty \,\Delta P_{xy}.
+\end{eqnarray}\]</span></p>
+<p>One notices that this time, the coefficient in front of the Laplacian
+is identical for the two modes <span class="math inline">\(P\)</span>.
+Moreover, we must choose, for the same isotropy reasons: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;a^2={136 \,c_\perp^2 \over \kappa-2c_\perp^2},\qquad\qquad
+b^2={4 \,c_\perp^2 \over \kappa-c_\perp^2},\\
+&amp;&amp;\lambda&#39;_\chi=
+{(749-442\,\kappa)\lambda_\chi \over
+(317-442\,\kappa)+216\lambda_\chi},\\
+\mbox{and}&amp;&amp;\lambda_\nu^{&#39;}={4 (\kappa-c_\perp^2)\lambda_\nu
+\over
+                             2(\kappa-2c_\perp^2)+\kappa\,\lambda_\nu},
+\end{eqnarray}\]</span> where <span
+class="math inline">\(\kappa\)</span> and <span
+class="math inline">\(c_\perp\)</span> are free parameters of the model,
+which must satisfy the relations <span
+class="math inline">\(0&lt;\kappa&lt;749/442\)</span> and <span
+class="math inline">\(c_{\perp}^2&lt;\kappa/2&lt;749/884\)</span>. One
+can note that we have had to take <span
+class="math inline">\(\lambda_\nu\neq\lambda&#39;_\nu\)</span>. For
+isotropy reasons and simplicity of writing, we choose for the
+equilibrium values: <span class="math display">\[\begin{eqnarray}
+&amp;q^{(0)}_{\alpha\,i}=\kappa_i j_\alpha,\quad \left\{\begin{array}{l}
+\alpha \in \{x,y\}\\
+i \in\{1,2\}
+\end{array}\right.\mbox{ with }\displaystyle\kappa_1={13 \kappa -8 \over
+3}\quad\displaystyle
+\mbox{and }\kappa_2={14 \kappa -19 \over 6},\qquad
+\\
+&amp;\displaystyle S_1^{(0)}=\left(4+(47\kappa-46){c_s^2 \over 3}
+\right)\rho,\\
+&amp;\displaystyle S_2^{(0)}=\left(28+(154\kappa-365){c_s^2 \over
+6}\right)\rho.
+\end{eqnarray}\]</span> We note that this choice is the one that allows
+us to fall directly back onto equations similar to those of the
+eleven-velocity model, but there exist other values of <span
+class="math inline">\(\kappa_1\)</span> and <span
+class="math inline">\(\kappa_2\)</span> allowing one to obtain an
+isotropic model. To obtain the desired equation of state of the gas,
+<span class="math inline">\(P=c_s^2\,\rho\)</span>, we must give the
+equilibrium value of <span class="math inline">\(e\)</span>: <span
+class="math display">\[\begin{equation}
+e^{(0)}=c_s^2\,\rho
+\end{equation}\]</span> where <span class="math inline">\(c_s\)</span>
+remains a free parameter of the model with the restriction <span
+class="math inline">\(c_s^2&lt;3\kappa/2\)</span>. The shear and bulk
+viscosities, the coefficient <span
+class="math inline">\(D_\infty\)</span>, as well as the pressure are
+given by: <span class="math display">\[\begin{eqnarray}
+&amp;&amp;\nu_\infty=
+({\kappa\over 2}-c_{\perp}^2)\,({1\over \lambda_\nu}-{1\over
+2}),\qquad\qquad
+\xi_\infty=({3\kappa\over 2}-c_s^2)\,({1\over \lambda_e}-{1\over 2}),\\
+&amp;&amp;D_\infty=c_{\perp}^2\,{845-1383\,\kappa+442\,\kappa^2 \over
+  \kappa(749-442\,\kappa)}\,({1\over \lambda_\chi}-{1\over 2}),
+\qquad\mbox{and \qquad}P=c_s^2\,\rho.\qquad\qquad
+\end{eqnarray}\]</span></p>
+<p>Like the eleven-velocity model, the fifteen-velocity model is not
+Galilean invariant. This problem being very strongly linked to that of
+the introduction of nonlinear terms and of convective derivatives, we
+will treat this problem later.</p>
+<h1 id="the-viscous-15-velocity-model"><span class="secnum">3.4</span> The viscous 15-velocity
+model</h1>
+<p>The transition from the elastic model to the viscous case is done by
+assuming that the eigenvalues <span
+class="math inline">\(\lambda_\gamma\)</span> and <span
+class="math inline">\(\lambda_\gamma&#39;\)</span> are of order one, and
+one can take without loss of generality <span
+class="math inline">\(\lambda_\gamma=\lambda_\gamma&#39;\)</span>. For
+continuity reasons, we will keep the same equilibrium quantities for the
+viscous case as for the elastic case. We must specify the equilibrium
+values of the two <span class="math inline">\(P\)</span> modes. We will
+take the simplest choice at our disposal, that is: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;P^{(0)}_{xx}=P^{(0)}_{xy}=0.
+\end{eqnarray}\]</span> One then recovers the Stokes equations with, now
+for the shear viscosity, <span class="math display">\[\begin{equation}
+\label{viscosite-0}
+\nu_0=({\kappa\over 2}-c_{\perp}^2)\,({1\over \lambda_\nu}-{1\over 2})+
+c_{\perp}^2\,({1\over
+  \lambda_\gamma}-{1 \over 2}).
+\end{equation}\]</span></p>
+<h1 id="the-viscoelastic-15-velocity-model"><span class="secnum">3.5</span> The viscoelastic
+15-velocity model</h1>
+<p>If one takes back the equilibrium quantities as well as the isotropy
+conditions of the two previous cases, one can make the hypothesis that
+when the eigenvalues <span class="math inline">\(\lambda_\gamma\)</span>
+and <span class="math inline">\(\lambda_\gamma&#39;\)</span> are small
+but not strictly zero, the isotropy conditions still remain valid. We
+can then check, through the dispersion-equation method, as for the
+eleven-velocity model, that our model is isotropic up to relatively
+large values of the wavenumber <span class="math inline">\(k\)</span>,
+as indicated in figure <a href="#soldispvisc">3.2</a>. In the same way
+as for the eleven-velocity model, the transition from the viscous
+behaviour to a viscoelastic behaviour occurs around <span
+class="math inline">\(\displaystyle
+k_c=\frac{\lambda_\gamma}{2\,c_{\perp}}\)</span>.</p>
+<p>This model will be used for all the simulations in the rest of this
+manuscript.</p>
+<figure id="soldispvisc">
+<p><img src="figures/re2.svg" alt="image" /> <img src="figures/im2.svg"
+alt="image" /></p>
+<figcaption>Figure 3.2: Solutions of the dispersion equation of the
+viscoelastic 15-velocity model with <span
+class="math inline">\(c_{\perp}^2=1/5\)</span>, <span
+class="math inline">\(c_s^2=1/2\)</span>, <span
+class="math inline">\(\lambda_\gamma=0.1\)</span>, <span
+class="math inline">\(\nu_\infty=0.1\)</span>, <span
+class="math inline">\(\kappa=2
+/3\)</span>, <span class="math inline">\(\lambda_e=1.14\)</span>, <span
+class="math inline">\(\lambda_S=1.2\)</span>, <span
+class="math inline">\(\lambda_\chi=1.0\)</span>, and <span
+class="math inline">\(\lambda_z=1.1\)</span>.</figcaption>
+</figure><nav class="pager"><a class="prev" href="part3-chapter2.html"><span>Previous</span>Implementation and isotropy</a><a class="next" href="part3-chapter4.html"><span>Next</span>Numerical Simulations</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

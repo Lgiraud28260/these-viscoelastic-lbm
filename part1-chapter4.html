@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boundary Conditions at Solid Walls — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '4.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li class="current"><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+<ul>
+<li><a href="#introduction"
+id="toc-introduction"><span class="secnum">4.1</span> Introduction</a></li>
+<li><a href="#introduction-of-a-body-force"
+id="toc-introduction-of-a-body-force"><span class="secnum">4.2</span> Introduction of a body
+force</a></li>
+<li><a href="#permeability-calculation"
+id="toc-permeability-calculation"><span class="secnum">4.3</span> Permeability calculation</a></li>
+<li><a href="#chapman-enskog-expansion-and-bounce-back-equation"
+id="toc-chapman-enskog-expansion-and-bounce-back-equation"><span class="secnum">4.4</span> Chapman-Enskog
+expansion and bounce-back equation</a>
+<ul>
+<li><a href="#second-order-chapman-enskog-expansion"
+id="toc-second-order-chapman-enskog-expansion"><span class="secnum">4.4.1</span> Second-order
+Chapman-Enskog expansion</a></li>
+<li><a href="#setting-up-the-bounce-back-equation"
+id="toc-setting-up-the-bounce-back-equation"><span class="secnum">4.4.2</span> Setting up the
+bounce-back equation</a></li>
+</ul></li>
+<li><a href="#poiseuille-flow" id="toc-poiseuille-flow"><span class="secnum">4.5</span> Poiseuille
+flow</a>
+<ul>
+<li><a href="#exact-solution" id="toc-exact-solution"><span class="secnum">4.5.1</span> Exact
+solution</a></li>
+<li><a href="#experimentation-on-permeability"
+id="toc-experimentation-on-permeability"><span class="secnum">4.5.2</span> Experimentation on
+permeability</a></li>
+</ul></li>
+<li><a href="#flow-in-a-duct" id="toc-flow-in-a-duct"><span class="secnum">4.6</span> Flow in a
+duct</a>
+<ul>
+<li><a href="#formulation"
+id="toc-formulation"><span class="secnum">4.6.1</span> Formulation</a></li>
+<li><a href="#three-dimensional-model-d3c1.2-or-d3q19"
+id="toc-three-dimensional-model-d3c1.2-or-d3q19"><span class="secnum">4.6.2</span> Three-dimensional
+model – D3C1.2 or D3Q19</a></li>
+<li><a href="#closure-equation" id="toc-closure-equation"><span class="secnum">4.6.3</span> Closure
+equation</a></li>
+</ul></li>
+<li><a href="#permeability-calculation-for-a-duct"
+id="toc-permeability-calculation-for-a-duct"><span class="secnum">4.7</span> Permeability
+calculation for a duct</a></li>
+<li><a href="#random-porous-medium"
+id="toc-random-porous-medium"><span class="secnum">4.8</span> Random porous medium</a>
+<ul>
+<li><a href="#two-dimensional-medium"
+id="toc-two-dimensional-medium"><span class="secnum">4.8.1</span> Two-dimensional medium</a></li>
+<li><a href="#three-dimensional-medium"
+id="toc-three-dimensional-medium"><span class="secnum">4.8.2</span> Three-dimensional
+medium</a></li>
+</ul></li>
+<li><a href="#conclusion" id="toc-conclusion"><span class="secnum">4.9</span> Conclusion</a></li>
+</ul>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part I · Foundations of the Lattice Boltzmann Method — Chapter 4</p><h1>Boundary Conditions at Solid Walls</h1></header><p><span id="chap-clfs" data-label="chap-clfs"></span></p>
+<h1 id="introduction"><span class="secnum">4.1</span> Introduction</h1>
+<p>Since the earliest work, it has often been claimed that lattice
+gases, and by extension lattice Boltzmann gases, constitute an ideal
+method for handling problems in fluid mechanics in a complex geometry.
+Two major reasons are put forward to support this idea: the first is
+that lattice gases in general accurately reproduce the bulk equations of
+fluid mechanics, that is the Stokes or Navier-Stokes equations. The
+second reason stems from the fact that fluid-solid boundary conditions
+are particularly simple to implement. Thus, the bounce-back arises
+simply from the idea that a particle attempting to leave the simulation
+domain will bounce back and end up at the node it came from with an
+opposite velocity. The question of the cancellation of the velocity at
+the wall has thus been made implicit, but the question now arises of the
+exact spatial position of this wall. A linear analysis of the
+bounce-back based on a first-order Chapman-Enskog expansion [<a
+href="#ref-CHL">37</a>] places the wall position halfway between the
+last fluid node and the first solid node.</p>
+<p>The lattice Boltzmann method appears to be very efficient at handling
+problems in complex geometries, such as porous media, compared to
+commonly used methods such as finite differences or finite elements.
+However, first-order analysis only gives the exact wall position in the
+case of linear flows. Many authors have shown that the effective wall
+position depends strongly on the kinematic viscosity but also on the
+eigenvalues of the collision matrix that do not enter directly into the
+hydrodynamic equations. Finally, the wall position also depends on its
+orientation with respect to the lattice axes. Conditions on the
+eigenvalues of the collision matrix have indeed been found which allow
+the walls to be located exactly for a Poiseuille flow along a principal
+lattice axis [<a href="#ref-GA">34</a>].</p>
+<p>The exact location of the wall is a crucial problem, especially when
+the smallest characteristic size between obstacles cannot exceed a few
+lattice units. A typical example is the simulation of flow in porous
+media, where the dominant phenomena are flows through the smallest
+pores. Moreover, the permeability of a porous medium depends on the
+fluid viscosity in a simulation when the bounce-back is used. This is
+one of the major shortcomings of the lattice Boltzmann method.</p>
+<p>The aim of this chapter is to show that there exist conditions on the
+eigenvalues of the collision matrix which make the wall locations, as
+well as the permeability of a porous medium, independent of viscosity
+for two- and three-dimensional flows.</p>
+<h1 id="introduction-of-a-body-force"><span class="secnum">4.2</span> Introduction of a body
+force</h1>
+<p>Before studying the influence of the eigenvalues of the collision
+matrix on the boundary conditions, it seems useful to dwell briefly on
+the introduction of a body force. Indeed, to model a pressure gradient,
+it is convenient to use a body force <span
+class="math inline">\(\rho\,{\vec F}\)</span>. To do so, one adds at
+each time step and at each lattice node a small amount of momentum
+related to <span class="math inline">\({\vec F}\)</span>. For
+simplicity, we shall consider here only the case where <span
+class="math inline">\(\rho_0\,{\vec F}\)</span> is constant in magnitude
+and direction. One shows that the microdynamic equation of the lattice
+Boltzmann gas is then written: <span
+class="math display">\[\begin{equation}
+N_i(\vec{r}+\vec{c}_i,t+1)=N_i(\vec{r},t)-\sum_{j=0}^{b}{\Omega_{ij}\,\left(
+N_j-N_j^{(0)}\right)}+t_p\,\rho_0{\vec{F}.\vec{c}_i\over c_s^2},
+\end{equation}\]</span> where <span
+class="math inline">\(N_j^{(0)}\)</span> represents the equilibrium
+populations in direction <span class="math inline">\(j\)</span> and can
+be written as: <span class="math display">\[\begin{equation}
+N_j^{(0)}=t_p\,\rho\,\left(1+{u_\alpha.c_{i\alpha} \over c_s^2}+
+{u_\alpha\,u_\beta \over 2 c_s^2}\left(3 c_{i\alpha}\,
+c_{i\beta}-\delta_{\alpha\beta} \right)  \right).
+\end{equation}\]</span> The coefficients <span
+class="math inline">\(t_p\)</span> depend on the model considered; they
+represent the weight of a direction. Introducing these weights is
+necessary to obtain an isotropic lattice.</p>
+<p>The matrix <span class="math inline">\(\Omega_{ij}\)</span> is called
+the linearized collision matrix. It has the property of conserving the
+total mass and momentum during the collision. Simpler models exist,
+where the matrix <span class="math inline">\(\Omega\)</span> is replaced
+by a scalar. These are called B.G.K. models [<a
+href="#ref-BGK">35</a>].</p>
+<p>We shall show, through a very simple example, that the introduction
+of a body force makes it necessary to modify the definition of the
+momentum. To start with, suppose that the usual definitions of mass and
+momentum remain valid. We then have: <span
+class="math display">\[\begin{equation}
+\label{oldmassmom}
+\begin{array}{l}
+\displaystyle\rho(\vec{r},t)=\sum_{i=0}^{b}{N_i(\vec{r},t)},\\
+\displaystyle j_\alpha=\rho\,u_\alpha=\sum_{i=0}^{b}{N_i(\vec{r},t)\,
+c_{i\alpha}}.
+\end{array}
+\end{equation}\]</span></p>
+<p>To convince oneself that the definition of momentum is no longer
+valid when a body force is added, one can perform the closed-box
+experiment described in figure <a href="#closebox">4.1</a>. The applied
+force then represents the force due to gravity.</p>
+<figure id="closebox">
+<img src="figures/closebox.svg" />
+<figcaption>Figure 4.1: Closed-box experiment</figcaption>
+</figure>
+<p>One of course expects the fluid to be at rest with a pressure (or
+density) gradient proportional to the applied force: <span
+class="math display">\[\begin{equation}
+{\partial P\over \partial y}=\rho_0 \,F.
+\end{equation}\]</span></p>
+<p>If one uses the formulas given by (<a
+href="#mjx-eqn:oldmassmom">4.3</a>), one then notices that the fluid is
+not at rest, but moves with a constant “velocity” <span
+class="math inline">\(-\rho_0\,F / 2\)</span>. This justifies the
+validity, for this simple case, of the new definition of momentum
+described in [<a href="#ref-GA">34</a>]: <span
+class="math display">\[\begin{equation}
+j_\alpha=\rho\,u_\alpha=\sum_{i=0}^{b}{N_i(\vec{r},t)\,
+c_{i\alpha}}+\frac{1}{2} \rho(\vec{r},t)\,{\vec F}.
+\end{equation}\]</span></p>
+<p>We shall adopt this new definition for the entire remainder of the
+study.</p>
+<h1 id="permeability-calculation"><span class="secnum">4.3</span> Permeability calculation</h1>
+<p>The permeability is introduced as the coefficient of proportionality
+between the flow rate of a fluid through a porous medium and the force,
+or pressure gradient, applied to it. This linear relation is called
+Darcy’s law, after an engineer in charge of the water supply for the
+city of Dijon in the <span class="math inline">\(19^{th}\)</span>
+century. It comes from a series of experiments performed in 1856 on the
+filtration of water by a bed of sand. This relation thus stems from
+macroscopic observations and is written as: <span
+class="math display">\[\begin{equation}
+\label{darcy}
+{\mathbf{q}}=-\frac{1}{\rho\,\nu}\,K\,\nabla P,
+\end{equation}\]</span> with <span class="math inline">\(\nu\)</span>
+the kinematic viscosity, <span class="math inline">\(\nabla P\)</span>
+the pressure gradient, <span class="math inline">\(K\)</span> the
+permeability tensor and <span class="math inline">\(q\)</span> the flow
+rate.</p>
+<p>When the lattice Boltzmann method is used to simulate a porous
+medium, it is convenient to take a spatially periodic medium. The
+pressure gradient is therefore replaced by the application of a constant
+force <span class="math inline">\(\rho_0\,F\)</span>. Darcy’s law is
+then written: <span class="math display">\[\begin{equation}
+\label{darcy2}
+q_\alpha=\frac{\rho_0}{\nu}\,K_{\alpha\beta}\,F_\beta,
+\end{equation}\]</span> the permeability tensor being considered as
+diagonal to first approximation and will from now on be denoted <span
+class="math inline">\(K_\alpha\)</span>.</p>
+<p>The permeability is determined by the geometry of the porous medium.
+It is a macroscopic parameter resulting from microscopic features.
+Moreover, this parameter depends significantly on the smallest pores. It
+is therefore necessary, regardless of the numerical method chosen, to
+treat precisely the fluid flow through the smallest crevices of the
+porous medium. The lattice Boltzmann method, if used without care, does
+not allow permeabilities to be computed rigorously, because the
+permeability and the wall positioning then depend on the fluid
+viscosity. An example is shown in figure <a
+href="#tubecarrevis">4.2</a>: the wall position varies considerably as a
+function of viscosity in the case of flow in a square-section duct.</p>
+<figure id="tubecarrevis">
+<img src="figures/shape1.svg" />
+<figcaption>Figure 4.2: Wall position for different
+viscosities</figcaption>
+</figure>
+<h1
+id="chapman-enskog-expansion-and-bounce-back-equation"><span class="secnum">4.4</span> Chapman-Enskog
+expansion and bounce-back equation</h1>
+<p>The non-physical dependence of the wall position on viscosity when
+using the bounce-back method to handle wall boundary conditions is not
+insurmountable. To find a solution to this problem we will use the work
+done in chapter <a href="part1-chapter3.html">3</a> of the first part on
+the second-order Chapman-Enskog expansion.</p>
+<h2 id="second-order-chapman-enskog-expansion"><span class="secnum">4.4.1</span> Second-order
+Chapman-Enskog expansion</h2>
+<p>Indeed, the Chapman-Enskog expansion gives us the expressions of the
+expansion of the populations as a function of the macroscopic variables.
+For simplicity of the expressions, let us work in the basis of
+eigenvectors of the collision matrix. Knowing now the equilibrium values
+that allow the desired equations to be modeled, we can deduce the first
+correction to equilibrium, and, resuming the notation used previously,
+one finds: <span class="math display">\[\begin{equation}
+-{\widehat \Omega}\,
+{\widehat{\mathbf{N}}}^{(1)}=\partial_{t_1}{\widehat{\mathbf{N}}}^{(0)}+\widehat{{\mathcal{S}}}_\alpha\partial_{\alpha
+&#39;}{\widehat{\mathbf{N}}}^{(0)},
+\label{ferc}
+\end{equation}\]</span> and then the second correction to equilibrium
+through <span class="math display">\[\begin{equation}
+-{\widehat
+\Omega}\,{\widehat{\mathbf{N}}}^{(2)}=\partial_{t_2}{\widehat{\mathbf{N}}}^{(0)}+({\mathbf{\mathcal{I}}}-{{\widehat
+\Omega}\over 2})\partial_{t_1}{\widehat{\mathbf{N}}}^{(1)}
++\widehat{{\mathcal{S}}}_\alpha({\mathbf{\mathcal{I}}}-{{\widehat
+\Omega}\over 2})\partial_{\alpha &#39;}{\widehat{\mathbf{N}}}^{(1)}.
+\label{serc}
+\end{equation}\]</span> It is therefore possible to “reconstruct” the
+expressions of the populations by substituting these expressions back
+into the population basis up to second order with: <span
+class="math display">\[\begin{equation}
+\label{devn}
+{\mathbf{N}}={\mathbf{N}}^{(0)}+\epsilon\,{\mathbf{N}}^{(1)}+\epsilon^2\,{\mathbf{N}}^{(2)}+{\mathcal{O}}(\epsilon^3).
+\end{equation}\]</span></p>
+<h2 id="setting-up-the-bounce-back-equation"><span class="secnum">4.4.2</span> Setting up the
+bounce-back equation</h2>
+<p>The bounce-back of a population on a wall, often called
+<span><em>Bounce-back</em></span>, can be written as an equation. Recall
+that the bounce-back sends the particle back in the direction opposite
+to where it came from, i.e.: <span
+class="math display">\[\begin{equation}
+\label{eqrebons}
+N_i(\vec{r}_0,t)=N_j(\vec{r}_0+\vec{c_j},t)\qquad\mbox{with
+}\vec{c_j}=-\vec{c_i}\mbox{  and   }(\vec{r}_0+\vec{c_j})\,\in\mbox{
+solid}.
+\end{equation}\]</span> If we denote by <span
+class="math inline">\(N&#39;&#39;(\vec{r},t)\)</span> the populations
+that have undergone the collision but before propagation, the
+microdynamic equation is then written: <span
+class="math display">\[\begin{equation}
+N_i(\vec{r}+c_i,t+1)=N&#39;&#39;_i(\vec{r},t),
+\end{equation}\]</span> and the bounce-back equation consequently
+becomes: <span class="math display">\[\begin{equation}
+N_i(\vec{r}_0,t)=N&#39;&#39;_j(\vec{r}_0,t-1).
+\end{equation}\]</span> If the flow is stationary, the situation
+simplifies and the bounce-back equation can now be written: <span
+class="math display">\[\begin{equation}
+\label{finrebond}
+N_i(\vec{r}_0)=N&#39;&#39;_j(\vec{r}_0)\qquad\mbox{with
+}\vec{c_j}=-\vec{c_i}\mbox{ and   }(\vec{r}_0+\vec{c_j})\in\mbox{solid}
+.
+\end{equation}\]</span></p>
+<p>The expressions arising from the second-order Chapman-Enskog
+expansion and the bounce-back equation form a system which will allow
+us, for simple cases that we shall generalize later, to determine
+relations between the eigenvalues of the collision matrix in order to
+fix the wall position independently of viscosity. A simple case to study
+is Poiseuille flow parallel to a lattice axis.</p>
+<h1 id="poiseuille-flow"><span class="secnum">4.5</span> Poiseuille flow</h1>
+<h2 id="exact-solution"><span class="secnum">4.5.1</span> Exact solution</h2>
+<p>A Poiseuille flow is the flow of a fluid between two parallel, fixed
+flat plates separated by a height <span
+class="math inline">\(h_0\)</span>. Poiseuille flow is a flow for which
+there exists a simple stationary solution in the laminar case. The
+velocity profile is then parabolic and given by: <span
+class="math display">\[\begin{equation}
+\label{vitpoiseuille}
+v_x(y)=-{F_x\over 2\nu}\left(y^2-(\frac{h_0}{2}+\Delta)^2\right),
+\end{equation}\]</span> where <span class="math inline">\(\nu\)</span>
+represents the kinematic viscosity of the fluid, <span
+class="math inline">\(F_x\)</span> the body force, <span
+class="math inline">\(h_0\)</span> the height of the channel, and <span
+class="math inline">\(\Delta\)</span> represents the error on the wall
+position. For the theoretical curve, one will of course take <span
+class="math inline">\(\Delta=0\)</span>.</p>
+<figure id="fig-poisseuille">
+<img src="figures/fig-poisseuille.svg" />
+<figcaption>Figure 4.3: Poiseuille flow – Velocity profile</figcaption>
+</figure>
+<p>Let us take the example of the D2C1.2 (D2Q9) model presented in
+chapter <a href="part1-chapter3.html">3</a> of the first part of this
+thesis. We shall restrict ourselves to the linear case throughout the
+study that follows. Furthermore, we shall consider the flow to be
+established and therefore stationary. In this case, the equilibrium
+populations have a simple expression, and taking into account the
+remarks made about the introduction of a body force, one simply has:
+<span class="math display">\[\begin{equation}
+{\mathbf{N}}^{(0)}=t_p\left(\rho_0\, {\mathbf{1}}+{1\over
+c_s^2}\,\left(j_x-{\rho_0 F_x\over 2 }\right){\mathbf{C}}_x\right),
+\end{equation}\]</span> with <span class="math display">\[\displaystyle
+t_0={3-5c_s^2\over 3},\quad t_1={c_s^2\over 3}\quad\mbox{and
+}t_2={c_s^2\over 12}.\]</span> For Poiseuille flow, the only non-zero
+velocity derivatives are <span
+class="math inline">\(\partial_y\,j_x\)</span> at first order, and <span
+class="math inline">\(\partial_y^2\,j_x\)</span> at second order. Thanks
+to the second-order Chapman-Enskog expansion performed in chapter <a
+href="part1-chapter3.html">3</a>, one finds that the first correction to
+equilibrium is written: <span class="math display">\[\begin{equation}
+\epsilon\,{\mathbf{N}}^{(1)}=\epsilon\,{S_{xy}^{(1)}\over 4}
+{\mathbf{Q}}_{xy}=-{1\over 12 \lambda_\nu}\,{\partial j_x\over \partial
+y} {\mathbf{Q}}_{xy}.
+\end{equation}\]</span> For the second-order corrections, we obtain the
+equations: <span class="math display">\[\begin{eqnarray}
+&amp;&amp;\partial_{t_2}q^{(0)}_x-\left( 1-\frac{1}{\lambda_\nu}
+\right)S^{(1)}_{xy}=-\lambda_\chi\,q_x^{(2)},\\
+&amp;&amp;\partial_{t_2}j_x+\left( 1-\frac{1}{\lambda_\nu}
+\right)S^{(1)}_{xy}=0,
+\end{eqnarray}\]</span> since <span
+class="math inline">\(q^{(0)}_x=j_x\)</span>, it immediately follows
+that <span class="math display">\[q_x^{(2)}=\frac{2}{\lambda_\chi}\left(
+1-\frac{1}{\lambda_\nu} \right)S^{(1)}_{xy}\]</span> One finally
+obtains: <span class="math display">\[\begin{equation}
+\epsilon^2\,{\mathbf{N}}^{(2)}=\epsilon^2\,{q_x^{(2)}\over
+12}{\mathbf{T}}_{xxy}=-{\nu\over 6 \lambda_\chi}{\partial^2 j_x\over
+\partial y^2}{\mathbf{T}}_{xxy}.
+\end{equation}\]</span> Collecting the terms in equation (<a
+href="#mjx-eqn:devn">4.10</a>), and keeping terms up to second order:
+<span class="math display">\[\begin{equation}
+{\mathbf{N}}=t_p\left(\rho_0\, {\mathbf{1}}+\,{1\over
+c_s^2}\,\left(j_x-{\rho_0 F_x\over 2
+}\right){\mathbf{C}}_x\right)-{1\over 12 \lambda_\nu}\,{\partial
+j_x\over \partial y} {\mathbf{Q}}_{xy}-{\nu\over 6
+\lambda_\chi}{\partial^2 j_x\over \partial y^2}{\mathbf{T}}_{xxy}.
+\end{equation}\]</span></p>
+<p>Since the vectors are all eigenvectors of the matrix <span
+class="math inline">\(\Omega\)</span>, one obtains after the collision
+step: <span
+class="math display">\[{\mathbf{N}}&#39;&#39;=t_p\left(\rho_0\,
+{\mathbf{1}}+{1\over c_s^2}\,\left(j_x+{\rho_0 F_x\over 2
+}\right){\mathbf{C}}_x\right)+{1\over 12}\left(1-{1\over
+\lambda_\nu}\right){\partial j_x\over \partial y}
+{\mathbf{Q}}_{xy}+{\nu\over 6}\left(1-{1\over
+\lambda_\chi}\right){\partial^2 j_x\over \partial
+y^2}{\mathbf{T}}_{xxy}.\]</span></p>
+<p>If one substitutes the previous expressions into the bounce-back
+equation (<a href="#mjx-eqn:finrebond">4.14</a>), one obtains: <span
+class="math display">\[\begin{equation}
+{2\,t_p\over c_s^2}j_x\,{\mathbf{C}}_x-\frac{1}{12}\frac{\partial
+j_x}{\partial
+y}{\mathbf{Q}}_{xy}+\frac{\nu}{6}\left(1-\frac{2}{\lambda_\chi}
+\right)\frac{\partial^2 j_x}{\partial y^2}\,{\mathbf{T}}_{xxy}=0.
+\end{equation}\]</span> Projecting onto the different components, one
+notices that only the “diagonal” directions are involved and one can
+write a single closure equation: <span
+class="math display">\[\begin{equation}
+\label{fermeture}
+j_x\pm\frac{1}{2}\frac{\partial j_x}{\partial
+y}+\frac{\Lambda^2}{2}\,\frac{\partial^2 j_x}{\partial y^2}=0.
+\end{equation}\]</span> where “+” and “-” correspond to considering
+respectively the upper or lower boundaries of the domain. For brevity we
+have set: <span class="math display">\[\begin{equation}
+\label{Lambdacarre}
+\Lambda^2=\frac{1}{3}{(\lambda_\nu-2)(\lambda_\chi-2)\over
+\lambda_\nu\,\lambda_\chi},
+\end{equation}\]</span> since we have taken: <span
+class="math display">\[\nu={1 \over 3}\left({1\over
+\lambda_\nu}-\frac{1}{2}\right).\]</span></p>
+<p>Let us treat the example of the upper boundary, as indicated in
+figure <a href="#figpoishaut">4.4</a>; the treatment and the solution
+will of course be identical for the lower wall.</p>
+<figure id="figpoishaut">
+<img src="figures/figpoishaut.svg" />
+<figcaption>Figure 4.4: Upper wall in Poiseuille flow</figcaption>
+</figure>
+<p>Taking the mesh into account, the velocity is given by: <span
+class="math display">\[\begin{equation}
+v_x(y)=-{F_x\over 2\nu}\left(y^2-(y_0+\frac{1}{2}+\Delta)^2\right),
+\end{equation}\]</span> which can also be written: <span
+class="math display">\[\begin{equation}
+v_x(y)=-{F_x\over 2\nu}\left(y^2-(H/2)^2\right),
+\end{equation}\]</span> where <span class="math inline">\(H\)</span> is
+the height of the channel actually simulated. If we substitute this
+expression, evaluated at the point <span
+class="math inline">\(y_0\)</span>, into the closure equation (<a
+href="#mjx-eqn:fermeture">4.23</a>) just determined, one obtains: <span
+class="math display">\[\begin{equation}
+H^2=h_0^2+(4\,\Lambda^2-1).
+\end{equation}\]</span></p>
+<p>The channel height thus depends in general on the eigenvalues of the
+linearized collision matrix, since <span
+class="math inline">\(\Lambda^2\)</span> depends on them. One can note
+that for the particular case where one chooses <span
+class="math inline">\(\displaystyle\Lambda^2=\frac{1}{4}\)</span>, the
+simulated height is the same as the one initially expected for
+Poiseuille flow.</p>
+<p>One can also note that if one neglects the second correction to
+equilibrium, and therefore <span class="math inline">\(\left({\partial^2
+j_x}/{\partial y^2} \right)\)</span>, equation (<a
+href="#mjx-eqn:fermeture">4.23</a>) indeed gives us the answer of the
+first-order analysis: the wall lies strictly halfway between the last
+liquid node and the first solid node, independently of the eigenvalues
+of the collision matrix.</p>
+<p>One can also note that equation (<a
+href="#mjx-eqn:fermeture">4.23</a>) remains identical for the
+three-dimensional D3C1.2 (D3Q19) models. For the FHP model (D2C1-), it
+is necessary to introduce a small correction due to the hexagonal
+geometry. We can then generalize the closure equation (<a
+href="#mjx-eqn:fermeture">4.23</a>) by: <span
+class="math display">\[\begin{equation}
+\label{fermeturetoutmodele}
+j_x\pm\frac{l_\perp}{2}\frac{\partial j_x}{\partial
+y}+l_\perp^2\,\frac{\Lambda^2}{2}\,\frac{\partial^2 j_x}{\partial
+y^2}=0,
+\quad l_\perp=\left\{
+\begin{array}{c}
+{\sqrt{3}\over 2},\mbox{ for hexagonal models}\\
+1,\mbox{ for cubic models}
+\end{array}
+\right.
+\end{equation}\]</span></p>
+<p>The height of the channel actually simulated is then given by: <span
+class="math display">\[\begin{equation}
+\label{geneclose}
+H^2=h_0^2+l_\perp^2\,(4\,\Lambda^2-1).
+\end{equation}\]</span> The choice <span
+class="math inline">\(\displaystyle\Lambda^2=1/4\)</span> allows us to
+have an exact solution for Poiseuille flow. This parameter, common to
+all models, will be called the <span><em>magic
+parameter</em></span>.</p>
+<p>One can finally make the connection with the study carried out in
+Irina Ginzbourg’s thesis [<a href="#ref-GIN">38</a>], where she
+indicates that the choice <span class="math display">\[\begin{equation}
+\label{irinalambda}
+\lambda_\chi=-8\,\frac{\lambda_\nu-2}{\lambda_\nu-8},
+\end{equation}\]</span> makes it possible to obtain exact solutions for
+Poiseuille flow. Indeed, this choice amounts to taking <span
+class="math inline">\(\displaystyle\Lambda^2=1/4\)</span>.</p>
+<h2 id="experimentation-on-permeability"><span class="secnum">4.5.2</span> Experimentation on
+permeability</h2>
+<p>Applying Darcy’s law (<a href="#mjx-eqn:darcy2">4.7</a>) to the case
+of Poiseuille flow of height <span class="math inline">\(h_0\)</span>,
+one finds directly that the permeability is given by: <span
+class="math display">\[\begin{equation}
+\label{permh}
+K^{th}=\frac{h_0^2}{12}.
+\end{equation}\]</span> The permeability deduced from a lattice
+Boltzmann simulation varies with the actually simulated height <span
+class="math inline">\(H\)</span>. But the latter depends on <span
+class="math inline">\(\Lambda^2\)</span>, and hence on viscosity, except
+in the case where <span class="math inline">\(\Lambda^2\)</span> remains
+fixed and <span class="math inline">\(\Lambda^2=1/4\)</span>. When <span
+class="math inline">\(\Lambda^2\)</span> is fixed, one obtains a
+relation between the viscosity and the eigenvalue <span
+class="math inline">\(\lambda_\chi\)</span>.</p>
+<p>To study how the error evolves as a function of the mesh resolution
+for the permeability computation, we shall use the relative
+permeability. We shall take as definition of the relative permeability:
+<span class="math display">\[\begin{equation}
+K^{rel}=\frac{K-K^{th}}{K^{th}}.
+\end{equation}\]</span> From equations (<a
+href="#mjx-eqn:geneclose">4.29</a>) and (<a
+href="#mjx-eqn:permh">4.31</a>), one has: <span
+class="math display">\[\begin{equation}
+\label{krelh2}
+K^{rel}=l_\perp^2\,\frac{4\Lambda^2-1}{h_0^2}.
+\end{equation}\]</span></p>
+<figure id="figda1">
+<img src="figures/da1.svg" />
+<figcaption>Figure 4.5: Variation of the relative permeability as a
+function of mesh resolution</figcaption>
+</figure>
+<p>The relative permeability therefore varies as <span
+class="math inline">\(h_0^{-2}\)</span> when the mesh resolution is
+increased while keeping <span class="math inline">\(\Lambda^2\)</span>
+fixed. The relation (<a href="#mjx-eqn:krelh2">4.33</a>) is verified
+numerically as shown in figure <a href="#figda1">4.5</a>. Since the flow
+rate is computed from the maximum velocity in the channel by <span
+class="math display">\[\begin{equation}
+K^{mes}=\frac{2 \,\nu}{3\,\rho_0\,F_x}j_x^{max},
+\end{equation}\]</span> the curves coincide perfectly for odd channel
+heights.</p>
+<p>The widely used single-relaxation-time lattice Boltzmann model, known
+as the B.G.K. model, was introduced by [<a href="#ref-BGK">35</a>] and
+differs from the models used here only in that all the eigenvalues are
+chosen to be equal. In this case, one has: <span
+class="math display">\[\begin{equation}
+\Lambda^2=12\,\nu^2.
+\end{equation}\]</span> The relative permeability then takes the form:
+<span class="math display">\[\begin{equation}
+\label{krelnu}
+K^{rel}(\nu)=\frac{48\,\nu^2-1}{h_0^2}.
+\end{equation}\]</span> If one then wishes to obtain an exact solution
+of Poiseuille flow, one must take <span
+class="math inline">\(K^{rel}=0\)</span>, namely <span
+class="math display">\[\begin{equation}
+\lambda_\nu=8-4\sqrt{3}.
+\end{equation}\]</span></p>
+<figure id="figbgk359">
+<img src="figures/bgk359.svg" />
+<figcaption>Figure 4.6: Variation of the relative permeability as a
+function of the square of the viscosity for the B.G.K.
+model</figcaption>
+</figure>
+<p>Figure <a href="#figbgk359">4.6</a> allows one to visualize the error
+made when computing a permeability with the B.G.K. model, and also
+allows one to verify the validity of equation (<a
+href="#mjx-eqn:krelnu">4.36</a>). In this graph, the errors are
+amplified by the fact that a very wide range of viscosities has been
+chosen.</p>
+<h1 id="flow-in-a-duct"><span class="secnum">4.6</span> Flow in a duct</h1>
+<p>While the study of Poiseuille flow has shown us that it was necessary
+to consider eigenvalues that do not appear in the bulk equations of the
+dynamics, it only gives answers for one particular type of flow. One can
+indeed note that the solution provided by the previous study does not
+carry over to the study of a Poiseuille flow in a channel inclined with
+respect to the lattice axes [<a href="#ref-GA">34</a>].</p>
+<p>We shall now consider a flow, more complex than Poiseuille’s, in a
+straight duct of arbitrary cross-section.</p>
+<h2 id="formulation"><span class="secnum">4.6.1</span> Formulation</h2>
+<p>Consider a duct of constant cross-section along the <span
+class="math inline">\(x\)</span> axis. We use, as previously, a periodic
+space and forcing in the <span class="math inline">\(x\)</span>
+direction. The Stokes equation then becomes for this type of flow: <span
+class="math display">\[\begin{equation}
+-\rho_0\,F_x=\nu\,\left(\frac{\partial^2 j_x}{\partial
+y^2}+\frac{\partial^2 j_x}{\partial z^2}  \right).
+\end{equation}\]</span> We can now, in the same way as for Poiseuille
+flow, determine a closure equation using the second-order Chapman-Enskog
+expansion and the bounce-back equation. Before that, we shall briefly
+present the three-dimensional model that we use.</p>
+<h2
+id="three-dimensional-model-d3c1.2-or-d3q19"><span class="secnum">4.6.2</span> Three-dimensional
+model – D3C1.2 or D3Q19</h2>
+<p>The 19-velocity model is based on the lattice described in figure <a
+href="#D3Q19">4.7</a>.</p>
+<figure id="D3Q19">
+<img src="figures/d3q19.svg" />
+<figcaption>Figure 4.7: Lattice of the 19-velocity model in three
+dimensions</figcaption>
+</figure>
+<p>We choose, in the same way as for the nine-velocity model presented
+in chapter <a href="part1-chapter3.html">3</a> of this part, the
+eigenvectors constituting an orthogonal basis of our 19-dimensional
+space as follows:</p>
+<p><span class="math display">\[\begin{equation}
+\label{vectorlist3d}
+\begin{array}{lll}
+{\mathbf{1}}&amp;=&amp;\left\{ c_i^0 \right\}\\
+{\mathbf{C}}_x&amp;=&amp;\left\{ c_{ix}  \right\}\\
+{\mathbf{C}}_y&amp;=&amp;\left\{ c_{iy}  \right\}\\
+{\mathbf{C}}_z&amp;=&amp;\left\{ c_{iz}  \right\}\\
+{\mathbf{E}}&amp;=&amp;\left\{ 30 c_i^0-19 c_i^2  \right\}\\
+{\mathbf{C}}_{xy}&amp;=&amp;\left\{ c_{ix}\,c_{iy}    \right\}\\
+{\mathbf{C}}_{xz}&amp;=&amp;\left\{ c_{ix}\,c_{iz}  \right\}\\
+{\mathbf{C}}_{yz}&amp;=&amp;\left\{ c_{iy}\,c_{iz}  \right\}\\
+{\mathbf{Q}}_{1}&amp;=&amp;\displaystyle\left\{ c_{ix}^2-{c_i^2\over
+3}  \right\}\\
+{\mathbf{Q}}_{2}&amp;=&amp;\left\{ c_{iy}^2-c_{iz}^2  \right\}\\
+{\mathbf{T}}_{xxx}&amp;=&amp;\left\{ c_{ix}^3-5c_{ix}\,
+(c_{iy}^2+c_{iz}^2)   \right\}\\
+{\mathbf{T}}_{yyy}&amp;=&amp;\left\{ c_{iy}^3-5c_{iy}\,
+(c_{ix}^2+c_{iz}^2)  \right\}\\
+{\mathbf{T}}_{zzz}&amp;=&amp;\left\{ c_{iz}^3-5c_{iz}\,
+(c_{ix}^2+c_{iy}^2)  \right\}\\
+{\mathbf{H}}&amp;=&amp;\left\{ 12 c_i^0-16 c_i^2+21(c_{ix}^2\,c_{iy}^2
++c_{ix}^2\,c_{iz}^2 +c_{iy}^2\,c_{iz}^2 )  \right\}\\
+{\mathbf{Q}}_{3}&amp;=&amp;\left\{
+4c_{ix}^4-2c_{iy}^4-2c_{iz}^4-3c_{ix}^2\,c_{iy}^2-3c_{ix}^2\,c_{iz}^2+6c_{iy}^2\,c_{iz}^2  \right\}\\
+{\mathbf{Q}}_{4}&amp;=&amp;\left\{
+2c_{iy}^4-2c_{iz}^4-3c_{ix}^2\,c_{iy}^2+ 3c_{ix}^2\,c_{iz}^2 \right\}\\
+{\mathbf{H}}_{5x}&amp;=&amp;\left\{c_{ix}(c_{iy}^4-c_{iz}^4)   \right\}\\
+{\mathbf{H}}_{5y}&amp;=&amp;\left\{
+c_{iy}(c_{ix}^4-c_{iz}^4)   \right\}\\
+{\mathbf{H}}_{5z}&amp;=&amp;\left\{c_{iz}(c_{ix}^4-c_{iy}^4)    \right\}.
+\end{array}
+\end{equation}\]</span> These vectors will be associated with the
+following eigenvalues: <span
+class="math display">\[\displaystyle\left(0,0,0,0,\lambda_e,\lambda_\nu,\lambda_\nu,\lambda_\nu,\lambda_\tau,\lambda_\tau,\lambda_\chi,\lambda_\chi,\lambda_\chi
+,\lambda_\sigma,\lambda_\nu,\lambda_\nu,\lambda_\chi,\lambda_\chi,\lambda_\chi\right).\]</span>
+We have repeated some of the eigenvalues for convenience. Indeed, the
+calculations will be simplified and will not suffer from a lack of
+generality under this assumption. One can then choose the equilibrium
+quantities of this model to obtain the desired macroscopic equations.
+For the non-propagating population: <span
+class="math display">\[\begin{equation}
+N_0^{(0)}=(1-2c_s^2)\,\rho\,\left(1-{1\over 2
+(1-2c_s^2)}(u_x^2+u_y^2+u_z^2)  \right),
+\end{equation}\]</span> for the other populations, one takes: <span
+class="math display">\[\begin{equation}
+N_i^{(0)}=t_p\,\rho\,\left(1+{u_\alpha \,c_{i\alpha}\over
+c_s^2}+g\,{u_\alpha\,u_\beta\over 2
+c_s^2}\,(3\,c_{i\alpha}c_{i\beta}-\delta_{\alpha\beta}) \right),
+\end{equation}\]</span> with <span
+class="math inline">\(p=c_i^2\)</span> and <span
+class="math display">\[\begin{equation}
+t_1={c_s^2\over6}\qquad\mbox{and}\qquad t_2={c_s^2\over12}.
+\end{equation}\]</span> The speed of sound, <span
+class="math inline">\(c_s\)</span>, is then a parameter of the model;
+the shear viscosity is given by: <span
+class="math display">\[\begin{equation}
+\nu={1\over 3}\left({1\over \lambda_\nu}-{1\over 2} \right),
+\end{equation}\]</span> the bulk viscosity is defined by: <span
+class="math display">\[\begin{equation}
+\xi=({5\over 9}-c_s^2)\,\left({1\over \lambda_e}-{1\over 2} \right).
+\end{equation}\]</span> The parameter <span
+class="math inline">\(g\)</span> is taken equal to one to simulate the
+Navier-Stokes equations, and <span class="math inline">\(g=0\)</span>
+for the Stokes equations.</p>
+<h2 id="closure-equation"><span class="secnum">4.6.3</span> Closure equation</h2>
+<p>We can now redo the work presented previously for the two-dimensional
+model, concerning the closure equation. One then finds, for the D3C1.2
+(D3Q19) model, taking the same definition for <span
+class="math inline">\(\Lambda\)</span>: <span
+class="math display">\[\begin{equation}
+\label{fermeture3dd3q19}
+j_x\pm\frac{1}{2}\frac{\partial j_x}{\partial
+  z}+\frac{\Lambda^2}{2}\,\frac{\partial^2 j_x}  {\partial
+  z^2}-\frac{\Lambda^2}{4}\, \frac{\partial^2 j_x}{\partial y^2}=0,
+\end{equation}\]</span> where one will take the “+” sign when the wall
+is located above the last liquid node, and “–” in the other case. A
+problem then arises: when the derivative <span
+class="math inline">\(\displaystyle\partial^2 j_x/
+\partial y^2\)</span> is not constant along the entire wall, then there
+is no unique value of <span class="math inline">\(\Lambda\)</span>
+allowing an arbitrary wall to be located halfway between the solid and
+fluid nodes. However, for the simple example of flow between two
+parallel flat plates, i.e. Poiseuille flow, the solution <span
+class="math inline">\(\Lambda^2=1/4\)</span> is still valid. One can
+also verify that for the case of a corner between two perpendicular flat
+plates, two closure equations must be satisfied and one then finds that
+<span class="math inline">\(\Lambda^2=1/2\)</span> allows the corner to
+be positioned halfway between the solid and fluid nodes. One can
+therefore conclude that it is not possible to find a single number <span
+class="math inline">\(\Lambda\)</span> such that the wall position lies
+halfway between the solid and liquid nodes.</p>
+<h1 id="permeability-calculation-for-a-duct"><span class="secnum">4.7</span> Permeability
+calculation for a duct</h1>
+<p>We have shown that the effective wall position, at second order of
+the expansion, depends on viscosity through the magic parameter <span
+class="math inline">\(\Lambda\)</span>. One may therefore expect that if
+this parameter remains fixed, the position of the walls of a medium, and
+hence the permeability, should not vary. This is what we observe
+numerically in the case of flows in a duct. As a demonstration, we have
+carried out permeability calculations in square sections, figure <a
+href="#tubecarre">4.8</a>, and in H-shaped sections, figure <a
+href="#tubeH">4.10</a>. The results are presented for the critical value
+<span class="math inline">\(\Lambda=1/4\)</span> and for different
+values of the scaling coefficient or mesh resolution <span
+class="math inline">\(h\)</span>.</p>
+<figure id="tubecarre">
+<img src="figures/tubecarre.svg" />
+<figcaption>Figure 4.8: Square duct</figcaption>
+</figure>
+<figure id="figbgklb359-carre">
+<img src="figures/bgkcarre.svg" />
+<figcaption>Figure 4.9: Variation of the relative permeability of the
+square tube as a function of the square of the viscosity for the B.G.K.
+model and for the multiple-relaxation-time model</figcaption>
+</figure>
+<p>To evaluate the relative permeability, we need a theoretical value of
+the permeability. For the square tube, we have followed the prediction
+of J. Happel and H. Brenner [<a href="#ref-HBPRED">41</a>], which gives:
+<span class="math display">\[\begin{equation}
+k^{th}\approx0.035144\,h^2.
+\end{equation}\]</span></p>
+<figure id="tubeH">
+<img src="figures/tubeh.svg" />
+<figcaption>Figure 4.10: H-shaped duct</figcaption>
+</figure>
+<p>For the H-shaped tube, we performed simulations at very large <span
+class="math inline">\(h\)</span>, which allowed us to find: <span
+class="math display">\[\begin{equation}
+k^{th}/h^2 \approx0.0690\pm0.0005.
+\end{equation}\]</span></p>
+<figure id="figbgklb359-H">
+<img src="figures/bgkh.svg" />
+<figcaption>Figure 4.11: Variation of the relative permeability of the
+H-shaped tube as a function of the square of the viscosity for the
+B.G.K. model and for the multiple-relaxation-time model</figcaption>
+</figure>
+<p>We have used the value <span
+class="math inline">\(\Lambda=1/4\)</span> for the simulations presented
+here, but any other value of <span
+class="math inline">\(\Lambda&gt;0\)</span> would show similar
+results.</p>
+<h1 id="random-porous-medium"><span class="secnum">4.8</span> Random porous medium</h1>
+<p>If the porous medium becomes more complex than the simple cases
+exposed previously, it would seem natural that the “magic” properties of
+the parameter <span class="math inline">\(\Lambda\)</span> should
+disappear. In fact, this is not the case: certain properties will
+persist when <span class="math inline">\(\Lambda\)</span> remains fixed.
+However, we must distinguish between the two- and three-dimensional
+cases.</p>
+<h2 id="two-dimensional-medium"><span class="secnum">4.8.1</span> Two-dimensional medium</h2>
+<p>Consider an infinite porous medium made up of cylinders of identical
+diameters arranged in a square pattern. If we vary the viscosity while
+keeping the parameter <span class="math inline">\(\Lambda\)</span>
+constant, one notices that the permeability of the medium no longer
+depends on the viscosity. However, we no longer know the exact position
+of the wall; we only know that it does not vary with viscosity when the
+value of <span class="math inline">\(\Lambda\)</span> is fixed. It is
+therefore interesting to take large viscosities to obtain faster
+convergence in number of iterations, which is impossible if one does not
+fix <span class="math inline">\(\lambda\)</span>, as clearly shown by
+figure <a href="#tubecarrevis">4.2</a>.</p>
+<p>It is then legitimate to ask how the error on the permeability varies
+as a function of a scaling coefficient <span
+class="math inline">\(h\)</span>, chosen here as the cylinder diameter,
+and of <span class="math inline">\(\Lambda\)</span>. For different
+values of the magic parameter, we shall determine the relative
+permeability as a function of the factor <span
+class="math inline">\(h\)</span>. The value of the relative error is
+computed from an extrapolation of the values obtained for values of
+<span class="math inline">\(h\approx 300\)</span>. One can then see, as
+in figure <a href="#vark-hL">4.12</a>, that for a given porous medium,
+no particular value seems to emerge clearly, even if the value <span
+class="math inline">\(\Lambda^2=1/2\)</span> appears to give the most
+accurate results. One can, incidentally, estimate the precision of the
+method from the log-log diagram. It can then be estimated to be <span
+class="math inline">\(h^{-2}\)</span> for all values of <span
+class="math inline">\(\Lambda^2\)</span>.</p>
+<figure id="vark-hL">
+<img src="figures/log-log-krel-h.svg" />
+<figcaption>Figure 4.12: Relative error on the permeability as a
+function of the mesh resolution <span class="math inline">\(h\)</span>
+for different values of <span
+class="math inline">\(\Lambda^2\)</span></figcaption>
+</figure>
+<h2 id="three-dimensional-medium"><span class="secnum">4.8.2</span> Three-dimensional medium</h2>
+<p>For the three-dimensional case, one can see from figure <a
+href="#fig6a">4.14</a> that the permeability depends on the viscosity
+even if the parameter <span class="math inline">\(\Lambda\)</span>
+remains fixed. But in the D3C1.2 (D3Q19) model, there remains an
+additional eigenvalue, <span
+class="math inline">\(\lambda_\tau\)</span>, which seems to play an
+important role, since it is associated with two symmetry moments similar
+to those of the moments connected to the eigenvalue <span
+class="math inline">\(\lambda_\nu\)</span> determining the viscosity. If
+we push the analogy a little further, it naturally comes to mind to take
+<span class="math inline">\(\lambda_\tau=\lambda_\nu\)</span>. We shall
+treat the example of the three-dimensional lattice of cubes shown with
+<span class="math inline">\(h=3\)</span> in figure <a
+href="#cube3d">4.13</a>. One can however verify that the results remain
+analogous for any other geometry.</p>
+<figure id="cube3d">
+<img src="figures/cross3d.svg" />
+<figcaption>Figure 4.13: Three-dimensional lattice of cubes – <span
+class="math inline">\(h=3\)</span></figcaption>
+</figure>
+<p>The relative error in figure <a href="#fig6a">4.14</a> is computed
+from the asymptotic value computed numerically by increasing the
+resolution, i.e. the factor <span class="math inline">\(h\)</span>
+(<span class="math inline">\(4\leq h\leq 45\)</span>). We obtain, by
+choosing <span class="math inline">\(\Lambda^2=1/4\)</span> and <span
+class="math inline">\(\lambda_\tau=\lambda_\nu\)</span>, <span
+class="math display">\[\begin{equation}
+{K^{th}\over h^2}\approx 0.07912 \pm 0.002.
+\end{equation}\]</span></p>
+<figure id="fig6a">
+<img src="figures/crossl14.svg" />
+<figcaption>Figure 4.14: Variation of the relative permeability as a
+function of the viscosity</figcaption>
+</figure>
+<p>One can thus conclude that the choice <span
+class="math inline">\(\lambda_\tau=\lambda_\nu\)</span> makes the
+permeability of a porous medium independent of the viscosity when the
+magic parameter is fixed.</p>
+<h1 id="conclusion"><span class="secnum">4.9</span> Conclusion</h1>
+<p>This study has allowed us to appreciate the magnitude of the errors
+that can be made when solid walls are introduced into our simulations.
+The first source of error is identified as a function of the eigenvalues
+of the linearized collision matrix and can be contained when the magic
+parameter <span class="math inline">\(\Lambda\)</span> remains fixed.
+The value <span class="math inline">\(\Lambda^2=1
+/4\)</span> moreover gives us the exact solution for Poiseuille flow in
+a channel parallel to the lattice axes. In three dimensions, we have an
+additional condition to <span
+class="math inline">\(\Lambda=C^{te}\)</span>: the values of <span
+class="math inline">\(\lambda_\tau\)</span> and <span
+class="math inline">\(\lambda_\nu\)</span> must be related by <span
+class="math inline">\(\lambda_\tau=\lambda_\nu\)</span>.</p>
+<p>The second source of error comes from the discretization itself of
+the obstacle and cannot be controlled with the bounce-back method
+(<span><em>Bounce Back</em></span>) that we use. Taken together, these
+errors suggest that the bounce-back method is of an order of accuracy
+close to two. The most important result of this study nevertheless
+remains that the permeability of a porous medium simulated by the
+lattice Boltzmann method no longer depends on the viscosity of the
+fluid.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-GA"><span class="refnum">[34]</span> I. Ginzbourg, P.M. Adler “Boundary flow condition
+analysis for dimensional lattice Boltzmann model”, <span><em>J.Phys
+II</em></span> <span><strong>4</strong></span> France (1994). <a class="refall" href="bibliography.html#ref-GA" title="In the full bibliography">↗</a></li>
+<li id="ref-BGK"><span class="refnum">[35]</span> Y.H. Qian, D. d’Humi<span>è</span>res,and P.
+Lallemand, “Lattice BGK Models for Navier-Stokes Equation,”
+<span><em>Europhysics Letters</em></span>, Vol. 17(6), 1992,
+pp. 479–484. <a class="refall" href="bibliography.html#ref-BGK" title="In the full bibliography">↗</a></li>
+<li id="ref-CHL"><span class="refnum">[37]</span> R. Cornubert, D. d’Humi<span>è</span>res, and D.
+Levermore, “A Knudsen layer theory” <span><em>Physica D</em></span>,
+<span><strong>47</strong></span>, pp. 241-259 (1991). <a class="refall" href="bibliography.html#ref-CHL" title="In the full bibliography">↗</a></li>
+<li id="ref-GIN"><span class="refnum">[38]</span> I. Ginzbourg, “Boundary conditions problems in lattice
+gas methods for single and multiple phases”, PhD,
+Universit<span>é</span> Paris VI (1994). <a class="refall" href="bibliography.html#ref-GIN" title="In the full bibliography">↗</a></li>
+<li id="ref-HBPRED"><span class="refnum">[41]</span> J. Happel and H. Brenner, “Low Reynolds Number
+Hydrodynamics”, <span><em>Prentice Hall</em></span>, Englewood Cliffs,
+NJ, 1965. <a class="refall" href="bibliography.html#ref-HBPRED" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="part1-chapter3.html"><span>Previous</span>Construction of the Models</a><a class="next" href="part2-chapter1.html"><span>Next</span>Characterization of a Viscoelastic Fluid</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

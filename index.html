@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+
+<header class="title-page">
+  <p class="eyebrow">Doctoral thesis · Université Henri Poincaré – Nancy I · October 31, 1997</p>
+  <h1>Viscoelastic Fluids with the Lattice Boltzmann Method</h1>
+  <p class="byline">Laurent Giraud</p>
+  <dl class="jury">
+    <div><dt>President</dt><dd>S. Zaleski</dd></div>
+    <div><dt>Reviewers</dt><dd>R. Keunings · O. Séro-Guillaume</dd></div>
+    <div><dt>Examiners</dt><dd>P. Lallemand · Y. Pomeau</dd></div>
+    <div><dt>Advisor</dt><dd>D. d'Humières</dd></div>
+  </dl>
+</header>
+<section class="abstract"><h2>Abstract</h2><p>In this thesis, we first present the Lattice Boltzmann method as a
+relaxation method of particle populations towards an equilibrium
+state.</p>
+<p>Then, in a second part, we study the impact of the relaxation times
+of these populations on the introduction of boundary conditions
+simulating solid walls. We deduce a law allowing the choice of these
+relaxation times so that the effective position of the walls no longer
+depends on them.</p>
+<p>Next, by doubling the number of moments required for the introduction
+of viscous effects and giving them very long relaxation times, we
+construct two isotropic models allowing the simulation of Jeffreys-type
+viscoelastic fluids. Many numerical simulations have validated this kind
+of behavior.</p>
+<p>Finally, in a last part, we introduce a variant of the Chapman-Enskog
+expansion. It allows us to exhibit a constitutive equation for our
+fluid. This law turns out, moreover, to be very close to that of a
+Jeffreys-type viscoelastic fluid.</p>
+<p>We also give research directions for introducing convective
+derivatives, as well as for introducing viscosity effects varying with
+shear.</p>
+<p><strong>Keywords:</strong> Lattice Boltzmann Equation,
+Viscoelasticity, Numerical Method, Multi-scale Technique, Jeffreys
+Fluids, Chapman-Enskog Expansion.</p></section>
+<section><h2>Contents</h2><ol class="full-toc">
+<li><a href="introduction.html"><span class="toc-num"></span>General Introduction</a></li>
+<li class="toc-part"><span>Part I</span>Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="toc-num">Chapter 1</span>Lattice gases</a></li>
+<li><a href="part1-chapter2.html"><span class="toc-num">Chapter 2</span>Lattice Boltzmann gases</a></li>
+<li><a href="part1-chapter3.html"><span class="toc-num">Chapter 3</span>Construction of the Models</a></li>
+<li><a href="part1-chapter4.html"><span class="toc-num">Chapter 4</span>Boundary Conditions at Solid Walls</a></li>
+<li class="toc-part"><span>Part II</span>Viscoelasticity</li>
+<li><a href="part2-chapter1.html"><span class="toc-num"></span>Characterization of a Viscoelastic Fluid</a></li>
+<li class="toc-part"><span>Part III</span>Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html"><span class="toc-num"></span>Introduction</a></li>
+<li><a href="part3-chapter1.html"><span class="toc-num">Chapter 1</span>Basic principles</a></li>
+<li><a href="part3-chapter2.html"><span class="toc-num">Chapter 2</span>Implementation and isotropy</a></li>
+<li><a href="part3-chapter3.html"><span class="toc-num">Chapter 3</span>Isotropic fifteen-velocity model</a></li>
+<li><a href="part3-chapter4.html"><span class="toc-num">Chapter 4</span>Numerical Simulations</a></li>
+<li><a href="part3-chapter5.html"><span class="toc-num">Chapter 5</span>Constitutive equation</a></li>
+<li><a href="conclusion.html"><span class="toc-num"></span>Conclusion</a></li>
+<li class="toc-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="toc-num">Appendix A</span>Definitions on Viscoelasticity</a></li>
+<li><a href="appendix-b.html"><span class="toc-num">Appendix B</span>Introduction of Objective Derivatives</a></li>
+<li><a href="appendix-c.html"><span class="toc-num">Appendix C</span>Introduction of a Passive Scalar - Modeling of Miscible Fluids</a></li>
+<li class="toc-part"></li><li><a href="bibliography.html"><span class="toc-num"></span>Bibliography</a></li></ol></section>
+
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

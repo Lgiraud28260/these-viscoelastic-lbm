@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Definitions on Viscoelasticity — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => 'A.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li class="current"><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+<ul>
+<li><a href="#a.1introduction"
+id="toc-a.1introduction"><span class="secnum">A.1</span> Introduction</a></li>
+<li><a href="#a.2conservation-laws-and-constitutive-laws"
+id="toc-a.2conservation-laws-and-constitutive-laws"><span class="secnum">A.2</span> Conservation
+laws and constitutive laws</a></li>
+<li><a href="#a.3conditions-imposed-on-constitutive-laws"
+id="toc-a.3conditions-imposed-on-constitutive-laws"><span class="secnum">A.3</span> Conditions
+imposed on constitutive laws</a>
+<ul>
+<li><a href="#a.3.1tensorial-invariance"
+id="toc-a.3.1tensorial-invariance"><span class="secnum">A.3.1</span> Tensorial invariance</a></li>
+<li><a href="#a.3.2symmetry-of-matter-isotropy"
+id="toc-a.3.2symmetry-of-matter-isotropy"><span class="secnum">A.3.2</span> Symmetry of matter,
+Isotropy</a></li>
+<li><a href="#a.3.3objectivity"
+id="toc-a.3.3objectivity"><span class="secnum">A.3.3</span> Objectivity</a></li>
+</ul></li>
+<li><a href="#a.4admissible-constitutive-laws"
+id="toc-a.4admissible-constitutive-laws"><span class="secnum">A.4</span> Admissible constitutive
+laws</a>
+<ul>
+<li><a href="#a.4.1quasi-linear-laws---oldroyd-b-law"
+id="toc-a.4.1quasi-linear-laws---oldroyd-b-law"><span class="secnum">A.4.1</span> Quasi-linear laws
+- Oldroyd-B law</a></li>
+<li><a href="#a.4.2introduction-of-invariants"
+id="toc-a.4.2introduction-of-invariants"><span class="secnum">A.4.2</span> Introduction of
+invariants</a>
+<ul>
+<li><a href="#a.4.2.1elementary-invariants"
+id="toc-a.4.2.1elementary-invariants"><span class="secnum">A.4.2.1</span> Elementary
+invariants</a></li>
+<li><a href="#a.4.2.2white-metzner-model"
+id="toc-a.4.2.2white-metzner-model"><span class="secnum">A.4.2.2</span> White-Metzner
+model</a></li>
+</ul></li>
+<li><a href="#a.4.3nonlinear-laws"
+id="toc-a.4.3nonlinear-laws"><span class="secnum">A.4.3</span> Nonlinear laws</a></li>
+</ul></li>
+<li><a href="#a.5linear-laws-and-complex-viscosity"
+id="toc-a.5linear-laws-and-complex-viscosity"><span class="secnum">A.5</span> Linear laws and
+complex viscosity</a>
+<ul>
+<li><a href="#a.5.1laws-in-integral-form"
+id="toc-a.5.1laws-in-integral-form"><span class="secnum">A.5.1</span> Laws in integral
+form</a></li>
+<li><a href="#a.5.2jeffreys-laws"
+id="toc-a.5.2jeffreys-laws"><span class="secnum">A.5.2</span> Jeffreys laws</a></li>
+<li><a href="#a.5.3complex-viscosity"
+id="toc-a.5.3complex-viscosity"><span class="secnum">A.5.3</span> Complex viscosity</a></li>
+</ul></li>
+</ul>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Appendix A</p><h1>Definitions on Viscoelasticity</h1></header><p><span id="visco2" data-label="visco2"></span></p>
+<h1 id="a.1introduction"><span class="secnum">A.1</span> Introduction</h1>
+<p>The purpose of this appendix is to show the differences between
+classical fluids and non-Newtonian viscoelastic fluids. This appendix is
+based on several course notes [<a href="#ref-COURSGAT">46</a>] [<a
+href="#ref-COURSHINCH">47</a>]. In general, non-Newtonian fluids are
+fluids whose characteristics change as a function of an external
+parameter or of mechanical stresses. Viscoelastic fluids belong to this
+last category.</p>
+<p>If one considers an elastic solid and a viscous fluid, one quickly
+sees that their deformations are of an extremely different type. An
+elastic body returns to its natural undeformed state after the stresses
+applied to it cease. In contrast, viscous fluids have no tendency to
+return to any undeformed initial state. One can therefore naturally
+deduce that the elastic stress depends directly on the deformation,
+while the viscous stress depends only on the deformation rate, that is,
+on its time derivative. A fluid that behaves like a mixture of these two
+characters is called a viscoelastic fluid. In general, a fluid can be
+considered non-Newtonian if its constitutive equation, relating the
+stress tensor to the strain-rate tensor, is no longer directly
+proportional to the latter.</p>
+<h1 id="a.2conservation-laws-and-constitutive-laws"><span class="secnum">A.2</span> Conservation
+laws and constitutive laws</h1>
+<p>In continuum mechanics, for a fluid whose characteristics do not vary
+with temperature, one uses the Cauchy form of the momentum conservation
+equation: <span class="math display">\[\begin{equation}
+\rho \left( \partial_t\,{\mathbf{u}}+{\mathbf{u}}\cdot\nabla{\mathbf{u}}
+\right)= \nabla \cdot{\mathbf{\sigma}}+ F
+\end{equation}\]</span> where <span class="math inline">\(F\)</span> is
+an external forcing term, and the mass conservation equation: <span
+class="math display">\[\begin{equation}
+\partial_t \,\rho + \nabla\cdot {\mathbf{u}}=0.
+\end{equation}\]</span> The unknowns in these four equations number ten
+if one considers that the tensor <span
+class="math inline">\(\sigma\)</span> is symmetric. To close the system,
+we therefore need six additional equations, often deduced from
+experiment: the constitutive laws.</p>
+<h1 id="a.3conditions-imposed-on-constitutive-laws"><span class="secnum">A.3</span> Conditions
+imposed on constitutive laws</h1>
+<p>The constitutive equations, or constitutive laws, give relations
+between the stress <span class="math inline">\(\sigma\)</span>, the
+fluid velocity <span class="math inline">\({\mathbf{u}}(r,t)\)</span>
+through the strain-rate tensor <span class="math inline">\({\dot
+D}\)</span>, its temperature, etc. For each fluid element, these
+relations will involve only local quantities and possibly spatial and
+temporal derivatives. Furthermore, the entire history of the material
+element considered, up to time <span class="math inline">\(t\)</span>,
+may come into play. For viscoelastic fluids, this relation is often
+nonlinear and depends on the complete history of the fluid. The
+constitutive equations must satisfy imposed conditions which can be
+classified into two large families: thermodynamic conditions and
+conditions of invariance under change of axis.</p>
+<p>The thermodynamic conditions result from the first and second laws of
+thermodynamics. They can be summarized as: “The total dissipated power
+must be positive (zero in the reversible case)”. These conditions will
+not be developed here; we will only be interested in “isothermal”
+fluids.</p>
+<p>The conditions of invariance under change of axis come from the fact
+that the equations must be written in a form independent of the
+orientation of the axes (tensorial invariance) and of the motion of the
+frame (objectivity); they must also be compatible with the symmetries of
+the material (isotropy).</p>
+<h2 id="a.3.1tensorial-invariance"><span class="secnum">A.3.1</span> Tensorial invariance</h2>
+<p>The constitutive equations must only contain quantities that can be
+put in a form independent of the orientation of the chosen axes, that
+is, having identical meaning in two systems of axes fixed relative to
+each other, which can be considered a good definition of what a tensor
+is. There can be two types of tensors in a constitutive equation: the
+<span><em>material tensors</em></span> related to the material
+(conductivity tensor, permeability tensor, …) and the <span><em>physical
+tensors</em></span> related to physical quantities. If the constitutive
+equation is written: <span class="math display">\[\begin{equation}
+\label{tt1}
+F\left(M_{ijk},T_{ij},V_{i},\dots\right)=0,
+\end{equation}\]</span> with <span
+class="math inline">\(M\)</span>, <span class="math inline">\(T\)</span>
+and <span class="math inline">\(V\)</span> tensors, then under an
+orthonormal change of coordinates, <span
+class="math display">\[\begin{equation}
+\label{chcoo}
+x&#39;_i=P_{i\,j}\,x_j+ C_i, \qquad
+\left(P_{i\,k}\,P_{j\,k}=\delta_{i\,j}\right)
+\end{equation}\]</span> equation(<a href="#mjx-eqn:tt1">A.3</a>) must
+remain satisfied when <span
+class="math inline">\(M_{ijk},T_{ij},V{i}\)</span> are replaced by <span
+class="math display">\[\begin{equation}
+M&#39;_{ijk}=P_{i\alpha}\,P_{j\beta}\,P_{k\gamma}\,M_{\alpha\beta\gamma},\quad
+T&#39;_{ij}=P_{i\alpha}\,P_{j\beta}\,T_{\alpha\beta},\quad
+V&#39;_i=P_{i\alpha}\,V_{\alpha}.
+\end{equation}\]</span></p>
+<h2 id="a.3.2symmetry-of-matter-isotropy"><span class="secnum">A.3.2</span> Symmetry of matter,
+Isotropy</h2>
+<p>Under any change of axis respecting the symmetries of the material,
+the material tensors remain invariant. The constitutive equations must
+therefore remain unchanged if only a change of basis is applied to the
+physical tensors.</p>
+<p>Maximum symmetry is obtained when the material is isotropic. The
+material tensors then remain unchanged under any transformation of the
+orthonormal group <span class="math inline">\(O(D)\)</span>. Such
+tensors are said to be <span><em>isotropic</em></span>. It is then easy
+to show that the only isotropic second-order tensors are the spherical
+tensors (proportional to <span
+class="math inline">\(\delta_{ij}\)</span>), and that fourth-order
+tensors must necessarily have the form: <span
+class="math display">\[\begin{equation}
+T_{\alpha\beta\gamma\delta}=\lambda\,\left(\delta_{\alpha\beta}\,\delta_{\gamma\delta}+
+\delta_{\alpha\gamma}\,\delta_{\beta\delta}+\delta_{\alpha\delta}\,\delta_{\beta\gamma}    \right)+\mu
+\delta_{\alpha\beta}\delta_{\gamma\delta}\delta_{\beta\gamma}.
+\end{equation}\]</span> When the material is isotropic, the constitutive
+equations must remain unchanged under any transformation of the
+orthogonal group. We thus have, with <span
+class="math inline">\(T\)</span> and <span
+class="math inline">\(V\)</span> material tensors: <span
+class="math display">\[F\left(T_{ij},V_{i},\dots\right)=0 \Rightarrow
+F\left(P_{i\alpha}\,P_{j\beta}\,T_{\alpha\beta},
+P_{i\alpha}\,V_{\alpha}\right)=0\]</span> for any orthogonal matrix
+<span class="math inline">\(P\)</span>. This implies that one can omit
+the material tensors in the constitutive equations in an isotropic
+medium. In general, the media studied in continuum mechanics are
+considered as isotropic; the constitutive equations thus contain only
+physical tensors and are independent of the material element
+considered.</p>
+<h2 id="a.3.3objectivity"><span class="secnum">A.3.3</span> Objectivity</h2>
+<p>The constitutive equations must be independent of the motion of the
+observer; they must therefore be invariant under the transformation
+defined by equation(<a href="#mjx-eqn:chcoo">A.4</a>) when <span
+class="math inline">\(P_{i\,j}\)</span> and <span
+class="math inline">\(C_i\)</span> now depend on time. This is the
+<span><em>objectivity</em></span> principle. This principle leads to
+introducing in the constitutive equations only objective quantities. One
+can show that the position of a material point is not objective: <span
+class="math display">\[\begin{equation}
+x&#39;_i=P_{i\,j}(t)\,x_j+ C_i(t),
+\end{equation}\]</span> that the velocity of this point is not either:
+<span class="math display">\[\begin{equation}
+u&#39;_i=P_{i\,j}(t)\,u_j+\dot{P_{i\,j}}(t)\,x_j+ \dot{C_i}(t).
+\end{equation}\]</span> On the other hand, one can verify that the
+strain-rate tensor: <span class="math display">\[\begin{equation}
+\dot{D}_{ij}={\partial u_i \over \partial x_j} + {\partial u_j \over
+\partial x_i}
+\end{equation}\]</span> is objective, but the rotation-rate tensor of a
+volume element <span class="math inline">\(\Omega\)</span>: <span
+class="math display">\[\begin{equation}
+\Omega_{ij}={\partial u_i \over \partial x_j} - {\partial u_j \over
+\partial x_i}
+\end{equation}\]</span> is not. Let <span
+class="math inline">\({\mathcal{W}}\)</span> be an objective quantity of
+order 2; it can be shown that an objective time derivative is
+necessarily of the form: <span class="math display">\[\begin{equation}
+{\partial_{obj.} {\mathcal{W}}\over \partial t}={D\,{\mathcal{W}}\over D
+t}+a\,{\mathcal{W}}\cdot
+{\mathcal{K}}+(d-1)\,{\mathcal{K}}\cdot{\mathcal{W}}+(a-1)\,
+{\mathcal{W}}\cdot{\mathcal{K}}^T+d\,{\mathcal{K}}^T\cdot{\mathcal{W}},
+\end{equation}\]</span> with <span class="math inline">\(\displaystyle
+({\mathcal{K}})_{ij}={\partial u_i\over \partial x_j}\)</span>, and
+<span class="math inline">\(D\)</span> indicating the material
+derivative. One can then choose the parameters to obtain different types
+of derivatives; some choices can be noted:</p>
+<ul>
+<li><p>if <span class="math inline">\(a=d=0\)</span> then this
+derivative is the convective derivative: <span
+class="math display">\[\begin{equation}
+{\partial_{obj.} {\mathcal{W}}\over \partial
+t}={\mathcal{W}}_{[1]}={D\,{\mathcal{W}}\over D t}-\left(
+{\mathcal{W}}\cdot{\mathcal{K}}^T+
+  {\mathcal{K}}\cdot{\mathcal{W}}\right),
+\end{equation}\]</span></p></li>
+<li><p>if <span class="math inline">\(a=d=1/2\)</span> then this
+derivative is the so-called Jaumann derivative: <span
+class="math display">\[\begin{equation}
+{\partial_{obj.} {\mathcal{W}}\over \partial
+t}={\mathcal{W}}_{[1]}^J={D\,{\mathcal{W}}\over D t}+{1\over
+  2}\left({\mathcal{W}}\cdot\Omega+\Omega^T \cdot{\mathcal{W}}\right),
+\end{equation}\]</span> which can also be written: <span
+class="math display">\[\begin{equation}
+{\mathcal{W}}_{[1]}^J={\mathcal{W}}_{[1]}+{1\over
+2}\left({\mathcal{W}}\cdot{\dot D}+ {\dot D}^T\cdot{\mathcal{W}}\right).
+\end{equation}\]</span></p></li>
+</ul>
+<p>The derivatives we will denote <span
+class="math inline">\({\mathcal{W}}_{[i]}\)</span> will be convective
+derivatives of order <span class="math inline">\(i\)</span>; by
+continuity and for consistency reasons, we will take: <span
+class="math display">\[\begin{equation}
+{\mathcal{W}}_{[0]}={\mathcal{W}}.
+\end{equation}\]</span></p>
+<h1 id="a.4admissible-constitutive-laws"><span class="secnum">A.4</span> Admissible constitutive
+laws</h1>
+<p>The previously indicated conditions, although numerous, do not allow
+writing a global constitutive equation valid for all fluids. One can
+nevertheless classify them into several groups. The simplest group is
+the quasi-linear group.</p>
+<h2 id="a.4.1quasi-linear-laws---oldroyd-b-law"><span class="secnum">A.4.1</span> Quasi-linear laws
+- Oldroyd-B law</h2>
+<p>A generic quasi-linear constitutive law containing time derivatives
+can be written from the previous indications in the form: <span
+class="math display">\[\begin{equation}
+\label{generique}
+\lambda_i\,\sigma_{[i]}=-\mu_0\,\left(\lambda&#39;_j\,D_{[j]} \right)
+\qquad i\geq 0,\, j\geq 1.
+\end{equation}\]</span> with <span class="math inline">\(\mu_0\)</span>
+a viscosity, <span class="math inline">\(\lambda_i\)</span> and <span
+class="math inline">\(\lambda&#39;_i\)</span> functions of the
+elementary invariants of the stress tensor <span
+class="math inline">\(\sigma\)</span> and the strain tensor <span
+class="math inline">\(D\)</span>. It is interesting to note that: <span
+class="math display">\[\begin{equation}
+D_{[n+1]}={\partial^n {\dot D}\over \partial t^n}.
+\end{equation}\]</span> Indeed, one can then pass from a viscoelastic
+fluid to a viscous fluid and recover the Navier-Stokes equations by
+taking <span class="math inline">\(i=0\)</span> and <span
+class="math inline">\(j=1\)</span>, or, more generally, <span
+class="math inline">\(j=i+1\)</span> and <span
+class="math inline">\(\lambda_j=\lambda_{i+1}\)</span>..</p>
+<p>One can then give a definition of a quasi-linear viscoelastic fluid:
+<span><em>A viscoelastic fluid is a non-Newtonian fluid whose
+constitutive law is of the form defined by equation (<a
+href="#mjx-eqn:generique">A.16</a>).</em></span></p>
+<p>Starting from this law, it is possible, with the valuable aid of
+experiment, to determine a constitutive equation corresponding to the
+fluid considered. Among these, some have become more famous than
+others.</p>
+<p>The so-called Oldroyd-B model [<a href="#ref-Oldroyd">1</a>], or
+convective Jeffreys model, is given by: <span
+class="math display">\[\begin{equation}
+\label{oldroyd-B}
+\sigma+\tau_1\,\sigma_{[1]}=-\mu_0\,\left(D_{[1]} +
+\tau_2\,D_{[2]}    \right).
+\end{equation}\]</span> The constant <span
+class="math inline">\(\tau_1\)</span> is called the relaxation time and
+<span class="math inline">\(\tau_2\)</span> the retardation time. One
+can note that, if they are both zero and, in the limit, equal, one
+recovers the constitutive equation of a classical Newtonian fluid. This
+equation is commonly used in numerical modeling. This model also serves
+as a basis for constructing nonlinear models. The simplest linear
+viscoelastic model is the Maxwell model constructed by taking <span
+class="math inline">\(\tau_2=0\)</span>.</p>
+<h2 id="a.4.2introduction-of-invariants"><span class="secnum">A.4.2</span> Introduction of
+invariants</h2>
+<p>One can complicate the models already obtained by introducing
+invariants of the system into the constitutive equations.</p>
+<h3 id="a.4.2.1elementary-invariants"><span class="secnum">A.4.2.1</span> Elementary
+invariants</h3>
+<p>It can be shown that the characteristic polynomial of a matrix <span
+class="math inline">\(({\mathcal{W}})_{ij}\)</span>, associated with the
+tensor <span class="math inline">\({\mathcal{W}}\)</span>, is invariant
+under change of basis. Let <span
+class="math inline">\({\mathcal{Q}}\)</span> be the change-of-basis
+matrix satisfying <span
+class="math inline">\({\mathcal{Q}}\cdot{\mathcal{Q}}^{-1}={\mathcal{I}}\)</span>.
+Then the characteristic polynomial of the matrix <span
+class="math inline">\({\mathcal{W}}&#39;={\mathcal{Q}}^{-1}\cdot{\mathcal{W}}\cdot{\mathcal{Q}}\)</span>
+satisfies: <span class="math display">\[\begin{eqnarray}
+P_c(\lambda)=\det\left({\mathcal{W}}&#39;-\lambda\,{\mathcal{I}}\right)&amp;=&amp;\det\left({\mathcal{Q}}^{-1}\cdot{\mathcal{W}}\cdot{\mathcal{Q}}-
+  \lambda\,{\mathcal{I}}\right) \nonumber\\
+&amp;=&amp;\det\left({\mathcal{Q}}^{-1}\cdot\left( {\mathcal{W}}-\lambda
+\,{\mathcal{I}}\right)\cdot{\mathcal{Q}}\right)\\
+&amp;=&amp;\det\left({\mathcal{Q}}^{-1}
+\right)\,\det\left({\mathcal{W}}-\lambda \,{\mathcal{I}}\right)\,
+\det\left({\mathcal{Q}}
+\right)            \nonumber\\
+&amp;=&amp;\det\left( {\mathcal{W}}-\lambda \,{\mathcal{I}}\right)
+\nonumber
+\end{eqnarray}\]</span></p>
+<p>Moreover, for a second-order tensor in three dimensions, one can
+write the characteristic polynomial <span
+class="math display">\[\begin{equation}
+P_c(\lambda)=-\lambda^3+M_I\,\lambda^2-M_{II}\,\lambda+M_{III},
+\end{equation}\]</span> and <span
+class="math inline">\(M_I,\,M_{II}\mbox{ and}\,M_{III}\)</span> are
+called the elementary invariants associated with the tensor <span
+class="math inline">\({\mathcal{W}}\)</span>, and we have: <span
+class="math display">\[\begin{eqnarray}
+M_I&amp;=&amp;{\mathrm{Tr}}\left({\mathcal{W}}\right)\nonumber\\
+M_{II}&amp;=&amp;{1\over
+2}\left[{\mathrm{Tr}}^2\left({\mathcal{W}}\right)-{\mathrm{Tr}}\left({\mathcal{W}}^2\right)
+\right]\\
+M_{III}&amp;=&amp;\det\left({\mathcal{W}}\right)={1\over
+  3}\left[{\mathrm{Tr}}\left({\mathcal{W}}^3\right)-M_I\,{\mathrm{Tr}}\left({\mathcal{W}}^2\right)+
+M_{II}\,{\mathrm{Tr}}\left({\mathcal{W}}\right)
+    \right]\nonumber
+\end{eqnarray}\]</span></p>
+<h3 id="a.4.2.2white-metzner-model"><span class="secnum">A.4.2.2</span> White-Metzner model</h3>
+<p>The White-Metzner model [<a href="#ref-WM">2</a>] is a variant of the
+Oldroyd-B model in which the viscosity depends on the invariants of
+<span class="math inline">\(\dot D\)</span>: <span
+class="math display">\[\begin{equation}
+\label{White-Metzner}
+\sigma+{\mu({\dot\gamma})\over G}\,\sigma_{[1]}=-\mu({\dot\gamma}
+)\,D_{[1]}
+\end{equation}\]</span> where <span
+class="math inline">\({\dot\gamma}\)</span> is related to the invariants
+of <span class="math inline">\(\dot D\)</span> by <span
+class="math display">\[\begin{equation}
+\label{shear-rate}
+{\dot\gamma}=\sqrt{{1\over 2} {\mathrm{Tr}}\left({\dot
+D}^2\right)}=\sqrt{{{\dot D}_I^2
+    \over 2}- {\dot D}_{II}},
+\end{equation}\]</span> <span class="math inline">\(G\)</span> a
+constant and the viscosity <span
+class="math inline">\(\mu({\dot\gamma})\)</span> a function often chosen
+as a power law with two parameters <span
+class="math inline">\(m\)</span> expressed in <span
+class="math inline">\(\mathrm{Pa.s}^n\)</span>, and <span
+class="math inline">\(n\)</span> dimensionless: <span
+class="math display">\[\begin{equation}
+\label{lpuissance}
+\mu({\dot\gamma})=m\,{\dot \gamma}^{n-1}.
+\end{equation}\]</span> When <span
+class="math inline">\(n&gt;1\)</span>, the fluid is said to be dilatant
+(<span><em>shear thickening</em></span>); when <span
+class="math inline">\(n&lt;1\)</span> the fluid is said to be
+pseudo-plastic (<span><em>shear thinning</em></span>). The vast majority
+of fluids are of pseudo-plastic type, that is, their viscosity decreases
+with stress. The motion of the fluid breaks its internal structure.</p>
+<p>Another law can be chosen, such as the Carreau-Yasuda law [<a
+href="#ref-carreau">4</a>] [<a href="#ref-yasuda">5</a>], with five free
+parameters <span class="math inline">\((\mu_0,\mu_\infty,\lambda,n
+\mbox{ and }a)\)</span>: <span class="math display">\[\begin{equation}
+\label{carreau-yasuda}
+{\mu-\mu_\infty \over \mu_0-\mu_\infty}=\left[ 1+\left(
+\lambda{\dot\gamma}^a     \right)   \right]^{(n-1)/a}.
+\end{equation}\]</span> The power law poorly represents the viscosity of
+the fluid for very low stress; the Carreau-Yasuda law fills this
+gap.</p>
+<h2 id="a.4.3nonlinear-laws"><span class="secnum">A.4.3</span> Nonlinear laws</h2>
+<p>One can complicate the constitutive laws at will, but a remark by
+Oldroyd about the Oldroyd-B model will lead to a form of law possessing
+eight free parameters, and allowing the modeling of a considerable
+number of viscoelastic fluids. The Oldroyd-B model intrinsically
+contains quadratic terms in velocity gradient, but not in a systematic
+way; one can therefore include those that are missing manually, which
+gives the so-called “Oldroyd-8-constants” equation: <span
+class="math display">\[\begin{eqnarray}
+\label{oldroyd-8-constants}
+\sigma+\tau_1\,\sigma_{[1]}+{1\over 2}\, \tau_3 \,\left(D_{[1]}
+\cdot\sigma+\sigma\cdot D_{[1]}  \right)+
+{1\over 5}\, \tau_5\, \sigma_I\,D_{[1]}+{1\over 2}\, \tau_6\,\left(
+\sigma:D_{[1]}\right){\mathcal{I}}\nonumber \\
+\qquad = -\mu_0\, \left[D_{[1]} + \tau_2\,D_{[2]}\right] -\mu_0\,
+\left[\tau_4\,\left(
+    D_{[1]}\cdot D_{[1]}  \right) +{1\over 2}\,\tau_7\,\left(
+D_{[1]}:D_{[1]}
+\right){\mathcal{I}}\right].
+\end{eqnarray}\]</span> The first two terms of the expression on the
+left of the equal sign and the first two terms on the right constitute
+the Oldroyd-B equation. There are validity conditions for the various
+constants of equation (<a href="#">A.26</a>). We will not develop them
+here.</p>
+<h1 id="a.5linear-laws-and-complex-viscosity"><span class="secnum">A.5</span> Linear laws and
+complex viscosity</h1>
+<h2 id="a.5.1laws-in-integral-form"><span class="secnum">A.5.1</span> Laws in integral form</h2>
+<p>The previous laws can be put, in a simple way or not, in integral
+form. In general, one shows that one can rewrite a linear constitutive
+equation in the form: <span class="math display">\[\begin{equation}
+\label{comportementintegralM}
+\sigma(t)=\int_{-\infty}^t{M(t-t&#39;)\,D_{[0]}(t,t&#39;)\,dt&#39;}
+\end{equation}\]</span> where <span
+class="math inline">\(M(t,t&#39;)\)</span> is the <span><em>memory
+function</em></span> of the fluid. One also defines the
+<span><em>relaxation modulus</em></span> function <span
+class="math inline">\(G(t,t&#39;)\)</span> by: <span
+class="math display">\[\begin{equation}
+\label{comportementintegralG}
+\sigma(t)=-\int_{-\infty}^t{G(t-t&#39;)\,{\dot
+D}_{[0]}(t&#39;)\,dt&#39;},
+\end{equation}\]</span> one then has, by integration by parts, the
+relation: <span class="math display">\[\begin{equation}
+M(t-t&#39;)={\partial G(t-t&#39;) \over \partial t}.
+\end{equation}\]</span></p>
+<h2 id="a.5.2jeffreys-laws"><span class="secnum">A.5.2</span> Jeffreys laws</h2>
+<p>To facilitate the integration of the Oldroyd-B model, we will make
+the following simplification; let us replace the convective derivatives
+by partial derivatives, this amounts to neglecting the quadratic terms
+in velocity gradient. One then obtains the Jeffreys constitutive
+equation: <span class="math display">\[\begin{equation}
+\label{jeffreys}
+\sigma+\,\tau_1 {\partial \sigma \over \partial t}=\mu_0\,\left({\dot
+D}+\tau_2\,{\partial {\dot D} \over \partial
+    t}    \right).
+\end{equation}\]</span></p>
+<p>One can then integrate equation (<a
+href="#mjx-eqn:jeffreys">A.30</a>), and its relaxation modulus is then
+given by: <span class="math display">\[\begin{equation}
+\label{modrelaxjeffreys}
+G(t-t&#39;)=\mu_0\left(1-{\tau_2 \over \tau_1}
+\right)\,e^{-(t-t&#39;)/\tau_1} + 2 {\mu_0\,\tau_2
+  \over \tau_1}\,\delta(t-t&#39;),
+\end{equation}\]</span> where the function <span
+class="math inline">\(\delta(t-t&#39;)\)</span> is the Dirac
+function.</p>
+<p>The Jeffreys equation is very often used in rheology. It allows
+modeling the internal layers of the Earth’s crust for example [<a
+href="#ref-Jeffreys">3</a>]. It is mainly this equation that we will try
+to model by the lattice Boltzmann method.</p>
+<h2 id="a.5.3complex-viscosity"><span class="secnum">A.5.3</span> Complex viscosity</h2>
+<p>Problems involving time-periodic effects can be simplified by
+switching to complex notation. Indeed, in Fourier space, a Jeffreys-type
+equation (<a href="#mjx-eqn:jeffreys">A.30</a>) can be written <span
+class="math display">\[\begin{equation}
+\label{jeffreys-complexe}
+\sigma\,\left(1+i\,\omega\,\tau_1\right)=\mu_0\,{\dot
+D}\left(1+i\,\omega\,\tau_2  \right),
+\end{equation}\]</span> or more simply, by analogy with Newtonian fluids
+and with a complex viscosity: <span
+class="math display">\[\begin{equation}
+\label{jeffreys-complexe2}
+\sigma=\mu^*\,{\dot D}\qquad\mbox{with
+}\mu^*=\mu_0\,{1+i\,\omega\,\tau_1\over 1+i\,\omega\,\tau_2 }.
+\end{equation}\]</span></p>
+<p>The complex viscosity can also be written in a simpler form: <span
+class="math display">\[\begin{equation}
+\label{visco-complexe}
+\mu^*=\mu_\infty+{\mu_0-\mu_\infty \over 1+i\,\omega\,\tau_1}
+\end{equation}\]</span> with <span
+class="math display">\[\begin{equation}
+\mu_\infty=\mu_0\,{\tau_2 \over \tau_1}
+\end{equation}\]</span> This formulation allows problems to be treated
+with methods similar to those used for Newtonian fluids, and it will
+therefore be very commonly used in the rest of our study.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-Oldroyd"><span class="refnum">[1]</span> J. G. Oldroyd, “On the formulation of rheological
+equations of state”, <span><em>Proc. Roy. Soc.</em></span>, Vol. A200,
+1950, pp. 523–541. <a class="refall" href="bibliography.html#ref-Oldroyd" title="In the full bibliography">↗</a></li>
+<li id="ref-WM"><span class="refnum">[2]</span> J.L. White and A.B. Metzner, <span><em>J. Appl. Polym.
+Sci.</em></span>, <span><strong>7</strong></span>, 1963,
+pp. 1867-1889. <a class="refall" href="bibliography.html#ref-WM" title="In the full bibliography">↗</a></li>
+<li id="ref-Jeffreys"><span class="refnum">[3]</span> H. Jeffreys, “The earth”, <span><em>Cambridge
+University Press</em></span>, 1929, pp. 265 <a class="refall" href="bibliography.html#ref-Jeffreys" title="In the full bibliography">↗</a></li>
+<li id="ref-carreau"><span class="refnum">[4]</span> P.J. Carreau, Ph.D. Thesis, University of Wisconsin,
+Madison (1968) <a class="refall" href="bibliography.html#ref-carreau" title="In the full bibliography">↗</a></li>
+<li id="ref-yasuda"><span class="refnum">[5]</span> K. Yasuda, Ph.D. Thesis, M.I.T. (1979) <a class="refall" href="bibliography.html#ref-yasuda" title="In the full bibliography">↗</a></li>
+<li id="ref-COURSGAT"><span class="refnum">[46]</span> R. Gatignol, Notes de Cours de D.E.A. de
+M<span>é</span>canique (1994) <a class="refall" href="bibliography.html#ref-COURSGAT" title="In the full bibliography">↗</a></li>
+<li id="ref-COURSHINCH"><span class="refnum">[47]</span> E.J. Hinch, Notes de Cours de l’<span>É</span>cole
+Doctorale de Physique - E.N.S. (1996) <a class="refall" href="bibliography.html#ref-COURSHINCH" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="conclusion.html"><span>Previous</span>Conclusion</a><a class="next" href="appendix-b.html"><span>Next</span>Introduction of Objective Derivatives</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

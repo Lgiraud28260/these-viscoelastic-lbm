@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Basic principles — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '1.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li class="current"><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method — Chapter 1</p><h1>Basic principles</h1></header><p>Let us recall, first of all, that a Newtonian viscous fluid responds,
+by a nonzero stress, to a variation of the deformation, and, calling
+<span class="math inline">\(\sigma_{ij}\)</span> the stress and <span
+class="math inline">\({\dot D}_{ij}=\partial_i v_j+\partial_j
+v_i\)</span> the deformation rate as a function of the local velocity
+<span class="math inline">\(v\)</span>, we then have as the constitutive
+law: <span class="math display">\[\begin{equation}
+\label{Newton-comp}
+\sigma_{ij}=- \mu \, {\dot D}_{ij},
+\end{equation}\]</span> the constant <span
+class="math inline">\(\mu\)</span> denoting the dynamic shear
+viscosity.</p>
+<p>The first idea one can have of a viscoelastic fluid is that it keeps,
+for a sufficiently long time, the memory of the stresses it has
+undergone in its past. The simplest equation to describe this phenomenon
+is the equation of Maxwell  [<a href="#ref-Maxwell">8</a>], where one
+makes the assumption that the memory of the fluid decays exponentially:
+<span class="math display">\[\begin{equation}
+\label{Maxwell-comp}
+\sigma_{ij}+\tau_1\,{\partial \sigma_{ij} \over \partial t }=-\mu \,
+{\dot D}_{ij},
+\end{equation}\]</span> the quantity <span
+class="math inline">\(\tau_1\)</span> being then a relaxation time. This
+equation integrates to: <span class="math display">\[\begin{equation}
+\label{Maxwell-comp-inter}
+\sigma_{ij}=-\int_{-\infty}^t{\left\{ {\mu\over \tau_1}
+e^{-{t-t&#39;\over \tau_1}}\right\} {\dot D_{ij}} dt&#39;  }.
+\end{equation}\]</span> One can already note that if the fluid loses
+memory very rapidly, <span class="math inline">\(\tau_1\)</span> becomes
+small, this being the assumption made for classical fluids, and then
+equation (<a href="#mjx-eqn:Maxwell-comp">1.2</a>) does tend toward the
+equation describing the behaviour of Newtonian fluids.</p>
+<p>From the set of <span class="math inline">\(n\)</span> populations at
+each lattice point, one can build <span class="math inline">\(n\)</span>
+modes or moments by linear combinations. The lattice Boltzmann scheme
+will then lead these modes to undergo a relaxation toward an equilibrium
+state. The relaxation times of these modes determine the different
+characters of the fluid, such as viscosity. They are introduced as the
+eigenvalues of the collision operator. When one performs a
+Chapman-Enskog expansion of the lattice Boltzmann models, one can
+isolate several moments linked to the components of the deformation rate
+tensor <span class="math inline">\({\dot D}\)</span>. Take the example
+of the two-dimensional model. Equations (<a
+href="part1-chapter3.html#mjx-eqn:sxx">3.18</a>) and (<a
+href="part1-chapter3.html#mjx-eqn:sxy">3.19</a>), for the moments
+denoted <span class="math inline">\(S_{xx}\)</span> and <span
+class="math inline">\(S_{xy}\)</span> in the expansion we carried out in
+part <a href="part1-chapter3.html">3</a>, can easily be rewritten: <span
+class="math display">\[\begin{eqnarray}
+S_{xx}^{(1)}+{1\over\lambda_\nu}\,{\partial S_{xx}^{(0)}\over \partial
+t_1}&amp;=&amp;-{\rho\over 3 \lambda_\nu} {\dot D}_{xx}^*,\\
+S_{xy}^{(1)}+{1\over\lambda_\nu}\,{\partial S_{xy}^{(0)}\over \partial
+t_1}&amp;=&amp;-{\rho\over 3 \lambda_\nu} {\dot D}_{xy}^*.
+\end{eqnarray}\]</span> The tensor <span class="math inline">\({\mathbf
+{\dot D}^*}\)</span> is related to the deformation rate tensor and to
+the space dimension, <span class="math inline">\(d\)</span>, by: <span
+class="math display">\[\begin{equation}
+\rho\,{
+\dot{\mathbf{D}}}^*=\rho\,{\dot{\mathbf{D}}}-\frac{2}{d}\,{\mathbf{I}}\,
+\left(\nabla\cdot {\mathbf{j}} \right).
+\end{equation}\]</span> The tensors <span class="math inline">\({\mathbf
+{\dot D}^*}\)</span> and <span class="math inline">\({\mathbf {\dot
+D}}\)</span> coincide in the case of an incompressible fluid.</p>
+<p>Up to now, in the study of the viscous cases, we had taken <span
+class="math inline">\(\lambda_\nu\)</span> of order 1, which corresponds
+to a short relaxation time. The quantities <span
+class="math inline">\(S_{\alpha\beta}^{(0)}\)</span> were then of order
+<span class="math inline">\(u^2\)</span> or zero, which has the effect
+of eliminating the time-derivative terms of these quantities and of
+recovering the classical Navier-Stokes equations. Indeed, if one makes
+this type of hypothesis, we can deduce the constitutive equation of our
+lattice Boltzmann gas: indeed, we then have: <span
+class="math display">\[\begin{eqnarray}
+S_{xx}^{(1)}&amp;=&amp;-{\rho \over 3 \lambda_\nu} {\dot D}_{xx}^*,\\
+S_{xy}^{(1)}&amp;=&amp;-{\rho \over 3 \lambda_\nu} {\dot D}_{xy}^*,
+\end{eqnarray}\]</span> and, taking the kinematic shear viscosity <span
+class="math inline">\(\nu\)</span> as: <span
+class="math display">\[\begin{equation}
+\nu={1\over 3}\left({1\over  \lambda_\nu}-{1\over 2}   \right)={\mu\over
+\rho},
+\end{equation}\]</span> and by identifying the components of the stress
+tensor <span class="math inline">\(\sigma\)</span>, this leads us to:
+<span class="math display">\[\begin{eqnarray}
+\sigma_{xx}&amp;=&amp;\left(1-{\lambda_\nu\over 2}\right)\,
+S_{xx}^{(1)}=-\mu \, {\dot D}_{xx}^*,\\
+\sigma_{xy}&amp;=&amp;\left(1-{\lambda_\nu\over 2}\right)\,
+S_{xy}^{(1)}=-\mu \, {\dot D}_{xx}^*.
+\end{eqnarray}\]</span> This is indeed the constitutive equation of a
+Newtonian fluid when one is placed in the incompressible limit.</p>
+<p>We will adapt to the lattice Boltzmann gas the idea already presented
+in  [<a href="#ref-DLCRAS">18</a>]. Thus, after the addition of extra
+internal variables to the viscous modes, we will let them relax with a
+very long, even infinite, relaxation time. The relaxation times of the
+viscous modes, which are traditionally short, will then become long, and
+this will guarantee a memory effect in the fluid. We will thus create
+temporal memory effects.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-Maxwell"><span class="refnum">[8]</span> J. C. Maxwell, <span><em>Phil. Trans. Roy.
+Soc.</em></span>, <span><strong>A157</strong></span>, 1867,
+pp. 49-88. <a class="refall" href="bibliography.html#ref-Maxwell" title="In the full bibliography">↗</a></li>
+<li id="ref-DLCRAS"><span class="refnum">[18]</span> D. d’Humi<span>è</span>res and P. Lallemand, “Gaz sur
+r<span>é</span>seau pour la repr<span>é</span>sentation des ondes
+transverses”, <span><em>C.R. Acad. Sci. Paris</em></span>, t.317,
+S<span>é</span>rie II, 1993, pp. 997–1001. <a class="refall" href="bibliography.html#ref-DLCRAS" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="part3-introduction.html"><span>Previous</span>Introduction</a><a class="next" href="part3-chapter2.html"><span>Next</span>Implementation and isotropy</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Implementation and isotropy — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '2.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li class="current"><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+<ul>
+<li><a href="#introduction"
+id="toc-introduction"><span class="secnum">2.1</span> Introduction</a></li>
+<li><a href="#dispersion-equation"
+id="toc-dispersion-equation"><span class="secnum">2.2</span> Dispersion equation</a></li>
+<li><a href="#first-viscoelastic-model"
+id="toc-first-viscoelastic-model"><span class="secnum">2.3</span> First viscoelastic model</a></li>
+<li><a href="#isotropic-eleven-velocity-model"
+id="toc-isotropic-eleven-velocity-model"><span class="secnum">2.4</span> Isotropic eleven-velocity
+model</a>
+<ul>
+<li><a href="#quasi-elastic-model"
+id="toc-quasi-elastic-model"><span class="secnum">2.4.1</span> <span><em>Quasi-elastic</em></span>
+model</a></li>
+<li><a href="#viscous-model" id="toc-viscous-model"><span class="secnum">2.4.2</span> Viscous
+model</a></li>
+<li><a href="#visco-demo" id="toc-visco-demo"><span class="secnum">2.4.3</span> Viscoelastic
+model</a></li>
+</ul></li>
+</ul>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method — Chapter 2</p><h1>Implementation and isotropy</h1></header><h1 id="introduction"><span class="secnum">2.1</span> Introduction</h1>
+<p>The simple principle of introducing temporal effects gives rise to
+nontrivial problems. Indeed, the Chapman-Enskog expansion, which allows
+us to separate the time scales, is no longer suited to handling these
+effects. This expansion is performed under the assumption that the
+longest times are smaller than the inverse of the smallest nonzero
+eigenvalue of the collision operator. This amounts to saying that the
+second-order dynamics of the non-conserved quantities is neglected. This
+assumption is clearly not satisfied in the case of the introduction of a
+large but finite relaxation time, because the long-time modes will
+permanently be far from their equilibrium values. We will only be able
+to use this expansion, as it stands, in the case where the relaxation
+times we consider will be infinite, that is, the case where these modes
+will be conserved quantities of the model. The Chapman-Enskog expansion
+will then be valuable to us for the determination of isotropy conditions
+of the models as well as for the determination of the equilibrium
+quantities when it is usable. Moreover, this expansion is only valid in
+the hydrodynamic limit, that is, at small wavenumber <span
+class="math inline">\(k\)</span> and small frequency <span
+class="math inline">\(\omega\)</span>.</p>
+<h1 id="dispersion-equation"><span class="secnum">2.2</span> Dispersion equation</h1>
+<p>An alternative to the Chapman-Enskog expansion for studying the
+models in which we will have finite but very large relaxation times, is
+to choose a method used, among others, by Coevorden <span><em>et
+al.</em></span> [<a href="#ref-CEBS">23</a>]. This method is based on
+the analysis of the dispersion equation.</p>
+<p>To determine the dispersion equation of our models, we will use a
+technique identical to that of the study of hydrodynamic fluctuations,
+but with the variables density, velocity, pressure,
+<span><em>etc.</em></span>, replaced by the populations <span
+class="math inline">\(N_i\)</span>.</p>
+<p>Let us consider a perturbation of the populations around an
+equilibrium state, <span class="math display">\[\begin{equation}
+N_i(\vec{r},t)=\delta N_i(\vec{r},t)+N_i^{(0)}.
+\end{equation}\]</span></p>
+<p>Since we are going to look at the evolution of the fluctuations, or
+perturbations, we will make the hypothesis of a quasi-stationary and
+homogeneous equilibrium state, that is, <span
+class="math inline">\(N_i^{(0)}\)</span> depends neither on space nor on
+time explicitly, but only on the density and the mean velocity. Because
+the fluctuations <span class="math inline">\(\delta N_i\)</span> around
+their equilibrium values <span class="math inline">\(N_i^{(0)}\)</span>
+are small, the equations describing their spatial and temporal
+variations are obtained by linearizing the evolution equation.</p>
+<p>The evolution equation of our lattice Boltzmann gas being written,
+<span
+class="math display">\[N_i(\vec{r}+\vec{c}_i,t+1)=N_i(\vec{r},t)-\sum_{j=0}^{b}{\Omega_{ij}\,\left(
+N_j-N_j^{(0)}\right)},\]</span> its linearization gives, keeping the
+first order of expansion in <span class="math inline">\(\delta
+N_i\)</span>,</p>
+<p><span class="math display">\[\begin{equation}
+\delta N_i(\vec{r}+\vec{c}_i,t+1)=-\left( {\partial H_i \over \partial
+N_j}\right)^{(0)}\, \delta N_j(\vec{r},t),
+\end{equation}\]</span> where <span class="math inline">\(\displaystyle
+H_i=N_i(\vec{r},t)-\sum_i{\Omega_{ij}\,\left(
+N_j-N_j^{(0)}\right)}\)</span>.</p>
+<p>We seek a solution of the form: <span
+class="math display">\[\begin{equation}
+\delta{\mathbf{N}}=\delta{\mathbf{N}}_0\,e^{i(\,{\mathbf{k}}\cdot{\mathbf{r}}-\omega\,t)},
+\end{equation}\]</span> which leads us to: <span
+class="math display">\[\begin{equation}
+\delta N_j({\mathbf{k}},t+1)=- e^{-i\,{\mathbf{k}}. \vec{c}_j}\left(
+{\partial H_j \over \partial
+    N_l}\right)^{(0)}\,\delta N_l({\mathbf{k}},t).
+\end{equation}\]</span></p>
+<p>We must now compute <span class="math inline">\(\displaystyle\left(
+{\partial H_j \over \partial
+    N_l}\right)^{(0)}\)</span>, which gives us: <span
+class="math display">\[\begin{eqnarray}
+&amp;\displaystyle\left( {\partial H_j \over \partial
+N_l}\right)^{(0)}&amp;=\delta_{j\,l}-{\partial \over \partial
+N_l}\,\sum_m{\Omega_{j\,m} (N_m-N_m^{(0)})} \nonumber \\
+&amp;&amp;=\delta_{j\,l}-\sum_m{\Omega_{j\,m}(\delta_{m\,l}-T_{m\,l})}\\
+&amp;&amp;=\delta_{j\,l}-C_{j\,l} \nonumber
+\end{eqnarray}\]</span></p>
+<p>In practice, one can greatly simplify this computation by carrying it
+out in the basis where the collision matrix is diagonal, such as that
+proposed in part <a href="part1-chapter3.html">3</a>.</p>
+<p>Returning to the initial conditions, one obtains: <span
+class="math display">\[\begin{equation}
+\delta N_j({\mathbf{k}},t)=\left(- e^{-i\,{\mathbf{k}}. \vec{c}_j}\left(
+\delta_{j\,l}-C_{j\,l}\right)\right)^t \delta N_l({\mathbf{k}},0),
+\end{equation}\]</span> and, taking the Fourier transform with respect
+to the time variable, one finds: <span
+class="math display">\[\begin{equation}
+\delta N_j({\mathbf{k}},\omega)={-1 \over \delta_{j\,l}-e^{-i\,\omega}
+\left(e^{-i\,{\mathbf{k}}.
+\vec{c}_j}(\delta_{j\,l}-C_{j\,l})   \right)}\delta N_l({\mathbf{k}},0),
+\end{equation}\]</span> where we made use of the rule for the summation
+of geometric series. Rearranging the terms, we finally have: <span
+class="math display">\[\begin{equation}
+\delta N_j({\mathbf{k}},\omega)=\left({ z \,e^{i\,{\mathbf{k}}.
+\vec{c}_j} \over (1-z\,e^{i\,{\mathbf{k}}.
+\vec{c}_j})\delta_{j\,l}-C_{j\,l} }\right)\delta N_l({\mathbf{k}},0),
+\end{equation}\]</span> with <span class="math inline">\(\displaystyle
+z=e^{i\,\omega}\)</span>.</p>
+<p>The dispersion equation is then a solvability condition of the
+system, made up of the previous dispersion relations, and is expressed
+by:</p>
+<p><span class="math display">\[\begin{equation}
+\label{dispersion}
+D(z)=Det((1-z\,e^{i\,{\mathbf{k}}. \vec{c}_j})\delta_{j\,l}-C_{j\,l})=0.
+\end{equation}\]</span></p>
+<p>For a given wave vector <span
+class="math inline">\({\mathbf{k}}\)</span>, the roots of <span
+class="math inline">\(D(z)=0\)</span> give the frequency in the complex
+plane of the corresponding “mode” in such a way that there exists a
+nonzero population vector <span
+class="math inline">\(\delta{\mathbf{N}}_0\,e^{i(-\omega
+t+\mathbf{k.r})}\)</span> solution of the linearized Boltzmann equation.
+Even though the analytical computation of the determinant <span
+class="math inline">\(D(z)\)</span> is possible by means of symbolic
+computation software, the hope of exhibiting analytic roots of it is in
+vain. The solutions will therefore be approximated either by a numerical
+solver, or by means of an expansion in powers of <span
+class="math inline">\(k\)</span>. According to classical studies of
+hydrodynamic fluctuations, as described for example in [<a
+href="#ref-BY">17</a>], one predicts that there exist solutions which,
+regardless of the spatial orientation of the wave vector <span
+class="math inline">\(k\)</span>, take the form: <span
+class="math display">\[\begin{equation}
+\label{transverse}
+\omega=-\nu\,k^2,
+\end{equation}\]</span> with <span class="math inline">\(\nu\)</span>
+the shear viscosity, for the purely diffusive modes which we will call
+shear modes or transverse modes, and <span
+class="math display">\[\begin{equation}
+\label{longitudinaux}
+\omega_\pm=\pm i\,c_s\,k-\Gamma\,k^2,
+\end{equation}\]</span> for the propagative and diffusive modes which we
+will call <span> <em>acoustic</em></span> modes. We will again show this
+type of property a little later during the analysis of the
+eleven-velocity viscoelastic model through equations (<a
+href="#mjx-eqn:eqperp">2.31</a>). The value <span
+class="math inline">\(\Gamma\)</span> is called the
+<span><em>width</em></span> or <span><em>attenuation</em></span>; it
+indicates the characteristic lifetime of these modes, <span
+class="math inline">\((\Gamma k^2)^{-1}\)</span>. It is proportional to
+the viscosities and other diffusive coefficients of the model. These
+modes propagate at the speed of sound in the medium <span
+class="math inline">\(c_s\)</span>.</p>
+<p>The number of these two types of modes depends on the dimension of
+space; typically, in three dimensions, neglecting thermal effects, one
+counts two transverse modes and two longitudinal modes. It has been
+shown [<a href="#ref-GBBE">25</a>] that lattice gases allow one to
+recover these modes with similar techniques. For lattice Boltzmann
+gases, the same holds, and one can determine numerically the dependence
+of the solutions as a function of <span
+class="math inline">\(k\)</span>. Figure <a href="#fig-kvit9">2.1</a> is
+the representation of the solutions, in real and complex parts, of the
+dispersion equation for a 9-velocity model in two dimensions. Unlike the
+modes in three dimensions, here we will have only a single transverse
+mode still given by equation (<a href="#mjx-eqn:transverse">2.10</a>),
+and two longitudinal modes still given by equation (<a
+href="#mjx-eqn:longitudinaux">2.11</a>).</p>
+<figure id="fig-kvit9">
+<p><img src="figures/real9cs1-2.svg" alt="image" /> <img
+src="figures/ima9cs1-2.svg" alt="image" /></p>
+<figcaption>Figure 2.1: Solutions of the dispersion equation for the
+nine-velocity model with <span class="math inline">\(c_s^2=1/2\)</span>,
+<span class="math inline">\(\lambda_\nu=1.66\)</span>, <span
+class="math inline">\(\lambda_e=1.94\)</span>, <span
+class="math inline">\(\lambda_\sigma=1.2\)</span> and <span
+class="math inline">\(\lambda_\chi=1.3\)</span>. </figcaption>
+</figure>
+<p>Exploiting these figures indeed confirms the existence of a purely
+diffusive transverse mode, identifiable in the upper part of the graph
+corresponding to the real part of the solutions (the curve farthest from
+the line <span class="math inline">\(y=1\)</span>). The study of this
+parabola gives us a way to verify relation (<a
+href="#mjx-eqn:transverse">2.10</a>). The curve closest to the line
+<span class="math inline">\(y=1\)</span> corresponds to the real part of
+the so-called propagative solution, and again allows us to verify the
+relation: <span class="math display">\[\begin{equation}
+\Gamma={\nu +\xi\over 2},
+\end{equation}\]</span> with <span class="math inline">\(\xi\)</span>,
+the bulk viscosity. On the graph of the imaginary part, it is easy to
+identify the straight lines corresponding to the acoustic contributions.
+One notices moreover that the approximation of a constant speed of sound
+as a function of <span class="math inline">\(k\)</span> is only valid
+for small <span class="math inline">\(k\)</span>. When <span
+class="math inline">\(k\)</span> becomes of order 1, the effects due to
+the presence of an underlying lattice appear and the straight lines
+curve inward. The other modes such that <span
+class="math inline">\(|z|&lt;1\)</span> when <span
+class="math inline">\(k\to 0\)</span> are called “non-hydrodynamic” and
+do not play a predominant role.</p>
+<h1 id="first-viscoelastic-model"><span class="secnum">2.3</span> First viscoelastic model</h1>
+<p>We will apply the principles mentioned at the beginning of this part.
+In a first step, we will not introduce additional internal variables in
+order to better appreciate their effects. Indeed, let us try to take
+very small eigenvalues for the modes related to the deformation rate
+tensor. In the various studies carried out in this thesis, these modes
+are denoted <span class="math inline">\(S_{\alpha\beta}\)</span>. For
+simplicity let us consider the two-dimensional case we have taken
+previously and in which we now take <span
+class="math inline">\(\lambda_\nu=0.1\)</span>. This value is not very
+small but it allows us to better observe the effects that appear.
+Indeed, if one plots the solutions of the dispersion equation in
+figure <a href="#fig-kvit9-visco">2.2</a>, one notices that two
+diffusive modes have become propagative beyond a certain value <span
+class="math inline">\(k=k_c\)</span>.</p>
+<figure id="fig-kvit9-visco">
+<p><img src="figures/real-angles-ln-0.1.svg" alt="image" /> <img
+src="figures/im-angles-ln-0.1.svg" alt="image" /></p>
+<figcaption>Figure 2.2: Solutions of the dispersion equation for the
+“viscoelastic” nine-velocity model with <span
+class="math inline">\(c_s^2=1/2\)</span>, <span
+class="math inline">\(\lambda_\nu=0.1\)</span>, <span
+class="math inline">\(\lambda_e=1.94\)</span>, <span
+class="math inline">\(\lambda_\sigma=1.2\)</span> and <span
+class="math inline">\(\lambda_\chi=1.3\)</span>. </figcaption>
+</figure>
+<p>The interpretation of such a phenomenon is not simple, but can be
+understood as follows: for small values of <span
+class="math inline">\(k\)</span>, the fluid is viscous. Thus, for a
+forcing with a long characteristic time, the fluid behaves as a
+classical fluid. Beyond a certain value of <span
+class="math inline">\(k\)</span>, called <span
+class="math inline">\(k_c\)</span>, two complex roots of the dispersion
+equation appear. There are then two new propagative modes, so transverse
+waves will be propagated in the medium.</p>
+<p>One can then make the observation that for <span
+class="math inline">\(k&gt;k_c\)</span>, the viscosity of the fluid can
+be represented by a complex viscosity of the form <span
+class="math inline">\(\displaystyle\nu^*={\nu_0/ (1+i \omega
+\tau)}.\)</span></p>
+<p>The fluid can then be regarded as being of viscoelastic type.</p>
+<p>If the overall behaviour of the previous model seems satisfactory on
+the graphs of the solutions of the dispersion equation, it is not so in
+the details. Indeed, by zooming in on the upper part, figure <a
+href="#fig-kvit9-visco-zoom">2.3</a> on the left of the graph of the
+real part of the solutions, one notes that the attenuation of the
+longitudinal mode is no longer of the form <span
+class="math inline">\(\Gamma k^2\)</span> during the transition from a
+viscous to a viscoelastic behaviour. Moreover, it depends strongly on
+the angle of the vector <span
+class="math inline">\({\mathbf{k}}\)</span> after this transition. One
+can also note that the attenuation of the transverse mode is not
+isotropic either.</p>
+<figure id="fig-kvit9-visco-zoom">
+<img src="figures/real-angles-ln-0.1-zoom.svg" />
+<figcaption>Figure 2.3: Zoom on the real part of the solutions of the
+dispersion equation for the “viscoelastic” nine-velocity
+model</figcaption>
+</figure>
+<p>The anisotropy of the attenuations is due to the fact that the shear
+viscosity is no longer isotropic because it is imposed by modes coming
+from a higher order of the expansion, whose dynamics we do not control
+<span><em>a priori</em></span>. Within the framework of the Maxwell
+theory [<a href="#ref-Maxwell">8</a>], this viscosity, called <span
+class="math inline">\(\nu_\infty\)</span>, or high-frequency viscosity,
+is zero. For our Boltzmann gas, this situation is not possible, which is
+why we will no longer attempt to model a fluid without imposing an
+infinite viscosity. In the same way that Jeffreys [<a
+href="#ref-Jeffreys">3</a>] introduced an infinite viscosity into the
+Maxwell model, we are going to follow the same approach for our models
+through the introduction of additional internal variables.</p>
+<h1 id="isotropic-eleven-velocity-model"><span class="secnum">2.4</span> Isotropic eleven-velocity
+model</h1>
+<p>To allow us to fix the value of the “infinite” viscosity as a
+function of different parameters of the model, we will introduce two
+additional modes, <span class="math inline">\(P_{xx}\)</span> and <span
+class="math inline">\(P_{xy}\)</span>, having the same symmetries as the
+viscous modes of the previous model, <span
+class="math inline">\(S_{xx}\)</span> and <span
+class="math inline">\(S_{xy}\)</span>. All four will be constructed
+through the introduction of two additional internal variables. The two
+new modes will have a very long relaxation time, while the two viscous
+modes will keep, as for the simulation of a classical fluid, a short
+relaxation time. We will thus have an “eleven-velocity” model in two
+dimensions as indicated in figure <a href="#onze-vitesses">2.4</a>,
+where the two internal variables are represented by the populations
+<span class="math inline">\(9\)</span> and <span
+class="math inline">\(10\)</span> which do not move and which are
+located at the centre of the figure.</p>
+<figure id="onze-vitesses">
+<img src="figures/onze-vitesses.svg" />
+<figcaption>Figure 2.4: Eleven-velocity model</figcaption>
+</figure>
+<p>To build this new model, we must define a new basis made of the
+eigenvectors of the collision matrix. We therefore choose the same
+vectors as for the nine-velocity model (D2Q9), to which we add two zero
+components for all eigenvectors, except for those associated with the
+four viscous modes. Since we must choose an orthogonal basis, this leads
+us, keeping two free parameters <span class="math inline">\(a\)</span>
+and <span class="math inline">\(b\)</span>, to take: <span
+class="math display">\[\begin{eqnarray}
+{\mathbf{e}}_{0}
+&amp;=&amp;\left(\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,
+\phantom{-}0, \phantom{-}0\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{1}
+&amp;=&amp;\left(\phantom{-}4,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,-2,-2,-2,-2,
+\phantom{-}0, \phantom{-}0\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{2}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}1,\phantom{-}0,-1,\phantom{-}0,\phantom{-}1,-1,-1,\phantom{-}1,
+\phantom{-}0, \phantom{-}0\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{3}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}0,\phantom{-}1,\phantom{-}0,-1,\phantom{-}1,\phantom{-}1,-1,-1,
+\phantom{-}0, \phantom{-}0\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{4}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}2,\phantom{-}0,-2,\phantom{-}0,-1,\phantom{-}1,\phantom{-}1,-1,
+\phantom{-}0, \phantom{-}0\phantom{-}\right) \\
+{\mathbf{e}}_{5}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}0,\phantom{-}2,\phantom{-}0,-2,-1,-1,\phantom{-}1,\phantom{-}1,
+\phantom{-}0, \phantom{-}0\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{6}
+&amp;=&amp;\left(\phantom{-}4,-2,-2,-2,-2,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,
+\phantom{-}0, \phantom{-}0\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{7}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}1,-1,\phantom{-}1,-1,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,
+\phantom{-}a, \phantom{-}0\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{8}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}1,-1,\phantom{-}1,-1,
+\phantom{-}0, \phantom{-}b\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{9}
+&amp;=&amp;\left(\phantom{-}0,-a,\phantom{-}a,-a,\phantom{-}a,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,
+\phantom{-}4, \phantom{-}0\phantom{-}\right) \nonumber\\
+{\mathbf{e}}_{10}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,
+-b,\phantom{-}b,-b,\phantom{-}b,
+\phantom{-}0,  \phantom{-}4\phantom{-}\right) \nonumber
+\end{eqnarray}\]</span> associated with the eigenvalues which we choose
+as follows: <span
+class="math display">\[\displaystyle\left(\phantom{-}0,\phantom{-}\lambda_e,\phantom{-}0,\phantom{-}0,\phantom{-}\lambda_\chi,\phantom{-}\lambda_\chi&#39;
+,\phantom{-}\lambda_\sigma,\phantom{-}\lambda_\nu,\phantom{-}\lambda&#39;_\nu,\phantom{-}\lambda_\gamma,\phantom{-}\lambda_\gamma&#39;\right).\]</span></p>
+<p>We must now find the equilibrium quantities necessary for the model
+to simulate the desired macroscopic equations. Unfortunately, the method
+that allows us to determine the equilibrium quantities, that is, the
+Chapman-Enskog expansion, is no longer valid in the range of relaxation
+time values that interests us. We will therefore study two cases. The
+first case is the one in which the new modes are strictly conserved; the
+fluid will then be almost <span><em>elastic</em></span>. The second case
+will be the one in which we will consider that the new modes have a fast
+relaxation time, as in the case of a viscous fluid.</p>
+<p>Using the same notation as in chapter <a
+href="part1-chapter3.html">3</a>, we can write the first- and
+second-order equations of the Chapman-Enskog expansion. Let us recall
+that we take as notation for the different modes: <span
+class="math display">\[\begin{eqnarray}
+\rho=3\phantom{+}\widehat{N}_{0}\,,\quad&amp;\phantom{+}\widehat{N}_{1}=2\rho/3-e\,,&amp;\quad
+j_x=\sqrt{6}\phantom{+}\widehat{N}_{2},\nonumber\\
+j_y=\sqrt{6}\phantom{+}\widehat{N}_{3}\,,\quad&amp;q_x=-2\sqrt{3}\phantom{+}\widehat{N}_{4}\,,&amp;\quad
+q_y=-2\sqrt{3}\phantom{+}\widehat{N}_{5},\nonumber\\
+\sigma=6\,\phantom{+}\widehat{N}_{6}\,,\quad&amp;S_{xx}=\sqrt{4+a^2}\,\phantom{+}\widehat{N}_{7}\,,\quad&amp;S_{xy}=\sqrt{4+b^2}\,\phantom{+}\widehat{N}_{8},\nonumber\\
+P_{xx}=2\,\sqrt{4+a^2}\,\phantom{+}\widehat{N}_{9}\,,\quad&amp;P_{xy}=2\,\sqrt{4+b^2}\,\phantom{+}\widehat{N}_{10},\nonumber
+\end{eqnarray}\]</span> where the quantities carrying a hat are
+expressed in the new basis whose change-of-basis matrix is given by the
+vectors <span class="math inline">\({\mathbf{e}}_{i}\)</span> that one
+will have normalized.</p>
+<h2 id="quasi-elastic-model"><span class="secnum">2.4.1</span> <span><em>Quasi-elastic</em></span>
+model</h2>
+<p>The model is said to be <span><em>elastic</em></span>, or rather
+quasi-elastic, because some attenuation remains, if the quantities <span
+class="math inline">\(P_{xx}\)</span> and <span
+class="math inline">\(P_{xy}\)</span> are strictly conserved, thus <span
+class="math inline">\(\lambda_\gamma=\lambda_\gamma&#39;=0\)</span>. The
+macroscopic equations that we obtain will no longer be the Stokes or
+Navier-Stokes equations, but similar equations in which a coupling
+appears with the two equations coming from the two new conserved
+quantities.</p>
+<p>Indeed, we obtain by writing equations (<a
+href="part1-chapter3.html#mjx-eqn:firstorderc">3.8</a>) and (<a
+href="part1-chapter3.html#mjx-eqn:secondorderc">3.9</a>), for the first
+order: <span class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}\rho+\partial_{x&#39;}j_x+\partial_{y&#39;}j_y=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}e^{(0)}+\frac{1}{6}\left(\partial_{x&#39;}\left(5j_x+q^{(0)}_x\right)
+                       +\partial_{y&#39;}\left(5j_y+q^{(0)}_y\right)\right)=-\lambda_ee^{(1)}\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}j_x+\partial_{x&#39;}e^{(0)}+{2\over
+4+a^2 }\partial_{x&#39;}S^{(0)}_{xx}+{4\over
+4+b^2}\partial_{y&#39;}S^{(0)}_{xy}-{a\over
+2(4+a^2)}\partial_{x&#39;}P_{xx}-
+{b\over 4+b^2}\partial_{y&#39;}P_{xy}=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}j_y+\partial_{y&#39;}e^{(0)}+{4\over
+4+b^2}\partial_{x&#39;}S^{(0)}_{xy}-{2\over
+4+a^2}\partial_{y&#39;}S^{(0)}_{xx}-
+{b\over 4+b^2}\partial_{x&#39;}P_{xy}+{a\over
+2(4+a^2)}\partial_{y&#39;}P_{xx}=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}q^{(0)}_x-\frac{2}{3}\partial_{x&#39;}(2\rho-3e^{(0)}-{\sigma^{(0)}\over
+2})-{4\over 4+a^2}\partial_{x&#39;}S^{(0)}_{xx}\nonumber\\
+&amp;&amp;+{4\over 4+b^2}\partial_{y&#39;}S^{(0)}_{xy}+{a\over
+4+a^2}\partial_{x&#39;}P_{xx}-{b\over
+4+b^2}\partial_{y&#39;}P_{xy}=-\lambda_\chi q^{(1)}_x\nonumber\\
+&amp;&amp;\label{toto1}\hspace{-0.5in}\partial_{t_1}q^{(0)}_y-\frac{2}{3}\partial_{y&#39;}(2\rho-3e^{(0)}-{\sigma^{(0)}\over
+2})+{4\over 4+a^2}\partial_{y&#39;}S^{(0)}_{xx}+{4\over
+4+b^2}\partial_{x&#39;}S^{(0)}_{xy}\\
+&amp;&amp;-{a\over 4+a^2}\partial_{y&#39;}P_{xx}-{b\over
+4+b^2}\partial_{x&#39;}P_{xy}=-\lambda_\chi q^{(1)}_y\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}\sigma^{(0)}+\left(\partial_{x&#39;}q^{(0)}_x+\partial_{y&#39;}q^{(0)}_y\right)
+=-\lambda_\sigma\sigma^{(1)}\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}S^{(0)}_{xx}+\frac{1}{3}\left(\partial_{x&#39;}(j_x-q^{(0)}_x)
+                                           -\partial_{y&#39;}(j_y-q^{(0)}_y)\right)
+=-\lambda_\nu S^{(1)}_{xx}\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}S^{(0)}_{xy}+\frac{1}{3}\left(\partial_{x&#39;}(2j_y+q^{(0)}_y)
+                                           +\partial_{y&#39;}(2j_x+q^{(0)}_x)\right)
+=-\lambda&#39;_\nu S^{(1)}_{xy}\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}P_{xx}-\frac{a}{3}\left(\partial_{x&#39;}(j_x-q^{(0)}_x)
+                                           -\partial_{y&#39;}(j_y-q^{(0)}_y)\right)
+=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}P_{xy}-\frac{b}{3}\left(\partial_{x&#39;}(2j_y+q^{(0)}_y)
+                                           +\partial_{y&#39;}(2j_x+q^{(0)}_x)\right)
+=0\nonumber
+\end{eqnarray}\]</span> then for the second order: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}\rho=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}j_x+{2\over
+4+a^2}\left(1-\frac{\lambda_\nu}{2}\right)\partial_{x&#39;}S^{(1)}_{xx}
+                        +{4\over
+4+b^2}\left(1-\frac{\lambda&#39;_\nu}{2}\right)\partial_{y&#39;}S^{(1)}_{xy}
+                        +\left(1-\frac{\lambda_e}{2}\right)\partial_{x&#39;}e^{(1)}=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}j_y+{4\over
+4+b^2}\left(1-\frac{\lambda&#39;_\nu}{2}\right)\partial_{x&#39;}S^{(1)}_{xy}
+                        -{2\over
+4+a^2}\left(1-\frac{\lambda_\nu}{2}\right)\partial_{y&#39;}S^{(1)}_{xx}
+                        +\left(1-\frac{\lambda_e}{2}\right)\partial_{y&#39;}e^{(1)}=0\nonumber
+\end{eqnarray}\]</span></p>
+<p>On the basis of the treatment of the D2Q9 model in chapter <a
+href="part1-chapter3.html">3</a> of the first part, we can anticipate
+the form of the equilibrium quantities of our model. Let us take: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp; e^{(0)}=c_s^2\,\rho+a_0\,\left( j_x^2+j_y^2\right),\\
+&amp;&amp; S^{(0)}_{xx}=a_1\,\left( j_x^2-j_y^2\right),\\
+&amp;&amp; S^{(0)}_{xy}=a_2\,j_x\,j_y,\\
+&amp;&amp; q^{(0)}_\alpha=q\, j_\alpha\qquad\mbox{with  }\alpha=(x,y),
+\end{eqnarray}\]</span> and <span class="math inline">\(a_i\)</span>
+constants to be determined. If we take the five conservation equations,
+keeping only the first-order terms in <span
+class="math inline">\({\mathbf{j}}\)</span> (<span
+class="math inline">\(a_0=a_1=a_2=0\)</span>) – we will not deal with
+the introduction of nonlinear terms in this part – we then obtain a
+system of five equations and five variables: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}\rho+\partial_{x&#39;}j_x+\partial_{y&#39;}j_y=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}j_x+c_s^2\,\partial_{x&#39;}\rho-{a\over
+2(4+a^2)}\partial_{x&#39;}P_{xx}-{b\over 4+b^2}\partial_{y&#39;}P_{xy}=0
+\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}j_y+c_s^2\,\partial_{y&#39;}\rho-
+{b\over 4+b^2}\partial_{x&#39;}P_{xy}+{a\over
+2(4+a^2)}\partial_{y&#39;}P_{xx}=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}P_{xx}-(1-q)\frac{a}{3}\left(\partial_{x&#39;}\,j_x
+                                           -\partial_{y&#39;}\,j_y\right)
+=0\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}P_{xy}-(2+q)\frac{b}{3}\left(\partial_{x&#39;}\,j_y
+                                           +\partial_{y&#39;}\,j_x\right)
+=0\nonumber
+\end{eqnarray}\]</span></p>
+<p>If we assume that the variables of this system can be put in the
+form: <span class="math display">\[\begin{equation}
+f=f_0 \,e^{s\,t+i\,{\mathbf{k}}\cdot{\mathbf{r}}},
+\end{equation}\]</span> then for this system to be isotropic, that is,
+for it not to depend on the direction of the vector <span
+class="math inline">\({\mathbf{k}}\)</span>, whatever the vector <span
+class="math inline">\({\mathbf{r}}=(\sin\theta, \cos \theta)\)</span>,
+the following determinant must not depend on <span
+class="math inline">\(\theta\)</span>: <span
+class="math display">\[\begin{equation}
+\hspace{-0.5in}\left|
+\begin{array}{ccccc}
+s&amp;i\,k\,\cos\theta&amp;i\,k\,\sin\theta&amp;0&amp;0\\
+i\,c_s^2\,k\,\cos\theta&amp;s&amp;0&amp;\displaystyle-{a\over
+2(4+a^2)}i\,\,k\,\cos\theta&amp;\displaystyle-{b\over
+4+b^2}i\,\,k\,\sin\theta\\
+i\,c_s^2\,k\,\sin\theta&amp;0&amp;s&amp;\displaystyle{a\over
+2(4+a^2)}i\,\,k\,\sin\theta&amp;\displaystyle-{b\over
+4+b^2}i\,\,k\,\cos\theta\\
+0&amp;-(1-q)\,\displaystyle{a\over3}\,i\,k\,\cos\theta&amp;(1-q)\,\displaystyle{a\over3}i\,\,k\,\sin\theta&amp;s&amp;0\\
+0&amp;-(2+q)\,\displaystyle{b\over
+3}\,i\,k\,\sin\theta&amp;-(2+q)\,\displaystyle{b\over
+3}i\,\,k\,\cos\theta&amp;0&amp;s
+\end{array}\right|.
+\label{determinant}
+\end{equation}\]</span></p>
+<p>This imposes on us relations between <span
+class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>
+and <span class="math inline">\(q\)</span>, which, if we set: <span
+class="math display">\[\begin{equation}
+c_{\perp}^2=-{b^2\,(q+2)\over 3 (4+b^2)},
+\end{equation}\]</span> become: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;a^2={-24 c_{\perp}^2 \over 6c_{\perp}^2+q-1}\\
+&amp;&amp;b^2={-12 c_{\perp}^2 \over 3c_{\perp}^2-2-q}.
+\end{eqnarray}\]</span></p>
+<p>This method is identical to the so-called dispersion-equation method
+since the latter amounts to considering an identical determinant but
+through different calculation steps. We have then ensured the isotropy
+of our model at first order. For the second order, the equations for
+<span class="math inline">\(P_{xx}\)</span> and <span
+class="math inline">\(P_{xy}\)</span> become, through the simplifying
+choices <span
+class="math inline">\(\lambda_\chi&#39;=\lambda_\chi\)</span> and <span
+class="math inline">\(\sigma^{(0)}=(-15/2\,c_s^2+4)\rho\)</span>: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}P^{(0)}_{xx}-{1\over3}\left({1\over
+\lambda_\chi}-{1\over 2}
+\right){a^2\over 4+a^2}(1+{q\over 2})\, \Delta P_{xx}
+=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}P^{(0)}_{xy}-{1\over3}\left({1\over
+\lambda_\chi}-{1\over 2}
+\right){b^2\over 4+b^2}(1-q)\,\Delta  P_{xy}
+=0,\nonumber
+\end{eqnarray}\]</span> where the symbol <span
+class="math inline">\(\Delta\)</span> represents the Laplacian. One then
+shows that it is necessary to have the same prefactor in front of the
+Laplacian, which we will call <span
+class="math inline">\(D_\infty\)</span>, in order to have the isotropy
+of these modes. This imposes: <span
+class="math display">\[\begin{equation}
+{a^2\over 4+a^2}\left( 1+{q\over 2} \right)={b^2\over 4+b^2}(1-q),
+\end{equation}\]</span> which, combined with the first-order relations,
+gives: <span class="math display">\[\begin{equation}
+q=-{1\over 2}.
+\end{equation}\]</span> We then have: <span
+class="math display">\[\begin{equation}
+\label{Dinfty}
+D_\infty=c_{\perp}^2({1\over \lambda_\chi}-{1\over 2}).
+\end{equation}\]</span></p>
+<p>The isotropy of the shear viscosity is obtained in the same way, but
+by taking the second order of the momentum conservation equation. This
+then gives us a relation between the eigenvalues <span
+class="math inline">\(\lambda_\nu\)</span> and <span
+class="math inline">\(\lambda&#39;_\nu\)</span>: <span
+class="math display">\[\begin{equation}
+\lambda&#39;_\nu={\lambda_\nu(8\,c_{\perp}^2-4)\over
+8\,c_{\perp}^2-2-\lambda_\nu}.
+\end{equation}\]</span> We then have for the shear viscosity: <span
+class="math display">\[\begin{equation}
+\nu_\infty=({1\over 4}-c_{\perp}^2)\left({1\over \lambda_\nu}-{1\over 2}
+\right).
+\end{equation}\]</span></p>
+<p>The isotropy of the bulk viscosity brings no additional condition,
+and it is given by: <span class="math display">\[\begin{equation}
+\xi_\infty=({3\over 4}-c_s^2)\left({1\over \lambda_e}-{1\over 2}
+\right).
+\end{equation}\]</span></p>
+<p>To summarize, we have built a model possessing the following
+macroscopic equations: <span class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_t\rho +
+\partial_xj_x+\partial_yj_y=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_x+\partial_x(c_s^2\,\rho)
+-\kappa_1\,\partial_xP_{xx}-\kappa_2\,\partial_yP_{xy}=\nu_\infty\,\Delta
+j_x+\xi_\infty\,\partial_x(\partial_xj_x+\partial_yj_y),\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_y+\partial_y(c_s^2\,\rho)  +\kappa_1\,\partial_yP_{xx}-\kappa_2\,\partial_xP_{xy}=\nu_\infty\,\Delta
+j_y+\xi_\infty\,\partial_y(\partial_xj_x+\partial_yj_y),\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tP_{xx}+\kappa_3\,(\partial_x\,
+j_x-\partial_y\,j_y)=D_\infty\,\Delta P_{xx},\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tP_{xy}+\kappa_4\,(\partial_x\,
+j_y+\partial_y\,j_x)=D_\infty\,\Delta P_{xy}\nonumber,
+\end{eqnarray}\]</span> with the constants <span
+class="math inline">\(\kappa_i\)</span> defined by <span
+class="math inline">\(\kappa_3=-a/2\)</span>, <span
+class="math inline">\(\kappa_4=-b/2\)</span>, <span
+class="math inline">\(\kappa_1\,\kappa_3=-c_{\perp}^2\)</span> and <span
+class="math inline">\(\kappa_2\,\kappa_4=-c_{\perp}^2\)</span>, and the
+pressure <span class="math inline">\(P\)</span> defined by <span
+class="math inline">\(P=c_s^2\,\rho\)</span>, which is the equation of
+state of our fluid. We can then define two modes <span
+class="math inline">\(H_{xx}\)</span> and <span
+class="math inline">\(H_{xy}\)</span> such that: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;H_{xx}=P_{xx}/\kappa_3\nonumber\\
+&amp;&amp;H_{xy}=P_{xy}/\kappa_4.
+\end{eqnarray}\]</span> The macroscopic equations are then written more
+simply: <span class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_t\rho +
+\partial_xj_x+\partial_yj_y=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_x+\partial_xP
++c_{\perp}^2\left(\partial_xH_{xx}+\partial_yH_{xy}\right)=\nu_\infty\,\Delta
+j_x+\xi_\infty\,\partial_x(\partial_xj_x+\partial_yj_y),\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_y+\partial_yP
++c_{\perp}^2\left(\partial_xH_{xy}-\partial_yH_{xx}\right)=\nu_\infty\,\Delta
+j_y+\xi_\infty\,\partial_y(\partial_xj_x+\partial_yj_y),\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tH_{xx}+\partial_x\,
+j_x-\partial_y\,j_y=D_\infty\,\Delta H_{xx},\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tH_{xy}+\partial_x\,
+j_y+\partial_y\,j_x=D_\infty\,\Delta H_{xy}\nonumber.
+\end{eqnarray}\]</span></p>
+<p>Thus, we then notice that these equations are indeed identical to
+those of Stokes with an additional coupling term between the momentum
+conservation equations and the conservation equations of the new modes.
+It is then possible to perform a change of frame such as the one
+indicated in figure <a href="#rotate">2.5</a>, in order to separate the
+different contributions of the modes and to verify their isotropy on the
+macroscopic equations.</p>
+<figure id="rotate">
+<img src="figures/rotate.svg" />
+<figcaption>Figure 2.5: Rotation of the frame by an angle <span
+class="math inline">\(\theta\)</span>.</figcaption>
+</figure>
+<p>We thereby obtain the following equations, which do not depend on the
+angle <span class="math inline">\(\theta\)</span> that the wave vector
+<span class="math inline">\({\mathbf{k}}\)</span> makes with the axis
+<span class="math inline">\(Ox\)</span>: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_t\rho + \partial_\parallel
+j_\parallel=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_\parallel+\partial_\parallel(c_s^2\,\rho)
++c_{\perp}^2\,\partial_\parallel
+H_\parallel=(\nu_\infty+\xi_\infty)\,\partial_\parallel^2\,j_\parallel,\nonumber\\
+&amp;&amp;\label{eqperp}\hspace{-0.5in}\partial_tH_\parallel+\partial_\parallel\,
+j_\parallel=D_\infty\,\partial_\parallel^2H_\parallel,\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_\perp+c_{\perp}^2
+\partial_\parallel
+H_\perp=\nu_\infty\,\partial_\parallel^2j_\perp,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tH_\perp+\partial_\parallel\,
+j_\perp=D_\infty\,\partial_\parallel^2H_\perp\nonumber.
+\end{eqnarray}\]</span> The solutions of the dispersion equation
+associated with this system are then given by: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;s_\perp=-i\,\omega_\perp+ \alpha_\perp\,k^2,\\
+&amp;&amp;s_\parallel=-i\,\omega_\parallel+\alpha_\parallel\,k^2,\\
+&amp;&amp; \omega_{\|}^2=(c_s^2+c_{\perp}^2)\,k^2,\\
+&amp;&amp; \omega_\perp^2=c_{\perp}^2\,k^2,\\
+&amp;&amp;\alpha_{\|}= {1\over 2}\left(\nu_\infty+\xi_\infty+
+{c_{\perp}^2 D_\infty \over c_s^2+c_{\perp}^2}\right),\\
+&amp;&amp;\alpha_{\perp}={\nu_\infty+D_\infty\over 2}.
+\end{eqnarray}\]</span> There exists a fifth, non-propagative solution
+<span class="math inline">\(s_0\)</span>, which is of no practical
+interest here.</p>
+<h2 id="viscous-model"><span class="secnum">2.4.2</span> Viscous model</h2>
+<p>The viscous model is constructed in the same way as the quasi-elastic
+model above, but by considering that the eigenvalues <span
+class="math inline">\(\lambda_\gamma\)</span> and <span
+class="math inline">\(\lambda_\gamma&#39;\)</span> are of the same order
+of magnitude as the others.</p>
+<p>We also take the same equilibrium quantities as before. This gives us
+the same bulk viscosity <span
+class="math inline">\(\xi_0=\xi_\infty\)</span>. On the other hand, the
+shear viscosity now comes from the two contributions of the modes <span
+class="math inline">\(T\)</span> and <span
+class="math inline">\(S\)</span> and is now expressed by: <span
+class="math display">\[\begin{equation}
+\nu_0=(\frac{1}{4}-c_{\perp}^2)\left({1\over \lambda_\nu}-{1\over 2}
+\right)+c_{\perp}^2\left({1\over \lambda_\gamma}-{1\over 2} \right)
+\end{equation}\]</span></p>
+<p>The simplest choice for the equilibrium values of the modes <span
+class="math inline">\(T_{xx}\)</span> and <span
+class="math inline">\(T_{xy}\)</span> is given by: <span
+class="math display">\[\begin{equation}
+T_{xx}^{(0)}=0,\quad\mbox{and}\quad T_{xy}^{(0)}=0.
+\end{equation}\]</span></p>
+<p>The macroscopic equations are identical to the Stokes equations:
+<span class="math display">\[\begin{eqnarray}
+&amp;&amp;\partial_t\rho + \partial_xj_x+\partial_yj_y=0,\nonumber\\
+&amp;&amp;\partial_tj_x+\partial_xP =\nu_0\,\Delta
+j_x+\xi_0\,\partial_x(\partial_xj_x+\partial_yj_y),\nonumber\\
+&amp;&amp;\partial_tj_y+\partial_yP=\nu_0\,\Delta
+j_y+\xi_0\,\partial_y(\partial_xj_x+\partial_yj_y).\nonumber
+\end{eqnarray}\]</span></p>
+<h2 id="visco-demo"><span class="secnum">2.4.3</span> Viscoelastic model</h2>
+<p>The transition from the viscous model to the viscoelastic model is
+done by letting the eigenvalue <span
+class="math inline">\(\lambda_\gamma\)</span> tend to 0. The analysis of
+this model can be carried out by the dispersion-equation method, for
+which we obtain a <span class="math inline">\(5\times 5\)</span>
+determinant that we must set to zero, and it turns out to be identical
+to the determinant (<a href="#mjx-eqn:determinant">2.20</a>) after some
+simplifications:</p>
+<p><span class="math display">\[\begin{equation}
+\hspace{-0.5in}\left|
+\begin{array}{ccccc}
+s&amp;i\,k\,\cos\theta&amp;i\,k\,\sin\theta&amp;0&amp;0\\
+c_s^2\,i\,k\,\cos\theta&amp;s&amp;0&amp;\displaystyle
+c_{\perp}^2\,i\,k\,\cos\theta&amp;\displaystyle
+c_{\perp}^2\,i\,k\,\sin\theta\\
+c_s^2\,i\,k\,\sin\theta&amp;0&amp;s&amp;\displaystyle-c_{\perp}^2\,i\,k\,\sin\theta&amp;\displaystyle
+c_{\perp}^2\,i\,k\,\cos\theta\\
+0&amp;i\,k\,\cos\theta&amp;\displaystyle-i\,k\,\sin\theta&amp;s+\lambda_\gamma&amp;0\\
+0&amp;i\,k\,\sin\theta&amp;\displaystyle
+i\,k\,\cos\theta&amp;0&amp;s+\lambda_\gamma
+\end{array}\right|,
+\label{determinant-2}
+\end{equation}\]</span> the variables of the system being put in the
+form: <span class="math display">\[\begin{equation}
+f=f_0 \,e^{s\,t+i\,{\mathbf{k}}\cdot{\mathbf{r}}}.
+\end{equation}\]</span></p>
+<p>The solutions that zero this determinant are then put in the form:
+<span class="math display">\[\begin{equation}
+s=-\frac{\lambda_\gamma}{2}\pm\frac{1}{2}\sqrt{\lambda_\gamma^2-4\,k^2\,c_{\perp}^2},
+\end{equation}\]</span> one then sees that the system passes from an
+oscillatory nature to a diffusive nature, thus from a propagative nature
+to a non-propagative nature, around <span
+class="math inline">\(\displaystyle
+k_c=\frac{\lambda_\gamma}{2\,c_{\perp}}\)</span>. As we indicated
+previously, this transition indicates that the fluid is viscous for
+forcings with a wavenumber <span
+class="math inline">\(k&lt;k_c\)</span>, and that it has a viscoelastic
+behaviour for <span class="math inline">\(k&gt;k_c\)</span>.</p>
+<p>The model we have just built is not Galilean invariant. The
+derivatives present in this linear study are so-called “partial”
+derivatives and not objective derivatives (cf. appendix A). This problem
+will be studied later, in appendix B.</p>
+<p>The eleven-velocity model we have built is not chronologically the
+first to appear. Since the set of simulations in this thesis is based on
+the model we are going to present now, we will therefore not pursue
+further the study of the eleven-velocity model.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-Jeffreys"><span class="refnum">[3]</span> H. Jeffreys, “The earth”, <span><em>Cambridge
+University Press</em></span>, 1929, pp. 265 <a class="refall" href="bibliography.html#ref-Jeffreys" title="In the full bibliography">↗</a></li>
+<li id="ref-Maxwell"><span class="refnum">[8]</span> J. C. Maxwell, <span><em>Phil. Trans. Roy.
+Soc.</em></span>, <span><strong>A157</strong></span>, 1867,
+pp. 49-88. <a class="refall" href="bibliography.html#ref-Maxwell" title="In the full bibliography">↗</a></li>
+<li id="ref-BY"><span class="refnum">[17]</span> J.-P. Boon and S. Yip, “Molecular hydrodynamics”,
+McGraw Hill, 1980. <a class="refall" href="bibliography.html#ref-BY" title="In the full bibliography">↗</a></li>
+<li id="ref-CEBS"><span class="refnum">[23]</span> D.V. van Coervorden, M.H. Ernst, R. Brito, and J.A.
+Somers, “Relaxation and transport in FCHC lattice gases”, <span><em>J.
+Stat. Phys</em></span>, Vol. 74(5/6), 1994, pp. 1085–1115. <a class="refall" href="bibliography.html#ref-CEBS" title="In the full bibliography">↗</a></li>
+<li id="ref-GBBE"><span class="refnum">[25]</span> P. Grosfils, J.P. Boon, R. Brito and M.Ernst,
+“Statistical hydrodynamics of lattice-gas automata”, <span><em>Physical
+Review E</em> </span>, Vol. 48 (4), 1993, pp. 2655–2668. <a class="refall" href="bibliography.html#ref-GBBE" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="part3-chapter1.html"><span>Previous</span>Basic principles</a><a class="next" href="part3-chapter3.html"><span>Next</span>Isotropic fifteen-velocity model</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

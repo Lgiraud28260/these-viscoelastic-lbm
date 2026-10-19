@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>General Introduction — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => String(n) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li class="current"><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><h1>General Introduction</h1></header><p>Fluid mechanics groups together the disciplines whose purpose is to
+describe and predict the motion of gases and liquids. This description
+proceeds through the derivation of partial differential equations that
+govern the motion of fluids.</p>
+<p>In a general way, mechanicians consider the fluid as a
+macroscopically continuous medium. Indeed, each macroscopic fluid
+element contains a considerable number of particles. To each physical
+point of the fluid, identified by its coordinates in space, one then
+attaches quantities that characterize its state: the velocity <span
+class="math inline">\(u=u(x,y,z,t)\)</span>, and two thermodynamic
+quantities linked by an equation of state of the fluid considered, such
+as the density <span class="math inline">\(\rho(x,y,z,t)\)</span> and
+the pressure <span class="math inline">\(P(x,y,z,t)\)</span> or else the
+temperature <span class="math inline">\(T(x,y,z,t)\)</span>. Thus, these
+partial differential equations derive from three main conservation laws.
+Mass conservation is expressed through <span><em>the continuity
+equation</em></span>, which reflects the fact that the variation of the
+amount of matter of a fluid element is equal to the mass fluxes that
+cross its walls. No approximation on the nature of the fluid is
+necessary to obtain this first equation. The second equation accounts
+for the conservation of momentum. If one considers that there is no
+internal dissipation of energy in the fluid due to viscosity, nor any
+heat exchange between the various parts, one obtains the so-called Euler
+equation. It is the fundamental equation of perfect fluids. If, now, one
+takes viscous dissipation effects into account, it is necessary to make
+an assumption on the form of the viscous stress tensor. This assumption,
+which is called the constitutive law, depends on the nature of the fluid
+considered. The simplest of these constitutive laws corresponds to the
+so-called <span><em>Newtonian</em></span> assumption; in this case the
+momentum conservation equation is called the
+<span><em>Navier-Stokes</em></span> equation. Depending on the nature of
+the fluid, one will choose an appropriate constitutive law, but it will
+always remain an approximation of the behavior of the real fluid under
+specific conditions of use.</p>
+<p>The third equation expresses the conservation of energy. In the same
+way as for the continuity equation, it stems from the fact that the
+variation of energy in a given volume is equal to the energy fluxes
+through the walls of the element of volume considered. It depends
+strongly on the previous assumption on the nature of the fluid.</p>
+<p>Some fluid materials used in industry do not meet the criteria of
+so-called Newtonian fluids. Among these fluids, some are called
+viscoelastic fluids. A viscoelastic fluid is a fluid which possesses
+both the viscous character of fluids and the elastic character of
+solids. To describe it, we will have to specify the constitutive law
+that characterizes it. Thus we will address the problem of the form of
+the constitutive laws that are admissible in general for physics, and
+for a viscoelastic fluid in particular.</p>
+<p>The mechanician must then set up techniques that allow him to obtain
+good numerical approximations of the solutions of the previous partial
+differential equations. The main resolution methods at his disposal are
+the finite difference, finite element, and spectral methods.</p>
+<p>The numerical method used as the basis of this thesis is of a quite
+different nature. Our approach is the simulation at the microscopic
+level of the evolution of the fluid particles constituting the medium.
+That is, we directly model the mesoscopic behavior of the fluid without
+going through the stages of determination and resolution of macroscopic
+equations. In our models, the fluid particles move and collide,
+imitating as closely as possible the real world. The problem is arduous
+because the resolution of the equations of motion of the fluid particles
+is prohibitive for a domain of significant size. The simplifying idea is
+then to spa­tia­lly discretize the simulated domain. By reducing the
+number of degrees of freedom of the problem, one correspondingly
+enlarges the domain that can be simulated numerically. This
+discretization, while it simplifies the construction of the model,
+nevertheless complicates the theoretical link with the real medium. It
+is by applying this idea not only to space but also to time that Hardy,
+de Pazzis and Pomeau created the first <span><em>lattice gas</em></span>
+and developed the foundations of the corresponding theory in 1973. This
+model does not faithfully reproduce hydrodynamic phenomena and one had
+to wait until 1985 for Frisch, Hasslacher and Pomeau to develop a model
+allowing the simulation of a fluid medium satisfying <span><em>a
+posteriori</em></span> the macroscopic Navier-Stokes equations.</p>
+<p>Lattice gas models then proved the validity of the
+<span><em>“inverse” approach</em></span> to resolving the Navier-Stokes
+equations, consisting in simulating a set of simplified particles
+interacting while satisfying the physical conservation principles. This
+approach, summarized as “Microscopic simplicity can generate macroscopic
+complexity”, is one of the essential contributions of lattice gases to
+fluid mechanics.</p>
+<p>We will first look at a history of lattice gases and of the
+progression towards the method that we will use throughout this thesis,
+the lattice Boltzmann equation. Indeed, this young method has been in
+constant evolution for the past ten years or so and seems today to have
+reached a state of maturity allowing it to compete with so-called more
+classical methods. We will describe the transition from the first
+lattice Boltzmann models considered by Mc Namara and Zanetti [<a
+href="#ref-MZ">15</a>] towards more recent models. This evolution will
+of course lead us to understand how the current models are built,
+including the well-known B.G.K. model, which turns out to be a
+particular case of the general models. The formulation we have just set
+up then allows us to approach more simply the study of the boundary
+conditions induced by the presence of solid walls. Thus, we will make
+the position of these walls independent of the fluid characteristics,
+which was one of the major flaws of this type of boundary condition.</p>
+<p>The constitutive laws used during numerical simulation by the lattice
+Boltzmann method are by default of Newtonian type. This stems from the
+fact that the viscous modes are relaxed towards an equilibrium state
+with a very short relaxation time. Thus the fluid almost instantaneously
+loses its “viscous memory”.</p>
+<p>We will therefore add additional characteristics to the fluid that
+allow us to modify the constitutive laws of the simulated fluids. The
+point is actually to give the fluid a viscous memory by the addition of
+new modes coupled to the viscous modes with a long relaxation time.</p>
+<p>Thus, we will extend the lattice Boltzmann method to allow the
+simulation of isotropic Jeffreys-type viscoelastic fluids. We will
+perform several numerical experiments which will allow us to better
+characterize the simulated fluid and thus demonstrate the validity of
+our assumptions.</p>
+<p>In a further step, we will try to understand why the addition of two
+modes coupled to the viscous modes and possessing very long relaxation
+times leads us to a Jeffreys-type fluid. Finally, we will explore some
+applications of our models allowing the simulation of even more complex
+fluids possessing nonlinear characteristics.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-MZ"><span class="refnum">[15]</span> G. McNamara and G. Zanetti, “Use of the Boltzmann
+Equation to Simulate Lattice Gas Automata”, <span><em>Phys. Rev.
+Lett.</em></span>, Vol. 61(20), 1988, pp. 2332–2335. <a class="refall" href="bibliography.html#ref-MZ" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="index.html"><span>Previous</span>Contents</a><a class="next" href="part1-chapter1.html"><span>Next</span>Lattice gases</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

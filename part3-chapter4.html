@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numerical Simulations — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '4.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li class="current"><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+<ul>
+<li><a href="#relaxation-of-a-wave"
+id="toc-relaxation-of-a-wave"><span class="secnum">4.1</span> Relaxation of a wave</a>
+<ul>
+<li><a href="#quasi-elastic-model"
+id="toc-quasi-elastic-model"><span class="secnum">4.1.1</span> Quasi-elastic model</a></li>
+<li><a href="#viscoelastic-model"
+id="toc-viscoelastic-model"><span class="secnum">4.1.2</span> Viscoelastic model</a></li>
+</ul></li>
+<li><a href="#couette-and-oscillating-couette-flow"
+id="toc-couette-and-oscillating-couette-flow"><span class="secnum">4.2</span> Couette and
+Oscillating Couette Flow</a>
+<ul>
+<li><a href="#couette-flow" id="toc-couette-flow"><span class="secnum">4.2.1</span> Couette
+Flow</a></li>
+<li><a href="#oscillating-couette-flow"
+id="toc-oscillating-couette-flow"><span class="secnum">4.2.2</span> Oscillating Couette
+Flow</a></li>
+</ul></li>
+<li><a href="#pulsed-poiseuille-flow"
+id="toc-pulsed-poiseuille-flow"><span class="secnum">4.3</span> Pulsed Poiseuille Flow</a></li>
+<li><a href="#flows-based-on-couette-flow"
+id="toc-flows-based-on-couette-flow"><span class="secnum">4.4</span> Flows based on Couette
+flow</a>
+<ul>
+<li><a href="#establishment-of-a-shear"
+id="toc-establishment-of-a-shear"><span class="secnum">4.4.1</span> Establishment of a
+shear</a></li>
+<li><a href="#shear-cessation" id="toc-shear-cessation"><span class="secnum">4.4.2</span> Shear
+cessation</a></li>
+<li><a href="#sudden-shear" id="toc-sudden-shear"><span class="secnum">4.4.3</span> Sudden
+shear</a></li>
+</ul></li>
+</ul>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method — Chapter 4</p><h1>Numerical Simulations</h1></header><p>The “viscoelastic lattice Boltzmann fluid” was designed starting from
+the idea of giving a long relaxation time to modes related to the
+viscous stress tensor. This clearly creates a memory effect. At this
+stage of the study, we do not have any justification for considering one
+constitutive equation rather than another, and our choice is made by
+trial and error. In the same way as the experimentalist, we find
+ourselves confronted with a fluid whose characteristics we have to
+determine.</p>
+<p>As we have seen throughout this thesis, the name of Jeffreys has
+appeared several times, and it is not revealing a great secret to
+announce that the working hypothesis we will adopt is that the fluid
+simulated by our method is a Jeffreys-type fluid. It indeed seemed
+natural to think of such a fluid based on the preceding chapters. In
+fact, the introduction of an infinite viscosity in a method which,
+already through the solutions of the dispersion equation, clearly showed
+the existence of a complex viscosity, hence a time-dependent one,
+pointed toward the Jeffreys fluid.</p>
+<p>To study our fluid, we will set up several types of simulations. The
+first type will allow the study of the presence of transverse waves.
+This will let us measure the various transport and attenuation
+coefficients of our fluid. Next, we will consider simulations in which
+temporal effects dominate. We will attempt to quantify its
+characteristics, first for forced flows. Then, in a second step, we will
+study the characteristics of our fluid for flow cases in which the
+transient state dominates.</p>
+<p>Since our fifteen-velocity model in two dimensions is the most
+advanced of all, it is the one we will use throughout the rest of this
+chapter.</p>
+<h1 id="relaxation-of-a-wave"><span class="secnum">4.1</span> Relaxation of a wave</h1>
+<p>In the classical Navier-Stokes equations, represented by
+equations (<a href="#mjx-eqn:NStokes-simu">4.1</a>) without thermal
+effects, one can distinguish, in two dimensions, three sinusoidal modes,
+namely two for the sound waves and one for the shear waves.</p>
+<p><span class="math display">\[\begin{eqnarray}
+\label{NStokes-simu}
+&amp;&amp;\partial_t\rho+{\mathbf{\nabla}} . \,{\mathbf{j}}=0\\
+&amp;&amp;\partial_t\,{\mathbf{j}} + {\mathbf{\nabla}} .
+({{\mathbf{j}}:{\mathbf{j}}\over \rho})=-{\mathbf{\nabla}} P +
+{\mathbf{\nabla}}.(\nu\,{\mathbf{\nabla}}
+{\mathbf{j}})+{\mathbf{\nabla}}(\xi\,{\mathbf{\nabla}}.\,{\mathbf{j}}),
+\end{eqnarray}\]</span> where <span
+class="math inline">\({\mathbf{j}}=\rho\,{\mathbf{u}}\)</span>
+represents the momentum, <span class="math inline">\(\nu\)</span> and
+<span class="math inline">\(\xi\)</span> denote respectively the shear
+viscosity and the bulk viscosity. As we have already seen previously,
+the solutions of the dispersion equation give, for the shear mode, as a
+function of the wave number <span class="math inline">\(k\)</span>,
+<span class="math display">\[\begin{equation}
+\omega=-\nu\,k^2,
+\end{equation}\]</span> and for the longitudinal (or sound) modes <span
+class="math display">\[\begin{equation}
+\omega=\pm c_s\, k-\Gamma\,k^2,
+\end{equation}\]</span> where <span class="math inline">\(c_s\)</span>
+denotes the speed of sound in the medium and <span
+class="math inline">\(\displaystyle\Gamma={\nu+\xi\over 2}\)</span> the
+longitudinal attenuation of sound waves.</p>
+<h2 id="quasi-elastic-model"><span class="secnum">4.1.1</span> Quasi-elastic model</h2>
+<p>The addition of two macroscopic equations corresponding to the two
+new conserved quantities, in the quasi-elastic case, leads to the
+consideration of five sinusoidal modes: two for the sound waves, two for
+the propagative transverse waves, and finally a last non-propagative
+mode with no physical meaning, apart from the fact that it has
+characteristics of a thermal mode, that is, it is purely diffusive. We
+recall that a transverse wave is “a wave whose velocity <span
+class="math inline">\(v=c_\perp\)</span> is directed perpendicular to
+its direction of propagation” [<a href="#ref-LL">40</a>].</p>
+<p>Indeed, if we take up the dynamical equations we had deduced from the
+Chapman-Enskog expansion of the fifteen-velocity model in the
+quasi-elastic case, by eliminating the nonlinear terms in <span
+class="math inline">\(j\)</span>, we obtain <span
+class="math display">\[\begin{eqnarray}
+\label{cont-sim}
+&amp;&amp;\partial_t\rho + \partial_xj_x+\partial_yj_y=0,\\
+\label{NSx-sim}
+&amp;&amp;\partial_tj_x+\partial_xP+ {c_\perp^2 \over
+\kappa}\,(\partial_xP_{xx}+\partial_yP_{xy})\nonumber\\
+&amp;&amp;\qquad=\nu_\infty\,\Delta
+j_x+\xi_\infty\,\partial_x(\partial_xj_x+\partial_yj_y),\qquad\qquad\\
+\label{NSy-sim}
+&amp;&amp;\partial_tj_y+\partial_yP+ {c_\perp^2 \over
+\kappa}\,(\partial_xP_{xy}-\partial_yP_{xx})\nonumber\\
+&amp;&amp;\qquad=\nu_\infty\,\Delta
+j_y+\xi_\infty\,\partial_y(\partial_xj_x+\partial_yj_y),\\
+&amp;&amp;\partial_tP_{xx}+ \kappa\,(\partial_xj_x-\partial_yj_y) =
+D_\infty \,\Delta P_{xx},\\
+\label{viscom-sim}
+&amp;&amp;\partial_tP_{xy}+ \kappa\,(\partial_xj_y+\partial_yj_x) =
+D_\infty \,\Delta P_{xy}.
+\end{eqnarray}\]</span></p>
+<p>Taking as initial condition a velocity wave, <span
+class="math display">\[u({\mathbf{r}},0)=\left({\mathbf{u}}_{\|}+{\mathbf{u}}_{\perp}\right)\,\cos
+({\mathbf{k}}
+\cdot {\mathbf{r}}),\]</span> one can then determine the temporal
+evolution of the system, which is given by <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;u({\mathbf{r}},t)=\left({\mathbf{u}}_{\|}\,\cos (\omega_{\|}
+t+\phi_{\|})/ \cos \phi_{\|}\,
+\,e^{-k^2
+    \alpha_{\|} t}\right.\quad \nonumber\\
+&amp;&amp;\phantom{u({\mathbf{r}},t)}
++\left.\phantom{\Big(}{\mathbf{u}}_{\perp}\,\cos (\omega_{\perp}
+t+\phi_{\perp})/ \cos \phi_{\perp}\,
+\,e^{-k^2 \alpha_{\perp} t}\right)\,\cos
+({\mathbf{k}}\cdot {\mathbf{r}}),\quad \nonumber
+\end{eqnarray}\]</span> where <span
+class="math inline">\({\mathbf{u}}_{\|}\)</span> and <span
+class="math inline">\({\mathbf{u}}_{\perp}\)</span> are respectively the
+velocity parallel and the velocity perpendicular to <span
+class="math inline">\({\mathbf{k}}\)</span>, and <span
+class="math display">\[\begin{eqnarray}
+\omega_{\|}^2=(c_s^2+c_{\perp}^2)\,k^2,
+&amp;&amp; \omega_\perp^2=c_{\perp}^2\,k^2,\label{omega1}\\
+\alpha_{\|}= {1\over 2}\left(\nu_\infty+\xi_\infty+
+{c_{\perp}^2 D_\infty \over c_s^2+c_{\perp}^2}\right),&amp;&amp;
+\alpha_{\perp}={\nu_\infty+D_\infty\over 2},\label{attenu1}\\
+\tan (\phi_{\|})= {D_\infty-\alpha_{\|} \over \omega_\|}\,k^2,
+\,\qquad\mbox{and}\,&amp;&amp; \tan (\phi_\perp)=
+{D_\infty-\alpha_{\perp} \over \omega_\perp} \,k^2.\qquad\quad
+\end{eqnarray}\]</span></p>
+<p>One can easily carry out this type of simulation for arbitrary angles
+between <span class="math inline">\({\mathbf{k}}\)</span> and <span
+class="math inline">\({\mathbf{r}}\)</span>, an example of which is
+shown in figure <a href="#relaxfig1">4.1</a> for a parallel wave and a
+transverse wave.</p>
+<figure id="relaxfig1">
+<p><img src="figures/fig2a.svg" alt="image" /> <img
+src="figures/fig2b.svg" alt="image" /></p>
+<figcaption>Figure 4.1: Relaxations of a wave with <span
+class="math inline">\(k=9.66\times10^{-2}\)</span>, <span
+class="math inline">\(c_{\perp}^2=1/5\)</span>, <span
+class="math inline">\(c_s^2=1/2\)</span>, <span
+class="math inline">\(\lambda_\gamma=0\)</span>, <span
+class="math inline">\(\nu_\infty=0.1\)</span>, <span
+class="math inline">\(\kappa=2/3\)</span>, <span
+class="math inline">\(\lambda_e=1.2\)</span>, <span
+class="math inline">\(\lambda_S=1.2\)</span>, <span
+class="math inline">\(\lambda_\chi=1.2\)</span>, and <span
+class="math inline">\(\lambda_z=1.6\)</span>.</figcaption>
+</figure>
+<p>Given that the transverse waves correspond to the shear modes of the
+system, this justifies the name “quasi-elastic model”. This elastic
+behavior is visible in figure <a href="#relaxfig1">4.1</a>a; indeed, the
+relaxation of a transverse wave is sinusoidal whereas for a Newtonian
+fluid this relaxation would be exponential. This model is not purely
+elastic because the above sinusoid is damped. The comparisons between
+the measurements and the theoretical predictions are excellent; they
+differ by less than <span class="math inline">\(0.5\%\)</span>, and this
+regardless of the angle between <span
+class="math inline">\({\mathbf{k}}\)</span> and <span
+class="math inline">\({\mathbf{r}}\)</span>. This confirms that our
+fifteen-velocity model is isotropic when the new modes are conserved
+<span class="math inline">\((\lambda_\gamma=0)\)</span>. The small
+errors observed are due to the fact that the isotropy of the model is
+ensured up to order <span class="math inline">\(k^2\)</span>, and that
+the corrections coming from higher orders are not necessarily
+isotropic.</p>
+<h2 id="viscoelastic-model"><span class="secnum">4.1.2</span> Viscoelastic model</h2>
+<p>Performing the same type of simulation for the viscoelastic model,
+that is, when <span class="math inline">\(\lambda_\gamma\ll1\)</span>,
+we encounter two distinct cases. The first case arises when the wave
+number <span class="math inline">\(k\)</span> is smaller than the value
+<span class="math inline">\(k_c\)</span>, which is the boundary between
+viscous behavior and viscoelastic behavior. We have already shown that
+<span class="math inline">\(k_c={\lambda_\gamma/ 2 c_\perp}\)</span>. If
+we take up the curve representing the imaginary part of the solutions of
+the dispersion equation, this situation appears when the wave number
+lies before the appearance of the transverse velocity; the behavior of
+the fluid is then elastic. Such a case leads to the viscous behavior of
+the fluid shown in figure <a href="#relaxfig2">4.2</a>.</p>
+<figure id="relaxfig2">
+<p><img src="figures/fig3a.svg" alt="image" /> <img
+src="figures/fig3b.svg" alt="image" /></p>
+<figcaption>Figure 4.2: Relaxations of a wave with <span
+class="math inline">\(k=3.005\times10^{-2}\)</span>, <span
+class="math inline">\(c_{\perp}^2=1/5\)</span>, <span
+class="math inline">\(c_s^2=1/2\)</span>, <span
+class="math inline">\(\lambda_\gamma=0.05\)</span>, <span
+class="math inline">\(\nu_\infty=0.1\)</span>, <span
+class="math inline">\(\kappa=2/3\)</span>, <span
+class="math inline">\(\lambda_e=1.2\)</span>, <span
+class="math inline">\(\lambda_S=1.2\)</span>, <span
+class="math inline">\(\lambda_\chi=1.2\)</span>, and <span
+class="math inline">\(\lambda_z=1.6\)</span>.</figcaption>
+</figure>
+<p>In the case where <span class="math inline">\(k&gt;k_c\)</span>, we
+recover a behavior with a shape identical to that of the quasi-elastic
+model. This type of simulation allows us to measure the transverse wave
+speed as well as the longitudinal wave speed as a function of the angle
+between <span class="math inline">\({\mathbf{k}}\)</span> and <span
+class="math inline">\({\mathbf{r}}\)</span>. This lets us observe that
+the transverse wave speed is no longer given by <span
+class="math inline">\(v_\perp=c_\perp\)</span> as in the quasi-elastic
+case, but by <span class="math display">\[\begin{equation}
+v_\perp=\sqrt{\lambda_\gamma\,\nu_0}
+\end{equation}\]</span> with <span class="math inline">\(\nu_0\)</span>
+the viscosity of the viscous model defined by <span
+class="math display">\[\begin{equation}
+\nu_0=({\kappa\over 2}-c_{\perp}^2)\,({1\over \lambda_\nu}-{1\over 2})+
+c_{\perp}^2\,({1\over
+  \lambda_\gamma}-{1 \over 2}),
+\end{equation}\]</span> regardless of the angle between <span
+class="math inline">\({\mathbf{k}}\)</span> and <span
+class="math inline">\({\mathbf{r}}\)</span>. This value proves to be
+exact with very high precision; the relative error is less than <span
+class="math inline">\(10^{-4}\)</span>. We will see later that this
+value of the transverse speed can be deduced from the Jeffreys-type
+constitutive equation and yields the same expression as the one we have
+just found. The longitudinal wave speed is also obtained with the same
+order of precision and we then have <span
+class="math inline">\(v_\parallel=\sqrt{v_\perp^2+c_s^2}\)</span>.</p>
+<p>In conclusion, these simulations confirm the isotropy of the
+quasi-elastic model and the extension of this isotropy to the
+viscoelastic model. They also allow us to find the values of the
+coefficients <span class="math inline">\(v_\perp\)</span> and <span
+class="math inline">\(v_\parallel\)</span> with significant
+precision.</p>
+<h1 id="couette-and-oscillating-couette-flow"><span class="secnum">4.2</span> Couette and
+Oscillating Couette Flow</h1>
+<p>We will now test the viscoelastic model in the presence of solid
+walls. These walls are of the back-bounce or
+<span><em>Bounce-back</em></span> type for all velocities, so care must
+be taken with velocities of norm two since they must feel the presence
+of obstacles at two sites away. We will first set up a Couette-type
+flow. We will therefore impose a velocity <span
+class="math inline">\(V_0\)</span> on one of the two walls in order to
+simulate a Couette flow. To implement this type of boundary condition,
+we must bias the collision, at the points closest to the moving wall, by
+adding a small amount of momentum <span class="math inline">\(\delta
+F\)</span> in the <span class="math inline">\(+x\)</span> direction and
+subtracting the same amount in the <span
+class="math inline">\(-x\)</span> direction at each iteration. It is
+then necessary to determine <span class="math inline">\(\delta
+F\)</span> as a function of the parameters of the model and the velocity
+<span class="math inline">\(V_0\)</span> to be imposed. For the present
+model, with fifteen velocities in two dimensions, it is easy to find the
+relation: <span class="math display">\[\delta F={\kappa \over 2}
+V_0,\]</span> with <span class="math inline">\(\kappa\)</span> one of
+the parameters of the model.</p>
+<h2 id="couette-flow"><span class="secnum">4.2.1</span> Couette Flow</h2>
+<p>One can then test the validity of such a type of boundary condition
+by imposing, slowly in time, a velocity on the moving wall so as not to
+excite the elastic modes. In practice, we use a hyperbolic tangent to
+impose the velocity of the moving plate. If we wait a long enough time,
+the velocity profile becomes linear as for a classical viscous fluid.
+The equations issued from the Chapman-Enskog expansion give us an
+indication of the value of the components of the viscous stress tensor.
+We can then choose <span><em>a priori</em></span>: <span
+class="math display">\[\begin{eqnarray}
+\sigma_{xx}={\nu_\infty \over \kappa}\lambda_\nu\,S^{(1)}_{xx}+
+{c_{\perp}^2 \over \kappa}\left(1-{\lambda_\gamma\over 2}
+\right)\,   P_{xx},\\
+\sigma_{xy}={\nu_\infty \over \kappa}\lambda&#39;_\nu\,S^{(1)}_{xy}+
+{c_{\perp}^2 \over \kappa}\left(1-{\lambda_\gamma\over 2}
+\right)\,   P_{xy}.
+\end{eqnarray}\]</span> One can then measure the stress and verify its
+value against the theoretical stress: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\sigma_{xx}=0\nonumber\\
+&amp;&amp;\sigma_{xy}=-\nu_0\,{\dot D}_{xy}=-\nu_0\,{\partial V_x\over
+\partial y}=\nu_0\,{V_0\over H}.
+\end{eqnarray}\]</span></p>
+<p>These last two relations are then verified to machine precision,
+which validates, at least for steady-state situations, the choice we
+made for the stress.</p>
+<h2 id="oscillating-couette-flow"><span class="secnum">4.2.2</span> Oscillating Couette Flow</h2>
+<p>A classical simulation to determine the real and imaginary parts of
+the viscosity is the so-called oscillating Couette simulation, whose
+characteristics are given in chapter 1 of the previous part. In fact, it
+is a Couette flow in which the moving plate vibrates with angular
+frequency <span class="math inline">\(\omega\)</span>. We must now make
+a hypothesis on the form of the complex viscosity to be used. We will of
+course choose a Jeffreys model, which gives for the complex viscosity:
+<span class="math display">\[\begin{equation}
+\nu^\star=\nu_\infty+{\nu_0-\nu_\infty \over 1+i\,\omega\,\tau_1},
+\end{equation}\]</span> with, as before, <span
+class="math display">\[\begin{equation}
+\nu_0=({\kappa\over 2}-c_{\perp}^2)\,({1\over \lambda_\nu}-{1\over 2})+
+c_{\perp}^2\,({1\over
+  \lambda_\gamma}-{1 \over 2}),
+\end{equation}\]</span> and <span
+class="math display">\[\begin{equation}
+\nu_\infty=({\kappa\over 2}-c_{\perp}^2)\,({1\over \lambda_\nu}-{1\over
+2}).
+\end{equation}\]</span> The choice <span
+class="math inline">\(\tau_1=1/\lambda_\gamma\)</span> seems quite
+natural, but this remains a working hypothesis.</p>
+<p>We will measure the resonance curves in phase and in amplitude of the
+fluid velocity as a function of the angular frequency <span
+class="math inline">\(\omega\)</span> at different heights in the
+channel. This yields figures <a href="#phase-couette">4.3</a> and <a
+href="#ampli-couette">4.4</a> when comparing the theoretical solutions
+of the Jeffreys model with the numerical values. The theoretical
+solutions are plotted as continuous lines; the circles, squares, and
+other cross-shaped points are the solutions obtained from the numerical
+simulations. To carry out the simulation, our simulation domain is
+reduced to two sites in the <span class="math inline">\(Ox\)</span>
+direction with periodic boundary conditions and 60 sites in <span
+class="math inline">\(Oy\)</span> with bounce-back (<span><em>bounce
+back</em></span>) boundary conditions. To obtain reasonable precision,
+we restricted ourselves to 100,000 iterations, which represents
+approximately 2 minutes of computation per resolution point in the
+following graphs. We can observe excellent agreement between the
+simulations and the theoretical solutions, without any adjustable
+parameter.</p>
+<figure id="phase-couette">
+<img src="figures/phase-couette.svg" />
+<figcaption>Figure 4.3: Phase diagram for the numerical model and for a
+Jeffreys fluid in the oscillating Couette flow</figcaption>
+</figure>
+<p>A resonance is observed at angular frequency <span
+class="math inline">\(\displaystyle\omega=\omega_0\approx\pi{v_\perp\over
+H}\)</span>.</p>
+<figure id="ampli-couette">
+<img src="figures/ampli-couette.svg" />
+<figcaption>Figure 4.4: Amplitude resonance for the numerical model and
+for a Jeffreys fluid in the oscillating Couette flow</figcaption>
+</figure>
+<p>If we extend the range of angular frequency, we obtain the graph in
+figure <a href="#ampli-complet-couette">4.5</a> where there is a second
+resonance peak for the velocities that are not at the center of the
+channel. Indeed, the curve for the velocity at the center of the channel
+does not show a resonance at <span
+class="math inline">\(2\,\omega_0\)</span>.</p>
+<figure id="ampli-complet-couette">
+<img src="figures/ampli-complet-couette.svg" />
+<figcaption>Figure 4.5: Amplitude resonance for the numerical model and
+for a Jeffreys fluid in the oscillating Couette flow – Presence of two
+resonance peaks</figcaption>
+</figure>
+<p>We can plot the error on the amplitude, in figure (<a
+href="#erreur-couette">4.6</a>).</p>
+<figure id="erreur-couette">
+<img src="figures/erreur-ampli-couette.svg" />
+<figcaption>Figure 4.6: Graph of the errors on the amplitudes between
+the numerical model and the Jeffreys fluid for the oscillating Couette
+flow</figcaption>
+</figure>
+<p>We can then observe that there are several different sources of
+error. The first one seems to be due to the walls, since the error grows
+as we approach the walls. One can indeed imagine, as in the case of a
+Newtonian fluid simulated with the lattice Boltzmann method, that the
+position of the wall varies depending on the eigenvalues of the
+collision operator. We will therefore be able to adapt the method
+presented in chapter <a href="part1-chapter4.html">4</a> of the first
+part, which allows one to correct these effects, to the method presented
+here, in the future. The second source of error is at the resonance; the
+number of iterations is probably not sufficient to eliminate spurious
+effects that push us away from the maximum amplitude. It appears however
+that the hypothesis <span class="math inline">\(\tau_1=1/
+\lambda_\gamma\)</span> is good enough, because a small variation on
+<span class="math inline">\(\tau_1\)</span> produces a strong variation
+on the error curve; typically, a <span
+class="math inline">\(1\%\)</span> error on <span
+class="math inline">\(\tau_1\)</span> doubles the error on the velocity
+at the first resonance. Nevertheless, it remains impossible to
+distinguish whether <span class="math inline">\(\tau_1=1/
+\lambda_\gamma\)</span> or <span class="math inline">\(\tau_1=1/
+\lambda_\gamma-1 /2\)</span>. The last possible source of error comes
+from the fact that our fluid is not rigorously a Jeffreys fluid. We will
+see at the end of this manuscript a derivation that will let us deduce
+the constitutive equation of our fluid; it will have an additional term
+compared to the Jeffreys constitutive equation. We will also see that
+although it is not negligible, this term has only a small influence.</p>
+<p>These simulations confirm that our fluid is indeed globally of
+Jeffreys type with a relaxation time <span
+class="math inline">\(\tau_1\)</span> of the order of <span
+class="math inline">\(1/\lambda_\gamma\)</span>. The walls introduced
+from the simple bounce-back yield errors which, even though they remain
+small, must be monitored carefully.</p>
+<h1 id="pulsed-poiseuille-flow"><span class="secnum">4.3</span> Pulsed Poiseuille Flow</h1>
+<p>We will now add a body force, intended to represent a gravity or a
+pressure gradient. Indeed, in the case of a fluid with linear equations,
+there is an equivalence between body force and pressure gradient by
+application of the superposition theorem. At each node and each
+iteration, we will add a small amount of momentum <span
+class="math inline">\(\rho F\)</span>.</p>
+<p>This will allow us to simulate a Poiseuille flow. This flow
+constitutes a test case when one wants to study the position of the
+solid walls actually simulated. The study presented in chapter <a
+href="part1-chapter4.html">4</a> does not apply directly here.</p>
+<p>In the same way as we carried out an oscillating Couette flow, we
+will carry out a pulsed Poiseuille flow by taking a sinusoidal body
+force. The mesh sizes are identical and the number of iterations is
+similar to what we used for the pulsed Couette flow. The analytical
+solution of this problem given in the second part of this thesis will
+serve as a comparison with the numerical values from the simulations. We
+can then plot the graph of the amplitude and the phase for the
+expression of the velocity taken at different heights of the Poiseuille
+channel. We thus have figures <a href="#poiseuill-phase">4.7</a> and <a
+href="#poiseuill-ampli">4.8</a>. The theoretical solutions are again
+drawn as continuous lines while the circles, squares, and cross-shaped
+points are the result of numerical simulations. A resonance is then
+observed at the angular frequency <span
+class="math inline">\(\displaystyle\omega=\omega_0\approx{\pi\,v_\perp\over
+H}\)</span>. This resonance frequency is identical to the one determined
+for the oscillating Couette flow.</p>
+<figure id="poiseuill-phase">
+<img src="figures/poiseuill-phase.svg" />
+<figcaption>Figure 4.7: Phase diagram for the numerical model and for a
+Jeffreys fluid in the pulsed Poiseuille flow</figcaption>
+</figure>
+<figure id="poiseuill-ampli">
+<img src="figures/poiseuill-ampli.svg" />
+<figcaption>Figure 4.8: Amplitude resonance for the numerical model and
+for a Jeffreys fluid in the pulsed Poiseuille flow</figcaption>
+</figure>
+<p>In this example, the agreement between the simulation and the
+analytical solution is excellent, still without any adjustable
+parameter. If we perform the same simulation for a wider range of
+angular frequency, we obtain a second resonance at <span
+class="math inline">\(\omega=3\,\omega_0\)</span>, even for the velocity
+at the center of the channel. We can also compute the error as a
+function of <span class="math inline">\(\omega\)</span> and of the
+height in the channel; we then obtain the curve <a
+href="#poiseuill-erreur">4.9</a>.</p>
+<figure id="poiseuill-erreur">
+<img src="figures/erreur-pois.svg" />
+<figcaption>Figure 4.9: Graph of the errors on the amplitudes between
+the numerical model and the Jeffreys fluid for the pulsed Poiseuille
+flow</figcaption>
+</figure>
+<p>The relative error is larger for the second resonance of this flow
+than in the Couette flow case. This is explained first by the fact that
+the frequency is higher, and therefore the time derivatives of the
+stress or velocity are also larger. We are thus no longer in the
+small-gradient approximation. The second reason is the same as that
+observed for the Couette flow: the difficulty of waiting for the
+spurious noise around the resonance to disappear; the problem is in fact
+aggravated by the high frequency. The errors due to the walls are still
+present and influence the error. The last source of error is, once
+again, due to the presence of an additional term in the constitutive
+equation of our fluid with respect to the Jeffreys fluid, although its
+effects are very limited.</p>
+<p>This study allows us to validate once again the Jeffreys-fluid
+hypothesis as well as the way we introduce a body force. It also warns
+us about the small-gradient hypothesis and shows us the limits of the
+model at high frequencies.</p>
+<h1 id="flows-based-on-couette-flow"><span class="secnum">4.4</span> Flows based on Couette
+flow</h1>
+<p>We will now carry out two flows that highlight transient effects.
+Based on the Couette flow, we will study the responses of our fluid to
+the establishment of the motion of the moving plate, then to its stop,
+and finally we will study its response when the plate undergoes a sudden
+motion. The theoretical calculations on these three experiments are done
+under the assumption that the fluid feels instantaneously and uniformly
+the effects of the motion of the plate throughout its volume. We will
+attempt to approach these assumptions as closely as possible in the
+simulations that follow, by a trick, since it is clearly evident from
+all we have just shown that information propagates in the fluid with a
+finite speed, whether transverse or longitudinal.</p>
+<h2 id="establishment-of-a-shear"><span class="secnum">4.4.1</span> Establishment of a shear</h2>
+<p>Take the Couette device at rest; then at <span
+class="math inline">\(t=0\)</span> we impose a constant velocity <span
+class="math inline">\(V_0\)</span> on the lower plate. We can
+mathematically represent the motion of the plate by a Heaviside function
+multiplied by a constant, i.e.: <span
+class="math inline">\(V_0\,H(t)\)</span>. So that the fluid feels the
+motion of the plate, we will impose on it the velocity of an established
+Couette flow at every point from <span
+class="math inline">\(t=0\)</span>, without touching the other modes of
+the system; by other modes we mean the modes which do not enter directly
+into the establishment of the shear. Thus, the shear of the fluid will
+indeed be numerically represented by a Heaviside-type function <span
+class="math inline">\(H(t)\)</span>, as shown in figure <a
+href="#fig-He1">4.10</a>. Note that in the case of a linear fluid, the
+shear <span class="math inline">\({\dot D}_{xy}\)</span> is the only
+non-zero component of the strain rate tensor; it can then be identified
+with one of its invariants, <span class="math inline">\({\dot
+\gamma}\)</span>, when one adopts the convention <span
+class="math inline">\({\dot D}_{xy}&gt;0\)</span>. If the Couette
+channel has a height <span class="math inline">\(H\)</span>, we then
+have in steady state: <span class="math display">\[\begin{equation}
+{\dot  D}_{xy}^0={\dot \gamma}_0={V_0 \over H}.
+\end{equation}\]</span></p>
+<figure id="fig-He1">
+<img src="figures/etabliss-h.svg" />
+<figcaption>Figure 4.10: Establishment of a shear at <span
+class="math inline">\(t=0\)</span>; the shear is represented by a
+Heaviside function <span class="math inline">\(H(t)\)</span> throughout
+the fluid volume</figcaption>
+</figure>
+<p>We then numerically measure the dimensionless quantity <span
+class="math inline">\(\sigma_{xy}/({\dot
+\gamma}_{0}\,\nu_0)=-\nu^+/\nu_0\)</span>, which we report on the graph
+in figure <a href="#fig-etabliss">4.11</a> as a function of the
+dimensionless time <span class="math inline">\(t/\tau_1\)</span>. The
+quantity <span class="math inline">\(\nu^+\)</span> is defined by: <span
+class="math display">\[\begin{equation}
+\sigma_{xy}=- {\dot \gamma}\,\nu^+.
+\end{equation}\]</span></p>
+<figure id="fig-etabliss">
+<img src="figures/etabliss-sig.svg" />
+<figcaption>Figure 4.11: Establishment of a shear at <span
+class="math inline">\(t=0\)</span>, measurement of <span
+class="math inline">\(\nu^+/\nu_0\)</span></figcaption>
+</figure>
+<p>We can then plot the graph of the error on the stress with respect to
+the theoretical value for a Jeffreys-type fluid: <span
+class="math display">\[\begin{equation}
+-{\sigma_{xy}\over {\dot \gamma}\,\nu_0 }={\nu^+\over
+\nu_0}=1-\left(1-{\nu_\infty\over \nu_0}\right)\,e^{-{t / \tau_1}}.
+\end{equation}\]</span> One can then observe that the minimum error is
+obtained with the choice: <span class="math display">\[\begin{equation}
+\tau_1=\left({1\over \lambda_\gamma}-{1\over2}\right).
+\end{equation}\]</span></p>
+<figure id="erreur-etabliss">
+<img src="figures/erreur-etabliss.svg" />
+<figcaption>Figure 4.12: Establishment of a shear at <span
+class="math inline">\(t=0\)</span>, measurement of the relative error on
+<span class="math inline">\(\nu^+/\nu_0\)</span></figcaption>
+</figure>
+<p>One can then see in graph <a href="#erreur-etabliss">4.12</a> that
+the error is extremely small. This simulation thus allows us to define
+the relaxation time <span class="math inline">\(\tau_1=1/
+\lambda_\gamma- 1 /2\)</span> of our models. It nevertheless remains
+acceptable to take <span
+class="math inline">\(\tau_1=1/\lambda_\gamma\)</span> since by
+definition <span class="math inline">\(\lambda_\gamma\ll 1\)</span>.</p>
+<h2 id="shear-cessation"><span class="secnum">4.4.2</span> Shear cessation</h2>
+<p>Starting from the same Couette device as before, but starting from an
+established initial solution, that is, the lower plate has been in
+uniform motion with velocity <span class="math inline">\(V_0\)</span>
+for an infinitely long time. At <span
+class="math inline">\(t=0\)</span>, we stop the plate and impose zero
+velocity throughout the fluid while keeping the value of the other modes
+of the system as we did previously. The shear of the fluid, <span
+class="math inline">\({\dot \gamma}\)</span>, can then be represented by
+a function of the form <span class="math inline">\({\dot
+\gamma}_0\,(1-H(t))\)</span>, which we recover in graph <a
+href="#fig-exten-H">4.13</a> obtained from the numerical simulation.</p>
+<figure id="fig-exten-H">
+<img src="figures/extinction-h.svg" />
+<figcaption>Figure 4.13: Shear cessation at <span
+class="math inline">\(t=0\)</span>; the shear can be represented by a
+function <span class="math inline">\(1-H(t)\)</span></figcaption>
+</figure>
+<p>We also numerically measure the dimensionless quantity <span
+class="math inline">\(-\sigma_{xy}/({\dot D}_{xy}
+\,\nu_0)=\nu^-/\nu_0\)</span> as a function of the dimensionless time
+<span class="math inline">\(t/\tau_1\)</span>. We report this
+measurement on graph <a href="#fig-diminu">4.14</a>.</p>
+<figure id="fig-diminu">
+<img src="figures/extinction-sig.svg" />
+<figcaption>Figure 4.14: Shear cessation at <span
+class="math inline">\(t=0\)</span>, measurement of <span
+class="math inline">\(\nu^-/\nu_0=-\sigma_{xy}/({\dot
+\gamma}_0\,\nu_0)\)</span></figcaption>
+</figure>
+<p>The error that can then be measured between the theoretical value and
+the simulation, given in figure <a href="#fig-erreur-diminu">4.15</a>,
+is again very small when making the hypothesis of a Jeffreys fluid.</p>
+<p>Indeed, for such a fluid, we have: <span
+class="math display">\[\begin{equation}
+-{\sigma_{xy} \over {\dot \gamma}_0\,\nu_0 }={\nu^- \over
+  \nu_0}=\left(1-{\nu_\infty\over \nu_0}
+\right)\,e^{-{t\over \tau_1}}.
+\end{equation}\]</span></p>
+<figure id="fig-erreur-diminu">
+<img src="figures/extinction-erreur-sig.svg" />
+<figcaption>Figure 4.15: Shear cessation at <span
+class="math inline">\(t=0\)</span>, error on the measurement of <span
+class="math inline">\(\nu^-/\nu_0\)</span></figcaption>
+</figure>
+<p>In this simulation, the minimum error is again obtained when: <span
+class="math display">\[\begin{equation}
+\tau_1=\left({1\over \lambda_\gamma}-{1\over2}\right).
+\end{equation}\]</span></p>
+<h2 id="sudden-shear"><span class="secnum">4.4.3</span> Sudden shear</h2>
+<p>In the same way as previously, but by establishing and then turning
+off the shear after a short time <span class="math inline">\(\delta
+t\)</span>, we obtain a shear resembling a Dirac function. In figure <a
+href="#fig-soudain-d">4.16</a>, the shear is equal to <span
+class="math inline">\({\dot \gamma}_0\)</span> only at the point <span
+class="math inline">\(t_0=0\)</span> and thus <span
+class="math inline">\(\delta t=1\)</span>.</p>
+<figure id="fig-soudain-d">
+<img src="figures/soudain-d.svg" />
+<figcaption>Figure 4.16: Sudden shear during one time step at <span
+class="math inline">\(t=0\)</span></figcaption>
+</figure>
+<p>The response to such a shear is given in figure <a
+href="#fig-soudain-sig">4.17</a>; it corresponds to the relaxation
+modulus <span class="math inline">\(G(t)\)</span> defined for a Jeffreys
+fluid by: <span class="math display">\[\begin{equation}
+G(t-t_0)=\mu_0\left(1-{\tau_2 \over \tau_1} \right)\,e^{-(t-t_0)/\tau_1}
++ 2 {\mu_0\,\tau_2 \over \tau_1}\,\delta(t-t_0).
+\end{equation}\]</span></p>
+<figure id="fig-soudain-sig">
+<img src="figures/soudain-sig.svg" />
+<figcaption>Figure 4.17: Response of the stress to a sudden shear during
+one time step at <span class="math inline">\(t=0\)</span></figcaption>
+</figure>
+<p>The error on this simulation is, once again, very small. Figure <a
+href="#erreur-H">4.18</a> shows the relative error as a function of the
+reduced time <span class="math inline">\(t / \tau_1\)</span>.</p>
+<figure id="erreur-H">
+<img src="figures/erreur-soudain.svg" />
+<figcaption>Figure 4.18: Relative error on the response to a sudden
+shear during one time step at <span
+class="math inline">\(t=0\)</span></figcaption>
+</figure>
+<p>In conclusion, the set of the three previous simulations, namely the
+establishment of a shear, the cessation of a shear, and the
+establishment of a shear during a short period, has allowed us to define
+the transient viscosities of our numerical model. We could then verify
+that they corresponded to the transient parameters of a Jeffreys fluid.
+We determined that the relaxation time of our fluid is given by <span
+class="math display">\[\tau_1=\left({1\over
+\lambda_\gamma}-{1\over2}\right).\]</span> However, since this time is
+very long, typically of the order of <span
+class="math inline">\(10^3\)</span>, the correction <span
+class="math inline">\(-1 /2\)</span> due to the presence of a discrete
+lattice does not bring a significant contribution.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-LL"><span class="refnum">[40]</span> L. Landau and E. Lifchitz, “M<span>é</span>canique des
+fluides”, <span><em>Edition MIR</em></span>, Moscou, (1971) <a class="refall" href="bibliography.html#ref-LL" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="part3-chapter3.html"><span>Previous</span>Isotropic fifteen-velocity model</a><a class="next" href="part3-chapter5.html"><span>Next</span>Constitutive equation</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

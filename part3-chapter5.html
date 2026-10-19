@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Constitutive equation — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '5.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li class="current"><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+<ul>
+<li><a href="#promotions-in-the-chapman-enskog-expansion"
+id="toc-promotions-in-the-chapman-enskog-expansion"><span class="secnum">5.1</span> Promotions in
+the Chapman-Enskog expansion</a></li>
+<li><a href="#numerical-simulations"
+id="toc-numerical-simulations"><span class="secnum">5.2</span> Numerical Simulations</a></li>
+</ul>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method — Chapter 5</p><h1>Constitutive equation</h1></header><p><span id="LAST" data-label="LAST"></span> The models presented have
+shown a certain ability to simulate a Jeffreys-type fluid, but we have
+no justification for this other than the results of the numerical
+experiments. The ideal situation would be to derive, from the various
+expansions, a constitutive equation for the fluid. However, neither the
+dispersion equation nor the Chapman-Enskog expansion in the viscous and
+quasi-elastic cases allows us to exhibit one. Nevertheless, the
+beginning of a derivation can be proposed in the form of a modification
+of the Chapman-Enskog expansion. Without claiming to be a rigorous
+derivation, this method will allow us to extract a constitutive law for
+our fluid.</p>
+<h1 id="promotions-in-the-chapman-enskog-expansion"><span class="secnum">5.1</span> Promotions in
+the Chapman-Enskog expansion</h1>
+<p>Let us take up again the Chapman-Enskog expansions of the
+eleven-velocity model in order to limit the number of equations to
+write. Our aim is not to treat this model in particular, but to give a
+methodology independent of the models chosen.</p>
+<p>The whole technique of the Chapman-Enskog expansion is based on the
+fact that each mode can be decomposed into a part at equilibrium, plus
+deviations around this equilibrium taken at second order, then at third
+order, <span> <em>etc...</em></span> This expansion thus applies when
+the modes are near equilibrium. However, if the relaxation time of a
+mode is long, this mode will always be very far from its equilibrium
+value. That is why the Chapman-Enskog expansion is no longer valid for
+treating the fluids considered here. We will nevertheless propose a
+variant of the Chapman-Enskog expansion that will give us an idea of
+what the behavior of the modes, and therefore of the fluid, could be
+when one or several relaxation times are long but finite.</p>
+<p>Let us take up the construction of the Chapman-Enskog expansion that
+we had carried out in chapter <a href="part1-chapter3.html">3</a> of the
+first part, from the start. We had taken a Taylor expansion to second
+order of the evolution equation of our fluid: <span
+class="math display">\[N_i(\vec{r}+\vec{c}_i,t+1)=N_i(\vec{r},t)-\sum_{j=0}^{b}{\Omega_{ij}\,\left(
+N_j-N_j^{(eq)}\right)},\]</span> where we have now changed the quantity
+<span class="math inline">\(N_j^{(0)}\)</span> to <span
+class="math inline">\(N_j^{(eq)}\)</span> because we are going to
+distinguish them in the rest of this calculation.</p>
+<p>The Taylor expansion thus leads us to the following expression in
+matrix form: <span class="math display">\[\begin{equation}
+\label{NewTaylor}
+\partial_t{\mathbf{N}}\,+\,{\mathbf{S}}_{\alpha}
+\partial_\alpha{\mathbf{N}}\,+\,{\mathbf{S}}_{\alpha}
+\,\partial_\alpha\partial_t{\mathbf{N}} \,+\,{1 \over 2}
+\left( \partial_t^2
+{\mathbf{N}}\,+\,{\mathbf{S}}_{\alpha}{\mathbf{S}}_{\beta}\,\partial_{\alpha\beta}^2
+{\mathbf{N}}\right)=  -\Omega\,\left(
+{\mathbf{N}}-{\mathbf{N}}^{(eq)}\right).
+\end{equation}\]</span></p>
+<p>The Chapman-Enskog expansion proper is based on the introduction of
+several time scales as well as an expansion of the populations <span
+class="math inline">\({\mathbf{N}}\)</span> around a value <span
+class="math inline">\({\mathbf{N}}^{(0)}\)</span>, which we identified
+with the equilibrium value <span
+class="math inline">\({\mathbf{N}}^{(eq)}\)</span>: <span
+class="math display">\[\begin{equation}
+\left\{
+\begin{array}{l}
+{\mathbf{N}}={\mathbf{N}}^{(0)}+\epsilon\,{\mathbf{N}}^{(1)}+\epsilon^2\,{\mathbf{N}}^{(2)}+\cdots,
+\\
+\partial_t=\epsilon\,\partial_{t_1}+\epsilon^2\,\partial_{t_2}+\cdots,\\
+\partial_\alpha=\epsilon\,\partial_{\alpha &#39;}.
+\end{array}
+\right.
+\end{equation}\]</span></p>
+<p>To this expansion, and since we now have eigenvalues of different
+orders of magnitude, we will add a separation of their contributions in
+the linearized collision matrix <span
+class="math inline">\(\Omega\)</span> by: <span
+class="math display">\[\begin{equation}
+\Omega=\Omega^{(0)}+\epsilon\,\Omega^{(1)}+\epsilon^2\,\Omega^{(2)}+\cdots.
+\end{equation}\]</span></p>
+<p>By reinjecting these definitions in equation (<a
+href="#mjx-eqn:NewTaylor">5.1</a>), and separating the different orders,
+we obtain, at first order, <span class="math inline">\(\epsilon\)</span>
+then <span class="math inline">\(\epsilon^2\)</span>: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\Omega^{(0)}\,\left({\mathbf{N}}^{(0)}-{\mathbf{N}}^{{\mathrm{eq}}}\right)=0,\\
+&amp;&amp;\hspace{-0.5in}\label{NewOne}\partial_{t_1}{\mathbf{N}}^{(0)}\,+\,{\mathbf{S}}_{\alpha}
+\,\partial_{\alpha&#39;}{\mathbf{N}}^{(0)}=-\Omega^{(0)}{\mathbf{N}}^{(1)}\,-\,\Omega^{(1)}\,\left({\mathbf{N}}^{(0)}-{\mathbf{N}}^{{\mathrm{eq}}}\right),\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}{\mathbf{N}}^{(0)}\,+\,\left({\mathbf{\mathcal{I}}}-{\Omega^{(0)}\over
+2} \right)\,\partial_{t_1}{\mathbf{N}}^{(1)}\,+\,{\mathbf{S}}_{\alpha}
+\,\left({\mathbf{\mathcal{I}}}-{\Omega^{(0)}\over 2}
+\right)\,\partial_{\alpha&#39;}{\mathbf{N}}^{(1)}\,-{\Omega^{(1)}
+  \over
+2}\,\partial_{t_1}\,\left({\mathbf{N}}^{(0)}-{\mathbf{N}}^{{\mathrm{eq}}}\right)\,-\nonumber\\
+&amp;&amp;\hspace{-0.5in}\label{NewTwo}\phantom{\partial_{t_2}{\mathbf{N}}^{(0)}\,+}\,{{\mathbf{S}}_{\alpha}\,\Omega^{(1)}\over
+  2}\,\partial_{\alpha&#39;}\left({\mathbf{N}}^{(0)}-{\mathbf{N}}^{{\mathrm{eq}}}\right)=-\Omega^{(0)}\,{\mathbf{N}}^{(2)}\,-\,\Omega^{(1)}\,{\mathbf{N}}^{(1)}\,-\,\Omega^{(2)}\,\left({\mathbf{N}}^{(0)}-{\mathbf{N}}^{{\mathrm{eq}}}\right).
+\end{eqnarray}\]</span></p>
+<p>Now let us gather the different terms by multiplying equation (<a
+href="#mjx-eqn:NewOne">5.5</a>) by <span
+class="math inline">\(\epsilon\)</span> and adding it to equation (<a
+href="#mjx-eqn:NewTwo">5.6</a>) multiplied by <span
+class="math inline">\(\epsilon^2\)</span>; after some manipulations, we
+obtain the generic equation: <span
+class="math display">\[\begin{equation}
+\partial_t{\mathbf{N}}\,+\,{\mathbf{S}}_{\alpha}\,\partial_\alpha{\mathbf{N}}\,-\,\frac{1}{2}\Bigl(\,\Omega\,\partial_t\left({\mathbf{N}}-{\mathbf{N}}^{{\mathrm{eq}}}
+  \right)\,+\,{\mathbf{S}}_{\alpha}\, \Omega
+\,\partial_\alpha\left({\mathbf{N}}-{\mathbf{N}}^{{\mathrm{eq}}}
+  \right)\,+  \Omega\,
+\left({\mathbf{N}}-{\mathbf{N}}^{{\mathrm{eq}}}\right)     \Bigr)=0.
+\end{equation}\]</span></p>
+<p>We can then write this last equation in the basis of the eigenvectors
+of the collision matrix, and taking up the notations of chapter <a
+href="part1-chapter3.html">3</a> of the first part, we obtain: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\partial_t{\widehat{\mathbf{N}}}\,+\,{\mathbf{\widehat
+S}}_{\alpha}\,\partial_\alpha{\widehat{\mathbf{N}}}\,-\,\frac{1}{2}\Bigl(\,{\widehat
+\Omega}\,\partial_t\left({\widehat{\mathbf{N}}}-{\widehat{\mathbf{N}}}^{{\mathrm{eq}}}
+  \right)\,+\nonumber\\
+&amp;&amp;
+\label{NewCE}\phantom{\partial_t{\widehat{\mathbf{N}}}\,+}  \,{\mathbf{\widehat
+S}}_{\alpha}\, {\widehat
+\Omega}\,\partial_\alpha\left({\widehat{\mathbf{N}}}-{\widehat{\mathbf{N}}}^{{\mathrm{eq}}}
+  \right)\,+  {\widehat \Omega}\,
+\left({\widehat{\mathbf{N}}}-{\widehat{\mathbf{N}}}^{{\mathrm{eq}}}\right)     \Bigr)=0.
+\end{eqnarray}\]</span></p>
+<p>Three distinct cases then arise: The first case concerns the
+conserved quantities <span class="math inline">\({\widehat N}_k\)</span>
+with <span class="math inline">\(k\in{\mathcal{C}}\)</span>, for which
+we choose: <span class="math display">\[\begin{equation}
+{\widehat N}_k^{(eq)}={\widehat N}_k,
+\end{equation}\]</span> we then notice that the eigenvalues associated
+with these modes no longer play any role.</p>
+<p>The second case concerns the quasi-conserved modes, <span
+class="math inline">\({\widehat N}_l\)</span> with <span
+class="math inline">\(l\in{\mathcal{Q}}\)</span>, for which we take:
+<span class="math display">\[\begin{equation}
+{\widehat N}_l^{(eq)}=0,
+\end{equation}\]</span> the eigenvalues associated with these modes
+being of order <span class="math inline">\(\epsilon\)</span>.</p>
+<p>The last case groups together all the other modes, <span
+class="math inline">\({\widehat N}_m\)</span> with <span
+class="math inline">\(l\in{\mathcal{R}}\)</span>, for which the
+equilibrium quantity will be a function, to be determined, of the
+conserved quantities of the model. The equations issued from (<a
+href="#mjx-eqn:NewCE">5.8</a>) for the indices <span
+class="math inline">\(l\in{\mathcal{R}}\)</span> are then identical to
+those given by the classical Chapman-Enskog expansion.</p>
+<p>If such an expansion is applied to the eleven-velocity model, we
+obtain, for the three conserved quantities <span
+class="math inline">\((\rho,j_x,j_y)\)</span> and for the two
+quasi-conserved quantities <span
+class="math inline">\((H_{xx},H_{xy})\)</span>, using the same notations
+as for the Chapman-Enskog expansion: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_t\rho\,+\,\partial_xj_x+\partial_yj_y=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_x+\partial_x\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left(
+\partial_xH_{xx}+\partial_yH_{xy}\right)+(1-4\,c_{\perp}^2)\,\partial_xS_{xx}^{(eq)}+\nonumber\\
+&amp;&amp;\hspace{-0.5in}\phantom{\partial_tj_x+}(1-2\,c_{\perp}^2)\,\partial_y
+S_{xy}^{(eq)}+\left(1-\frac{\lambda_e}{2}
+\right)\partial_x\,e^{(neq)}+\nonumber\\
+&amp;&amp;\hspace{-0.5in}\phantom{\partial_tj_x+}(1-4\,c_{\perp}^2)\,\left(1-\frac{\lambda_\nu}{2}
+\right)\partial_x\,S_{xx}^{(neq)}+(1-2\,c_{\perp}^2)\,\left(1-\frac{\lambda&#39;_\nu}{2}
+\right)\partial_y\,S_{xy}^{(neq)}=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_y+\partial_y\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left(
+\partial_xH_{xy}-\partial_yH_{xx}\right)-(1-4\,c_{\perp}^2)\,\partial_yS_{xx}^{(eq)}+\\
+&amp;&amp;\hspace{-0.5in}\phantom{\partial_tj_x+}(1-2\,c_{\perp}^2)\,\partial_x
+S_{xy}^{(eq)}+\left(1-\frac{\lambda_e}{2}
+\right)\partial_y\,e^{(neq)}-\nonumber\\
+&amp;&amp;\hspace{-0.5in}\phantom{\partial_tj_x+}(1-4\,c_{\perp}^2)\,\left(1-\frac{\lambda_\nu}{2}
+\right)\partial_y\,S_{xx}^{(neq)}+(1-2\,c_{\perp}^2)\,\left(1-\frac{\lambda&#39;_\nu}{2}
+\right)\partial_x\,S_{xy}^{(neq)}=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\left(1-\frac{\lambda_\gamma}{2}\right)\partial_tH_{xx}+\lambda_\gamma
+H_{xx}+\frac{2}{3}(1-q)\left(
+  \partial_xj_x-\partial_yj_y\right)-\frac{2}{3}\left(1-\frac{\lambda_\chi}{2}
+\right)\left(\partial_xq_x^{(neq)}-\partial_yq_y^{(neq)}
+\right)=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\left(1-\frac{\lambda_\gamma}{2}\right)\partial_tH_{xy}+\lambda_\gamma
+H_{xy}+\frac{2}{3}(2+q)\left(
+  \partial_yj_x+\partial_xj_y\right)+\frac{2}{3}\left(1-\frac{\lambda_\chi}{2}
+\right)\left(\partial_yq_x^{(neq)}+\partial_xq_y^{(neq)}
+\right)=0,\nonumber
+\end{eqnarray}\]</span> where <span
+class="math inline">\(N_l^{(neq)}=N_l-N_l^{(eq)}\)</span>, which may be
+reduced to the first term of its expansion to be consistent with the
+classical Chapman-Enskog expansion: <span
+class="math inline">\(N_l^{(neq)}=N_l^{(1)}\)</span>.</p>
+<p>Let us set the following definition of the tensor <span
+class="math inline">\({\dot D}^*\)</span>: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\rho\,{\dot D}^*_{xx}=\partial_xj_x-\partial_yj_y=\rho\,{\dot
+D}_{xx}-(\partial_xj_x+\partial_yj_y),\nonumber\\
+&amp;&amp;\rho\,{\dot D}^*_{xy}=\partial_xj_y+\partial_yj_x=\rho\,{\dot
+D}_{xy},
+\end{eqnarray}\]</span> with <span class="math inline">\({
+\dot{\mathbf{D}}}\)</span> the strain rate tensor. This definition can
+be written independently of the space dimension <span
+class="math inline">\(d\)</span> as: <span
+class="math display">\[\begin{equation}
+\rho\,{
+\dot{\mathbf{D}}}^*=\rho\,{\dot{\mathbf{D}}}-\frac{2}{d}\,{\mathbf{I}}\,
+\left(\nabla\cdot {\mathbf{j}} \right).
+\end{equation}\]</span></p>
+<p>Under the incompressible fluid hypothesis, <span
+class="math inline">\(\partial_xj_x+\partial_yj_y=0\)</span>, we obtain
+directly the components of the strain rate tensor: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\rho\,{\dot D}_{xx}=\partial_xj_x-\partial_yj_y=2\,
+\partial_xj_x,\nonumber\\
+&amp;&amp;\rho\,{\dot D}_{xy}=\partial_xj_y+\partial_yj_x,
+\end{eqnarray}\]</span> that is, <span class="math inline">\({\dot
+D}={\dot D}^*\)</span>.</p>
+<p>Taking <span class="math inline">\(q=-1 /2\)</span> and after some
+manipulations: <span class="math display">\[\begin{eqnarray}
+&amp;&amp;
+H_{xx}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\partial_tH_{xx}+\rho\,\frac{1}{\lambda_\gamma}{\dot
+D}^*_{xx}- {D_\infty
+  \over \lambda_\gamma}\,\Delta H_{xx}=0, \nonumber\\
+&amp;&amp;
+H_{xy}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\partial_tH_{xy}+\rho\,\frac{1}{\lambda_\gamma}{\dot
+D}^*_{xy}- {D_\infty
+  \over \lambda_\gamma} \,\Delta H_{xy}=0. \nonumber
+\end{eqnarray}\]</span> In the case of an incompressible fluid, we will
+simply replace the tensor <span class="math inline">\({\dot
+D}^*\)</span> by the tensor <span class="math inline">\({\dot
+D}\)</span>.</p>
+<p>From the equations issued from the preceding expansion, one can
+determine the expressions of the components of the stress: <span
+class="math display">\[\begin{eqnarray}
+\sigma_{xx}={2\,\nu_\infty}\lambda_\nu\,S^{(1)}_{xx}+ {c_{\perp}^2
+}\left(1-{\lambda_\gamma\over 2} \right)\,H_{xx},\\
+\sigma_{xy}={2\,\nu_\infty}\lambda&#39;_\nu\,S^{(1)}_{xy}+
+{c_{\perp}^2}\left(1-{\lambda_\gamma\over 2} \right)\,H_{xy}.
+\end{eqnarray}\]</span> Coupling these equations with those we have just
+determined for the tensor <span class="math inline">\(H\)</span>, and
+also considering the expressions of the components <span
+class="math inline">\(S^{(1)}_{xx}\)</span> and <span
+class="math inline">\(S^{(1)}_{xy}\)</span> issued from the
+Chapman-Enskog expansion already performed, namely: <span
+class="math display">\[\begin{eqnarray}
+S_{xx}^{(1)}&amp;=&amp;-{\rho \,\frac{1}{2\lambda_\nu}} {\dot
+D}^*_{xx},\\
+S_{xy}^{(1)}&amp;=&amp;-{\rho \,\frac{1}{2\lambda&#39;_\nu}} {\dot
+D}^*_{xy},
+\end{eqnarray}\]</span> we then obtain the constitutive equation of our
+fluid, which is here: <span class="math display">\[\begin{equation}
+\label{comportLB}
+{\mathbf{\sigma}}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\frac{\partial\,{\mathbf{\sigma}}}
+{\partial t} =-\rho\,
+\nu_0  \left({\dot{\mathbf{D}}}^*+\frac{\nu_\infty}{\nu_0}
+  \,\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\frac{\partial\,
+{\mathbf{\dot D}}^*}{\partial t}
+\right)\,+\,\frac{D_\infty}{\lambda_\gamma}\,\Delta {\mathbf{\sigma} }.
+\end{equation}\]</span></p>
+<p>One notices that, apart from the Laplacian term, this constitutive
+equation is that of Jeffreys. It can be noted that this constitutive
+equation is independent of the model chosen.</p>
+<h1 id="numerical-simulations"><span class="secnum">5.2</span> Numerical Simulations</h1>
+<p>One is then entitled to wonder about the influence of the additional
+Laplacian term on the simulations we have carried out. Let us take up,
+for example, the oscillating Couette flow experiment. From the new
+constitutive equation, we can derive a new complex viscosity <span
+class="math inline">\(\nu^*\)</span> of our fluid. Indeed, by taking up
+the calculations of chapter 1 of the first part, we now obtain: <span
+class="math display">\[\begin{equation}
+\sigma
+(1+i\,\omega\,\tau_1)=-\rho\,\nu_0\,(1+i\,\omega\,\tau_2)\frac{\partial
+  V_x}{\partial y}+
+\frac{D_\infty}{\lambda_\gamma}\rho\,\nu^*\,\frac{\partial^3
+  V_x}{\partial y^3},
+\end{equation}\]</span> with <span
+class="math display">\[\begin{equation}
+\tau_1=\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\qquad\mbox{and
+}\quad
+\tau_2=\frac{\nu_\infty}{\nu_0} \,
+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right),
+\end{equation}\]</span> still keeping the relation: <span
+class="math display">\[\begin{equation}
+\frac{\partial^2 V_x}{\partial y^2}=k^2\,V_x,\qquad\mbox{with }\quad
+k^2=\frac{i\,\omega}{\nu^*}.
+\end{equation}\]</span> One then easily obtains: <span
+class="math display">\[\begin{equation}
+\sigma
+(1+i\,\omega\,\tau_1)=-\rho\,\nu_0\,(1+i\,\omega\,\tau_3)\frac{\partial
+  V_x}{\partial y},
+\end{equation}\]</span> with <span
+class="math display">\[\begin{equation}
+\tau_3=\frac{\nu_\infty+D_\infty}{\nu_0}
+\,\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right),
+\end{equation}\]</span> which corresponds to adding <span
+class="math inline">\(D_\infty\)</span> to the infinite viscosity of the
+fluid. We can then compute again the relative error with respect to this
+new constitutive law for our numerical experiment, which gives us
+graph <a href="#fig-faible-erreur">5.1</a>.</p>
+<figure id="fig-faible-erreur">
+<img src="figures/newerreur.svg" />
+<figcaption>Figure 5.1: Relative error with respect to the new
+constitutive law of our fluid</figcaption>
+</figure>
+<p>If we compare this error with the one we had found when we compared
+our fluid to a Jeffreys fluid, it is of course smaller. The difference
+is moreover all the more visible as the frequency is large. Indeed, in
+that case, the wave number <span class="math inline">\(k\)</span> is
+large and the Laplacian term becomes large. The error is now mainly due
+to the presence of the boundary conditions, because the further we move
+from the center of the channel, the more the error grows. An analysis of
+the type carried out in chapter 4 of the first part is therefore
+necessary to reduce, or even cancel in some cases, these errors.</p>
+<p>Unfortunately, the Laplacian term cannot be reduced to an additional
+term in the infinite viscosity for all flow cases. On the other hand, it
+is possible to choose <span
+class="math inline">\(D_\infty\sim\lambda_\gamma\)</span> for all
+simulations. This choice has the effect of making the additional term in
+the Jeffreys constitutive law negligible. One must then remain vigilant
+as to the stability of the model, and one then finds relative errors
+with respect to a Jeffreys fluid of the same order of magnitude as in
+the previous case <a href="#fig-faible-erreur2">5.2</a>.</p>
+<figure id="fig-faible-erreur2">
+<img src="figures/faible-erreur.svg" />
+<figcaption>Figure 5.2: Relative error with respect to Jeffreys’ law
+taking <span
+class="math inline">\(D_\infty=\lambda_\gamma\)</span></figcaption>
+</figure>
+<p>One can then observe that the error at resonance exists, but remains
+very small compared to the error due to the boundary conditions.</p>
+<p>In conclusion, one can give the conservation equations as well as the
+equations that we may call quasi-conservation equations of our fluid in
+the following form: <span class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_t\rho\,+\,\partial_xj_x+\partial_yj_y=0,\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_x+\partial_x\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left( \partial_x
+  H_{xx}+\partial_yH_{xy}\right)=\nu_\infty\,\Delta
+j_x+\xi_\infty\,\partial_x\left(\partial_xj_x+\partial_yj_y
+\right)\nonumber\\
+&amp;&amp;\hspace{-0.5in}\partial_tj_y+\partial_y\,(c_s^2\rho)+c_{\perp}^2\,\left(1-\frac{\lambda_\gamma}{2}
+\right)\left(
+\partial_xH_{xy}-\partial_yH_{xx}\right)=\nu_\infty\,\Delta
+j_y+\xi_\infty\,\partial_y\left(\partial_xj_x+\partial_yj_y
+\right)\nonumber\\
+&amp;&amp;\hspace{-0.5in}
+H_{xx}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\partial_tH_{xx}+\rho\,\frac{1}{\lambda_\gamma}{\dot
+D}_{xx}^*- {D_\infty
+  \over \lambda_\gamma}\,\Delta H_{xx}=0, \nonumber\\
+&amp;&amp;\hspace{-0.5in}
+H_{xy}+\left(\frac{1}{\lambda_\gamma}-\frac{1}{2}\right)\,\partial_tH_{xy}+\rho\,\frac{1}{\lambda_\gamma}{\dot
+D}_{xy}^*- {D_\infty
+  \over \lambda_\gamma} \,\Delta H_{xy}=0. \nonumber
+\end{eqnarray}\]</span> It can be noted that these equations are also
+valid for the fifteen-velocity model if one considers that the variables
+<span class="math inline">\(P_{xx}\)</span> and <span
+class="math inline">\(P_{xy}\)</span> are defined up to a multiplicative
+constant <span class="math inline">\(\kappa\)</span>; we then have:
+<span class="math display">\[\begin{eqnarray}
+&amp;&amp;H_{xx}=\kappa\,P_{xx},\nonumber\\
+&amp;&amp;H_{xy}=\kappa\,P_{xy}.\nonumber\\
+\end{eqnarray}\]</span> Finally, the constitutive equation of our fluid
+is very close to that of a Jeffreys fluid. Moreover, the additional
+Laplacian term of the stress can be made negligible compared to the
+other terms of the constitutive equation when one chooses <span
+class="math inline">\(D_\infty\ll 1\)</span>.</p><nav class="pager"><a class="prev" href="part3-chapter4.html"><span>Previous</span>Numerical Simulations</a><a class="next" href="conclusion.html"><span>Next</span>Conclusion</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

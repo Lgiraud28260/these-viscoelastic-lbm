@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Characterization of a Viscoelastic Fluid — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '1.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li class="current"><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+<ul>
+<li><a href="#introduction"
+id="toc-introduction"><span class="secnum">1.1</span> Introduction</a></li>
+<li><a href="#characteristic-parameters"
+id="toc-characteristic-parameters"><span class="secnum">1.2</span> Characteristic parameters</a>
+<ul>
+<li><a href="#couette-flow" id="toc-couette-flow"><span class="secnum">1.2.1</span> Couette
+flow</a></li>
+<li><a href="#non-newtonian-viscosity---viscometric-parameters"
+id="toc-non-newtonian-viscosity---viscometric-parameters"><span class="secnum">1.2.2</span> Non-Newtonian
+viscosity - Viscometric parameters</a></li>
+<li><a href="#oscillatory-couette-flow"
+id="toc-oscillatory-couette-flow"><span class="secnum">1.2.3</span> Oscillatory Couette
+flow</a></li>
+</ul></li>
+<li><a href="#oscillatory-or-pulsed-poiseuille-flow"
+id="toc-oscillatory-or-pulsed-poiseuille-flow"><span class="secnum">1.3</span> Oscillatory or
+Pulsed Poiseuille Flow</a>
+<ul>
+<li><a href="#transient-parameters"
+id="toc-transient-parameters"><span class="secnum">1.3.1</span> Transient parameters</a>
+<ul>
+<li><a href="#activation-of-shear-from-a-fluid-at-rest"
+id="toc-activation-of-shear-from-a-fluid-at-rest"><span class="secnum">1.3.1.1</span> Activation of
+shear from a fluid at rest</a></li>
+<li><a href="#cessation-of-shear-from-an-already-sheared-fluid"
+id="toc-cessation-of-shear-from-an-already-sheared-fluid"><span class="secnum">1.3.1.2</span> Cessation
+of shear from an already sheared fluid</a></li>
+<li><a href="#sudden-shear" id="toc-sudden-shear"><span class="secnum">1.3.1.3</span> Sudden
+shear</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part II · Viscoelasticity</p><h1>Characterization of a Viscoelastic Fluid</h1></header><p><span id="visco-carac" data-label="visco-carac"></span></p>
+<h1 id="introduction"><span class="secnum">1.1</span> Introduction</h1>
+<p>Viscoelastic fluids can exhibit very varied behaviors. While for an
+incompressible Newtonian fluid it is generally sufficient to use two
+constants, the dynamic viscosity <span
+class="math inline">\(\mu\)</span> and the density <span
+class="math inline">\(\rho\)</span>, to characterize it, for a
+viscoelastic fluid a large number of parameters is required to describe
+it. Furthermore, in order to measure experimentally the value of a
+constant characterizing the fluid, it is useful to find an experiment
+that highlights it, which can easily be done for a Newtonian fluid but
+can become very complex for a viscoelastic fluid. For example, many
+states exist, steady or unsteady, that allow the dynamic viscosity of a
+Newtonian fluid to be measured. The major difficulty with a viscoelastic
+fluid is that its characteristic equations are not known in advance. If
+one tries, for example, to measure the viscosity of such a fluid with a
+viscometer, it will necessarily appear constant, whereas some fluids
+exhibit strong dependencies between viscosity and shear. We will
+therefore define a set of experiments to be performed in order to know
+what we shall call the characteristic parameters of the viscoelastic
+fluid under consideration. A summary of the main characteristics and
+definitions of viscoelastic fluids can be found in appendix A.</p>
+<h1 id="characteristic-parameters"><span class="secnum">1.2</span> Characteristic parameters</h1>
+<p>To simplify the characterization of a viscoelastic fluid, we will
+choose five <span><em>characteristic experiments</em></span> that will
+allow us to define eight distinct parameters that we will call
+<span><em>characteristic parameters</em></span> of viscoelastic
+behavior. These characteristic parameters allow most of the important
+behaviors of the fluid to be predicted.</p>
+<h2 id="couette-flow"><span class="secnum">1.2.1</span> Couette flow</h2>
+<p>Couette flow, figure <a href="#fig-couette">1.1</a>, is a classical
+flow of fluid mechanics. It is a flow between two parallel flat plates,
+one (<span><em>resp.</em></span> both) of which is (are) set in motion
+at a given velocity. Its linear and unconditionally stable character
+makes it a simple experiment to carry out both experimentally and
+numerically. In the case we have chosen, the plate at height <span
+class="math inline">\(y=H\)</span> moves with a uniform velocity <span
+class="math inline">\(V_0\)</span>, and the other, at <span
+class="math inline">\(y=0\)</span>, remains fixed.</p>
+<figure id="fig-couette">
+<img src="figures/fig-couette.svg" />
+<figcaption>Figure 1.1: Velocity profile for Couette flow</figcaption>
+</figure>
+<h2
+id="non-newtonian-viscosity---viscometric-parameters"><span class="secnum">1.2.2</span> Non-Newtonian
+viscosity - Viscometric parameters</h2>
+<p>In the case of Couette flow for the incompressible case, for a
+Newtonian fluid, only the <span
+class="math inline">\(\sigma_{xy}\)</span> component is non-zero.
+However, in the absence of constitutive equations for our fluid, no such
+assumption can be made. The most general form of the stress tensor is
+given by the fact that it is symmetric, which is the general case in all
+the studies we present here, that it is traceless and that it is
+invariant under the <span class="math inline">\(z\to-z\)</span>
+symmetry. These conditions give us: <span
+class="math display">\[\begin{equation}
+\sigma=\left(
+\begin{array}{ccc}
+\sigma_{xx}&amp;\sigma_{xy}&amp;0\\
+\sigma_{xy}&amp;\sigma_{yy}&amp;0\\
+0&amp;0&amp;\sigma_{zz}
+\end{array}
+\right),\qquad\mbox{with } \sigma_{xx}+\sigma_{yy}+\sigma_{zz}=0.
+\end{equation}\]</span> Three coefficients are thus required to
+characterize this flow. The strain rate tensor <span
+class="math inline">\(\dot D\)</span> has, for symmetry reasons, only
+its transverse or shear component, <span class="math inline">\({\dot
+  D}_{xy}\)</span>, non-zero, and we have: <span
+class="math display">\[\begin{equation}
+{\dot D}_{xy}={\partial v_x(y)\over \partial y}={V_0 \over H}.
+\end{equation}\]</span> It is therefore noted that the shear is constant
+at fixed temperature and velocity <span
+class="math inline">\(V_0\)</span>. This experiment gives us the
+<span><em>non-Newtonian viscosity</em></span> <span
+class="math inline">\(\mu({\dot
+  \gamma})\)</span>, or shear-dependent viscosity. Indeed, by analogy
+with Newtonian fluids: <span class="math display">\[\begin{equation}
+\sigma_{xy}=\mu({\dot \gamma})\,{\dot D}_{xy}
+\end{equation}\]</span> with the shear rate <span
+class="math inline">\({\dot \gamma}\)</span> defined by equation (<a
+href="appendix-a.html#mjx-eqn:shear-rate">A.23</a>). Note that in the
+case of the Couette flow mentioned here, <span
+class="math inline">\({\dot \gamma}=|{\dot D}_{xy}|\)</span>.</p>
+<p>In the same way, the <span><em>first and second normal stress
+coefficients</em></span>, or <span><em>viscometric
+parameters</em></span>, denoted <span
+class="math inline">\(\Psi_1\)</span> and <span
+class="math inline">\(\Psi_2\)</span>, are defined by: <span
+class="math display">\[\begin{eqnarray}
+\sigma_{xx}-\sigma_{yy}&amp;=&amp;-\Psi_1({\dot \gamma})\,{\dot
+D}_{xy}^2\\
+\sigma_{yy}-\sigma_{zz}&amp;=&amp;-\Psi_2({\dot \gamma})\,{\dot
+D}_{xy}^2
+\end{eqnarray}\]</span></p>
+<p>Note that <span class="math inline">\(\mu\)</span>, <span
+class="math inline">\(\Psi_1\)</span> and <span
+class="math inline">\(\Psi_2\)</span> are even functions of <span
+class="math inline">\({\dot
+  D}_{xy}\)</span>, which is why the power law (<a
+href="appendix-a.html#mjx-eqn:lpuissance">A.24</a>) and the
+Carreau-Yasuda law (<a
+href="appendix-a.html#mjx-eqn:carreau-yasuda">A.25</a>) are functions of
+<span class="math inline">\({\dot \gamma}\)</span>.</p>
+<h2 id="oscillatory-couette-flow"><span class="secnum">1.2.3</span> Oscillatory Couette flow</h2>
+<p>Consider again the experimental setup of Couette flow, but now
+assuming that the velocity <span class="math inline">\(V\)</span> of the
+upper plate depends on time as <span
+class="math display">\[\begin{equation}
+V= V_0 \cos(\omega\,t).
+\end{equation}\]</span></p>
+<p>For a Newtonian fluid, the stress is in phase with the strain rate.
+For a viscoelastic fluid, it is easily seen, using complex notation,
+that there will be a phase shift between stress and strain rate through
+the existence of a complex viscosity. The off-diagonal part of the
+stress tensor, <span class="math inline">\(\sigma_{xy}\)</span>, then
+takes the form: <span class="math display">\[\begin{equation}
+\sigma_{xy}= A(\omega)\,\cos(\omega\,t+\phi)
+\end{equation}\]</span> with <span
+class="math inline">\(A(\omega)=-\rho\,\sqrt{\nu&#39;^2+\nu&#39;&#39;^2}\)</span>
+and <span class="math inline">\(\tan\phi=-{\nu&#39;&#39;/
+\nu&#39;}\)</span> if the kinematic viscosity has been written in
+complex form: <span class="math display">\[\begin{equation}
+\nu^*=\nu&#39;-\,i\,\nu&#39;&#39;.
+\end{equation}\]</span> This therefore allows us to define two
+additional quantities, which are the real part and the imaginary part of
+the viscosity.</p>
+<p>The equation governing the motion of the fluid in a Couette channel
+is given by:</p>
+<p><span class="math display">\[\begin{equation}
+\label{ac1}
+\rho {\partial V_x \over \partial t}=-{\partial\sigma_{xy}\over \partial
+y}
+\end{equation}\]</span> with <span
+class="math display">\[\begin{equation}
+\label{ac2}
+\sigma_{xy}=-\mu\,{\dot D}_{xy}=-\mu\,{\partial V_x \over \partial y}.
+\end{equation}\]</span> Given that the flow is directed along the <span
+class="math inline">\(Ox\)</span> axis, and in the absence of a pressure
+gradient and a driving force, for a linear-type fluid we have: <span
+class="math display">\[\begin{equation}
+\sigma_{xx}=0.
+\end{equation}\]</span> Setting <span
+class="math inline">\(\nu=\mu/\rho\)</span>, the kinematic shear
+viscosity, we finally obtain by combining equations (<a
+href="#mjx-eqn:ac1">1.9</a>) and (<a href="#mjx-eqn:ac2">1.10</a>):
+<span class="math display">\[\begin{equation}
+\rho {\partial V_x \over \partial t}=\nu\, {\partial^2 V_x \over
+\partial y^2}.
+\end{equation}\]</span> Since the motion of the upper plate is periodic,
+it is advantageous to use complex notation, so we can write: <span
+class="math display">\[\begin{equation}
+{\partial^2 V_x \over \partial y^2}-k^2\,V_x=0,
+\end{equation}\]</span> with <span
+class="math display">\[\begin{equation}
+k^2={i\,\omega \over \nu^*}\qquad\mbox{where }\nu^*=\nu &#39;-i\,\nu
+&#39;&#39;.
+\end{equation}\]</span> For a viscous fluid, we will have <span
+class="math inline">\(\nu &#39;=\nu\)</span> and <span
+class="math inline">\(\nu &#39;&#39;=0\)</span>. In the following
+calculation, we will consider that the fluid under study has a complex
+viscosity. Thus, after some manipulation, we can finally find the
+expression of the complex components of <span
+class="math inline">\(k\)</span>, and setting: <span
+class="math display">\[\begin{equation}
+k=\alpha+i\, \beta,
+\end{equation}\]</span> we find: <span
+class="math display">\[\begin{equation}
+\left\{
+\begin{array}{l}
+\displaystyle\alpha={1\over |\nu^\star |}\sqrt{{\omega\over
+2}(|\nu^\star |-\nu&#39;&#39;)}\\
+\displaystyle\beta={\nu&#39;\over |\nu^\star |}\sqrt{{\omega\over
+2(|\nu^\star |-\nu&#39;&#39;)}}
+\end{array}\right.
+\end{equation}\]</span></p>
+<figure id="figan3-1">
+<img src="figures/figan3-1.svg" />
+<figcaption>Figure 1.2: Oscillatory Couette flow</figcaption>
+</figure>
+<p>The solution for the velocity at any point of the fluid to this
+problem, that is to say the velocity at height <span
+class="math inline">\(h\)</span>, is given by the relation: <span
+class="math display">\[\begin{equation}
+V_x(y)=V_0\,\mbox{Re}\left({\sinh(k\,y)\over
+\sinh(k\,H)  }e^{i\,\omega\,t}\right).
+\end{equation}\]</span> For simplicity of notation let us set: <span
+class="math display">\[\begin{equation}
+{\sinh(k\,y)\over \sinh(k\,H)  }=\alpha_1+i\,\beta_1,
+\end{equation}\]</span> we can then write the solution of this problem
+in the simplified form: <span class="math display">\[\begin{equation}
+V_x(y)=B(\omega,y)\,\cos  (\omega\, t +\phi ),
+\end{equation}\]</span> with <span class="math inline">\(\displaystyle
+B(\omega,y)=V_0\,\sqrt{\alpha_1^2+\beta_1^2}\)</span> and <span
+class="math inline">\(\displaystyle\phi=\arctan{\beta_1\over
+\alpha_1}\)</span> .</p>
+<h1 id="oscillatory-or-pulsed-poiseuille-flow"><span class="secnum">1.3</span> Oscillatory or
+Pulsed Poiseuille Flow</h1>
+<p>A second example which will also allow us to control the real and
+imaginary parts of the viscosity is that of Poiseuille flow. A
+Poiseuille flow is a flow between two parallel and fixed flat plates
+separated by a height <span class="math inline">\(H\)</span> as
+indicated in Fig.(<a href="#an3-fig-poisseuille">1.3</a>). To create a
+pulsation effect, one can take a pressure gradient oscillating in time.
+In the linear case, this is equivalent to taking a volumetric forcing
+term oscillating as a function of time.</p>
+<figure id="an3-fig-poisseuille">
+<img src="figures/an3-fig-poisseuille.svg" />
+<figcaption>Figure 1.3: Pulsed Poiseuille flow</figcaption>
+</figure>
+<p>The case of oscillatory Poiseuille flow, or pulsed Poiseuille flow,
+differs only slightly from the previous study. Indeed, the Stokes
+equation for Poiseuille flow is similar to the one employed previously.
+The only difference lies in the appearance of a pressure forcing term or
+of a volumetric force term which we will denote <span
+class="math inline">\(F(t)=F
+\cos(\omega t)\)</span>. Thus, one has to solve <span
+class="math display">\[\begin{equation}
+\label{ac3}
+\rho {\partial V_x \over \partial t}=F(t)-{\partial\sigma_{xy}\over
+\partial y},
+\end{equation}\]</span> where one still has <span
+class="math display">\[\begin{equation}
+\label{ac4}
+\sigma_{xy}=-\mu\,{\dot D}_{xy}=-\mu\,{\partial V_x \over \partial y}.
+\end{equation}\]</span> In the same way as before, in view of the
+symmetries of the problem, we have: <span
+class="math display">\[\begin{equation}
+\sigma_{xx}=0.
+\end{equation}\]</span></p>
+<p>Using complex notation, the equation we have to solve becomes: <span
+class="math display">\[\begin{equation}
+{\partial^2 V_x \over \partial y^2}-k^2\,V_x=-{F\over \nu^\star},
+\end{equation}\]</span> the expression of <span
+class="math inline">\(k\)</span> remains the same, namely: <span
+class="math display">\[\begin{equation}
+k=\alpha+i\, \beta,
+\end{equation}\]</span> with: <span
+class="math display">\[\begin{equation}
+\left\{
+\begin{array}{l}
+\displaystyle\alpha={1\over |\nu^\star |}\sqrt{{\omega\over
+2}(|\nu^\star |-\nu&#39;&#39;)}\\
+\displaystyle\beta={\nu&#39;\over |\nu^\star |}\sqrt{{\omega\over
+2(|\nu^\star |-\nu&#39;&#39;)}}
+\end{array}\right.
+\end{equation}\]</span></p>
+<p>The solution of equations (<a href="#mjx-eqn:ac3">1.20</a>) and (<a
+href="#mjx-eqn:ac4">1.21</a>) in terms of velocity is given by: <span
+class="math display">\[\begin{equation}
+V_x=\mbox{Re}\left[ e^{i\,\omega\,t}{F\over i
+\omega}\left({e^{k\,y}-1-e^{k\,H}+e^{k\,(H-y)} \over 1+e^{k\,H} }
+\right)\right].
+\end{equation}\]</span> For simplicity of notation, setting: <span
+class="math display">\[\begin{equation}
+{e^{k\,y}-1-e^{k\,H}+e^{k\,(H-y)} \over 1+e^{k\,H} }
+=\alpha_1+i\,\beta_1,
+\end{equation}\]</span> we then have: <span
+class="math display">\[\begin{equation}
+V_x=A\,\sin(\omega\,t+\phi),
+\end{equation}\]</span> with <span class="math inline">\(\displaystyle
+A(\omega,y)={F \over \omega}\,\sqrt{\alpha_1^2+\beta_1^2}\)</span> and
+<span class="math inline">\(\displaystyle\phi=\arctan{\beta_1\over
+\alpha_1}\)</span>.</p>
+<h2 id="transient-parameters"><span class="secnum">1.3.1</span> Transient parameters</h2>
+<p>In the following three experiments, we will define three parameters
+that come into play in the transient establishment of the flow, namely
+<span class="math inline">\(\nu^{+}\)</span>, <span
+class="math inline">\(\nu^{-}\)</span> and <span
+class="math inline">\(\nu^G\)</span>. These experiments can be defined
+from the previous Couette-type flows, taking as initial condition, for
+the non-zero component of the strain rate tensor, a non-periodic
+function of the Heaviside or Dirac type. In fact, everything happens as
+if one were actuating one of the two plates of the Couette device and
+the fluid immediately felt its effects. As these motions are no longer
+periodic in nature, we can no longer use the complex viscosity. We could
+therefore use Laplace transforms to solve these three problems
+analytically. The solutions thus obtained are difficult to exploit
+because they are in integral form. We will therefore prefer to use the
+equation relating stress and strain rate. Indeed, it is simpler to
+integrate by making the assumption that the fluid immediately feels in
+volume the action of the plate.</p>
+<h3 id="activation-of-shear-from-a-fluid-at-rest"><span class="secnum">1.3.1.1</span> Activation of
+shear from a fluid at rest</h3>
+<p>The first case is that in which the fluid is at rest until time <span
+class="math inline">\(t_0\)</span>, from which the upper plate is pulled
+in such a way that the shear is constant and non-zero throughout the
+fluid.</p>
+<figure id="fig-augmenstress">
+<img src="figures/fig-augmenstress.svg" />
+<figcaption>Figure 1.4: Activation of shear from a fluid at
+rest</figcaption>
+</figure>
+<p>This experiment will allow us to define the transient parameter <span
+class="math inline">\(\nu^{+}\)</span> by: <span
+class="math display">\[\begin{equation}
+\sigma_{xy}=-\nu^{+}\,{\dot D}_{xy}.
+\end{equation}\]</span> The parameter <span
+class="math inline">\(\nu^{+}\)</span> will therefore depend strongly on
+the nature of the fluid under consideration. Indeed, for the case of a
+Jeffreys fluid, whose characteristics are given in appendix <a
+href="appendix-a.html">A</a>, but whose constitutive equation we can
+recall: <span class="math display">\[\begin{equation}
+\sigma+\,\tau_1 {\partial \sigma \over \partial t}=-\mu_0\,\left({\dot
+    D}+\tau_2\,{\partial  {\dot D} \over \partial t}   \right),
+\end{equation}\]</span> and with the shear given by: <span
+class="math display">\[\begin{equation}
+{\dot D}_{xy}(t)={\dot D}_0\,H(t),
+\end{equation}\]</span> <span class="math inline">\(H(t)\)</span> being
+the Heaviside function, it is then found that the stress <span
+class="math inline">\(\sigma_{xy}\)</span> is given by: <span
+class="math display">\[\begin{eqnarray}
+\sigma_{xy}&amp;=&amp;-\mu_0\,{\dot D}_0\,{\tau_2\over
+\tau_1}-\mu_0\,{\dot
+  D}_0\,\left(1-{\tau_2\over \tau_1}   \right)\,\left(
+1-e^{-t/\tau_1}\right),\\
+&amp;=&amp;-\nu^{+}\,{\dot D}_0.
+\end{eqnarray}\]</span></p>
+<h3
+id="cessation-of-shear-from-an-already-sheared-fluid"><span class="secnum">1.3.1.2</span> Cessation
+of shear from an already sheared fluid</h3>
+<p>The second case is that in which the shear is suddenly stopped at
+time <span class="math inline">\(t=0\)</span> after it had been
+established at a constant non-zero value for “infinitely” long as
+illustrated in figure(<a href="#fig-diminustress">1.5</a>).</p>
+<figure id="fig-diminustress">
+<img src="figures/fig-diminustress.svg" />
+<figcaption>Figure 1.5: Cessation of shear from an already sheared
+fluid</figcaption>
+</figure>
+<p>This experiment will allow us to define the transient parameter <span
+class="math inline">\(\nu^{-}\)</span> by: <span
+class="math display">\[\begin{equation}
+\sigma_{xy}=-\nu^{-}\,{\dot D}_{xy}.
+\end{equation}\]</span> For a Jeffreys fluid we then have: <span
+class="math display">\[\begin{equation}
+\nu^{-}=-\mu_0\,{\dot D}_0\left(1-{\tau_2\over
+\tau_1}  \right)\,e^{-t/\tau_1}.
+\end{equation}\]</span></p>
+<h3 id="sudden-shear"><span class="secnum">1.3.1.3</span> Sudden shear</h3>
+<p>The last case is that in which the shear is sudden, that is to say,
+the time elapsed between the moment when it is established and the
+moment when it disappears is very short. The shape of this curve can be
+mathematically represented by a Dirac “delta” function, but physically
+this function is hardly accessible, so we will take the shape of the
+curve shown in figure(<a href="#fig-stresssoudain">1.6</a>).</p>
+<figure id="fig-stresssoudain">
+<img src="figures/fig-stresssoudain.svg" />
+<figcaption>Figure 1.6: Sudden shear</figcaption>
+</figure>
+<p>This experiment will allow us to define the transient parameter <span
+class="math inline">\(\nu^{G}\)</span> by: <span
+class="math display">\[\begin{equation}
+\sigma_{xy}=-\nu^{G}\,{\dot D}_{xy}.
+\end{equation}\]</span></p>
+<p>It can then be shown that for a time interval <span
+class="math inline">\(\delta t\ll 1\)</span>, we find: <span
+class="math display">\[\begin{equation}
+\nu^{G}=\delta t\, G(t-t_0),
+\end{equation}\]</span> where <span
+class="math inline">\(G(t-t_0)\)</span> is the relaxation modulus of the
+fluid, defined for a Jeffreys fluid in appendix <a
+href="appendix-a.html">A</a>: <span
+class="math display">\[\begin{equation}
+G(t-t_0)=\mu_0\left(1-{\tau_2 \over \tau_1} \right)\,e^{-(t-t_0)/\tau_1}
++ 2 {\mu_0\,\tau_2 \over \tau_1}\,\delta(t-t_0).
+\end{equation}\]</span></p>
+<p>Other transient parameters can also be defined, such as <span
+class="math inline">\(\Psi^+\)</span>, <span
+class="math inline">\(\Psi^-\)</span> or <span
+class="math inline">\(\Psi^G\)</span>, to quantify the transient
+responses of the two normal stresses. Thus, six additional parameters
+are obtained. However, we will not address these various parameters in
+this thesis and we will limit ourselves, for the sake of concision, to
+the eight main parameters presented previously, <span
+class="math inline">\(\mu\)</span>, <span
+class="math inline">\(\nu&#39;\)</span>, <span
+class="math inline">\(\nu&#39;&#39;\)</span>, <span
+class="math inline">\(\Psi_1\)</span>, <span
+class="math inline">\(\Psi_2\)</span>, <span
+class="math inline">\(\nu^+\)</span>, <span
+class="math inline">\(\nu^-\)</span> and finally <span
+class="math inline">\(\nu^G\)</span>.</p><nav class="pager"><a class="prev" href="part1-chapter4.html"><span>Previous</span>Boundary Conditions at Solid Walls</a><a class="next" href="part3-introduction.html"><span>Next</span>Introduction</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

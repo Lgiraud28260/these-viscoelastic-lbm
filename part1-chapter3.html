@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Construction of the Models — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '3.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li class="current"><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+<ul>
+<li><a href="#chapman-enskog-expansion"
+id="toc-chapman-enskog-expansion"><span class="secnum">3.1</span> Chapman-Enskog expansion</a></li>
+<li><a href="#two-dimensional-model"
+id="toc-two-dimensional-model"><span class="secnum">3.2</span> Two-dimensional model</a>
+<ul>
+<li><a href="#eigenvectors-and-definitions"
+id="toc-eigenvectors-and-definitions"><span class="secnum">3.2.1</span> Eigenvectors and
+definitions</a></li>
+<li><a href="#second-order-expansion"
+id="toc-second-order-expansion"><span class="secnum">3.2.2</span> Second-order expansion</a></li>
+<li><a href="#equilibrium-quantities"
+id="toc-equilibrium-quantities"><span class="secnum">3.2.3</span> Equilibrium quantities</a></li>
+</ul></li>
+</ul>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part I · Foundations of the Lattice Boltzmann Method — Chapter 3</p><h1>Construction of the Models</h1></header><p><span id="CE2" data-label="CE2"></span></p>
+<p>The construction of a lattice Boltzmann model is conditioned by the
+choice of a type of lattice, then by the determination of the linearized
+collision matrix <span class="math inline">\(\Omega\)</span>, and
+finally by finding the equilibrium values that will allow the model to
+simulate the desired macroscopic equations. It is this succession of
+steps that we shall present in this chapter starting from a simple
+example, built on a two-dimensional square lattice.</p>
+<h1 id="chapman-enskog-expansion"><span class="secnum">3.1</span> Chapman-Enskog expansion</h1>
+<p>Consider the evolution rule of our gas in the form <span
+class="math display">\[N_i(\vec{r}+\vec{c}_i,t+1)=N_i(\vec{r},t)-\sum_{j=0}^{b}{\Omega_{ij}\,\left(
+N_j-N_j^{(0)}\right)}\]</span> where <span
+class="math inline">\(N^{(0)}\)</span> denotes an equilibrium quantity.
+The time and space increments being both of the same order, we shall no
+longer distinguish them in what follows. A simple Taylor expansion to
+second order in time and/or space, in which we intentionally omit to
+write the higher order contributions, yields: <span
+class="math display">\[\begin{equation}
+\label{componant}
+\partial_tN_i\,+\,c_{i\alpha} \partial_\alpha N_i\,+\,c_{i\alpha}
+\,\partial_\alpha\partial_tN_i\,+\,{1 \over 2}
+\left( \partial_t^2
+N_i\,+\,c_{i\alpha}c_{i\beta}\,\partial_{\alpha\beta}^2
+N_i \right)=  -\Omega_{ij}\,\left( N_j-N_j^{(0)}\right).
+\end{equation}\]</span> This last equation can be expressed in matrix
+notation, and with <span
+class="math inline">\(\displaystyle({\mathbf{S}}_{\alpha})_{ij}=\delta_{ij}
+c_{i\alpha}\)</span>, where we adopt the implicit summation convention
+only over repeated Greek indices in the remainder of this study.
+Equation (<a href="#mjx-eqn:componant">3.1</a>) becomes: <span
+class="math display">\[\begin{equation}
+\partial_t{\mathbf{N}}\,+\,{\mathbf{S}}_{\alpha}
+\partial_\alpha{\mathbf{N}}\,+\,{\mathbf{S}}_{\alpha}
+\,\partial_\alpha\partial_t{\mathbf{N}} \,+\,{1 \over 2}
+\left( \partial_t^2
+{\mathbf{N}}\,+\,{\mathbf{S}}_{\alpha}{\mathbf{S}}_{\beta}\,\partial_{\alpha\beta}^2
+{\mathbf{N}}\right)=  -\Omega\,\left(
+{\mathbf{N}}-{\mathbf{N}}^{(0)}\right)
+\label{vector}
+\end{equation}\]</span> Using the following expression for <span
+class="math inline">\({\mathbf{N}}\)</span> and for the derivatives,
+<span class="math display">\[\begin{equation}
+\left\{
+\begin{array}{l}
+{\mathbf{N}}={\mathbf{N}}^{(0)}+\epsilon\,{\mathbf{N}}^{(1)}+\epsilon^2\,{\mathbf{N}}^{(2)},
+\\
+\partial_t=\epsilon\,\partial_{t_1}+\epsilon^2\,\partial_{t_2},\\
+\partial_\alpha=\epsilon\,\partial_{\alpha &#39;},
+\end{array}
+\right.
+\end{equation}\]</span> where we introduce two time scales and one space
+scale together with a small parameter <span
+class="math inline">\(\epsilon\)</span>. The expansion thus defined is
+called the <span><em>Chapman-Enskog expansion</em></span>. Substituting
+these definitions into equation (<a href="#mjx-eqn:vector">3.2</a>), and
+collecting the first-order terms in <span
+class="math inline">\(\epsilon\)</span>, we obtain: <span
+class="math display">\[\begin{equation}
+\partial_{t_1}{\mathbf{N}}^{(0)}+{\mathbf{S}}_{\alpha}\partial_{\alpha
+&#39;}{\mathbf{N}}^{(0)}=-\Omega\,
+{\mathbf{N}}^{(1)}
+\label{firstorder}
+\end{equation}\]</span> The second order is of course given by
+collecting the second-order terms in <span
+class="math inline">\(\epsilon\)</span>, and yields: <span
+class="math display">\[\partial_{t_2}{\mathbf{N}}^{(0)}+\partial_{t_1}{\mathbf{N}}^{(1)}+{\mathbf{S}}_{\alpha}
+\partial_{\alpha &#39;}{\mathbf{N}}^{(1)}+{1\over
+2}(\partial_{t^2_1}{\mathbf{N}}^{(0)}
++2\,{\mathbf{S}}_{\alpha}\partial_{t_1 \alpha
+&#39;}{\mathbf{N}}^{(0)}+{\mathbf{S}}_{\alpha}{\mathbf{S}}_{\beta}
+\,\partial_{\alpha &#39; \beta
+&#39;}{\mathbf{N}}^{(0)})=-\Omega\,{\mathbf{N}}^{(2)},\]</span> we can
+now use equation (<a href="#mjx-eqn:firstorder">3.4</a>) and obtain:
+<span class="math display">\[\begin{equation}
+\partial_{t_2}{\mathbf{N}}^{(0)}+({\mathbf{\mathcal{I}}}-{\Omega \over
+2})\partial_{t_1}{\mathbf{N}}^{(1)}
++{\mathbf{S}}_{\alpha}({\mathbf{\mathcal{I}}}-{\Omega \over
+2})\partial_{\alpha &#39;}{\mathbf{N}}^{(1)}=-
+\Omega\,{\mathbf{N}}^{(2)}.
+\label{secondorder}
+\end{equation}\]</span></p>
+<h1 id="two-dimensional-model"><span class="secnum">3.2</span> Two-dimensional model</h1>
+<p>In the following, and as a simple example, we shall use a
+two-dimensional square lattice which we shall call D2C1.2. This lattice
+corresponds to the D2Q9 lattice in the notation used in [<a
+href="#ref-BGK">35</a>] and is shown in figure (<a
+href="#d2q9">3.1</a>).</p>
+<figure id="d2q9">
+<img src="figures/d2q9.svg" />
+<figcaption>Figure 3.1: Pattern of the two-dimensional nine-velocity
+lattice</figcaption>
+</figure>
+<h2 id="eigenvectors-and-definitions"><span class="secnum">3.2.1</span> Eigenvectors and
+definitions</h2>
+<p>We must first construct the collision matrix. The only constraints we
+have on this choice are that the collision matrix must conserve mass and
+momentum. This implies that the vectors of the type <span
+class="math inline">\((1,\dots,1)\)</span> and <span
+class="math inline">\((c_{0\,\alpha},\dots,c_{i\,\alpha},\dots)\)</span>
+will be eigenvectors associated with the zero eigenvalue. The other
+vectors are simply chosen to be pairwise orthogonal. These eigenvectors
+necessarily have as generators powers and compositions of the vectors
+<span class="math inline">\(c_{i\alpha}\)</span>, such as (<span
+class="math inline">\(c_{i\alpha}\,c_{i\beta}\,c_{i\gamma}\dots\)</span>)
+for example. A simplification can be observed if one chooses <span
+class="math inline">\(Q_{i\alpha\beta}=c_{i\alpha}c_{i\beta}-{c_i^2/2}\,\delta_{\alpha\beta}\)</span>
+as eigenvectors. Indeed, these vectors enter directly into the
+expression of the viscous stress tensor and are mutually orthogonal or
+parallel. One can also have an energy-type eigenvector, <span
+class="math inline">\(e_i\sim  c_i^2/2\)</span>, with <span
+class="math inline">\(c_i^2=c_{ix}^2+c_{iy}^2\)</span>. We have thus
+chosen the following set of vectors constituting an orthogonal basis of
+the nine-dimensional space: <span
+class="math display">\[\begin{equation}
+\label{vectorlist}
+\begin{array}{lll}
+{\mathbf{1}}&amp;=&amp;\left\{ c_i^0 \right\}\\
+{\mathbf{E}}&amp;=&amp;\left\{ 4 c_i^0-3 c_i^2  \right\}\\
+{\mathbf{C}}_x&amp;=&amp;\left\{ c_{ix}  \right\}\\
+{\mathbf{C}}_y&amp;=&amp;\left\{ c_{iy}  \right\}\\
+{\mathbf{T}}_{xxy}&amp;=&amp;\left\{ 2 c_{ix}^3-3
+c_{iy}^2\,c_{ix}  \right\}\\
+{\mathbf{T}}_{yyx}&amp;=&amp;\left\{ 2 c_{iy}^3-3
+c_{ix}^2\,c_{iy}  \right\}\\
+{\mathbf{Q}}_{xx}&amp;=&amp;\displaystyle\left\{ c_{ix}^2-{c_i^2\over
+2}  \right\}\\
+{\mathbf{Q}}_{xy}&amp;=&amp;\left\{ c_{ix}c_{iy}  \right\}\\
+{\mathbf{H}}&amp;=&amp;\left\{ 9 c_{ix}^2\,c_{iy}^2-6 c_i^2+4
+c_i^0  \right\}\\
+\end{array}
+\end{equation}\]</span></p>
+<p>By normalizing these vectors, one finds: <span
+class="math display">\[\begin{eqnarray}
+{\mathbf{e}}_{0}
+&amp;=&amp;\left(\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1\phantom{-}\right)/3
+\nonumber\\
+{\mathbf{e}}_{1}
+&amp;=&amp;\left(\phantom{-}4,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1,-2,-2,-2,-2\phantom{-}\right)/6
+\nonumber\\
+{\mathbf{e}}_{2}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}1,\phantom{-}0,-1,\phantom{-}0,\phantom{-}1,-1,-1,\phantom{-}1\phantom{-}\right)/\sqrt{6}
+\nonumber\\
+{\mathbf{e}}_{3}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}0,\phantom{-}1,\phantom{-}0,-1,\phantom{-}1,\phantom{-}1,-1,-1\phantom{-}\right)/\sqrt{6}
+\nonumber\\
+{\mathbf{e}}_{4}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}2,\phantom{-}0,-2,\phantom{-}0,-1,\phantom{-}1,\phantom{-}1,-1\phantom{-}\right)/2\sqrt{3}
+\\
+{\mathbf{e}}_{5}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}0,\phantom{-}2,\phantom{-}0,-2,-1,-1,\phantom{-}1,\phantom{-}1\phantom{-}\right)/2\sqrt{3}
+\nonumber\\
+{\mathbf{e}}_{6}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}1,-1,\phantom{-}1,-1,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0\phantom{-}\right)/2
+\nonumber\\
+{\mathbf{e}}_{7}
+&amp;=&amp;\left(\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}0,\phantom{-}1,-1,\phantom{-}1,-1\phantom{-}\right)/2
+\nonumber\\
+{\mathbf{e}}_{8}
+&amp;=&amp;\left(\phantom{-}4,-2,-2,-2,-2,\phantom{-}1,\phantom{-}1,\phantom{-}1,\phantom{-}1\phantom{-}\right)/6
+\nonumber
+\end{eqnarray}\]</span> associated with the eigenvalues that we choose
+to be<span
+class="math display">\[\displaystyle\left(\phantom{-}0,\phantom{-}\lambda_e,\phantom{-}0,\phantom{-}0,\phantom{-}\lambda_\chi,\phantom{-}\lambda_\chi
+,\phantom{-}\lambda_\nu,\phantom{-}\lambda&#39;_\nu,\phantom{-}\lambda_\sigma\right).\]</span>
+where some eigenvalues are repeated for symmetry reasons.</p>
+<h2 id="second-order-expansion"><span class="secnum">3.2.2</span> Second-order expansion</h2>
+<p>We can express relations (<a href="#mjx-eqn:firstorder">3.4</a>) and
+(<a href="#mjx-eqn:secondorder">3.5</a>) in the eigenvector basis of
+<span class="math inline">\(\Omega\)</span>; this will allow us to
+greatly simplify the expressions to be manipulated. Thus, setting that
+the variables topped with a hat are expressed in the new basis, we have:
+<span class="math display">\[\begin{equation}
+\partial_{t_1}{\widehat{\mathbf{N}}}^{(0)}+\widehat{{\mathcal{S}}}_\alpha\partial_{\alpha
+&#39;}{\widehat{\mathbf{N}}}^{(0)}=-{\widehat \Omega}\,
+{\widehat{\mathbf{N}}}^{(1)}
+\label{firstorderc}
+\end{equation}\]</span> <span class="math display">\[\begin{equation}
+\partial_{t_2}{\widehat{\mathbf{N}}}^{(0)}+({\mathbf{\mathcal{I}}}-{{\widehat
+\Omega}\over 2})\partial_{t_1}{\widehat{\mathbf{N}}}^{(1)}
++\widehat{{\mathcal{S}}}_\alpha({\mathbf{\mathcal{I}}}-{{\widehat
+\Omega}\over 2})\partial_{\alpha &#39;}{\widehat{\mathbf{N}}}^{(1)}=-
+{\widehat \Omega}\,{\widehat{\mathbf{N}}}^{(2)}
+\label{secondorderc}
+\end{equation}\]</span></p>
+<p>We shall now attempt to recover the macroscopic equations; the
+continuity equation, the Stokes or Navier-Stokes equations, from
+relations (<a href="#mjx-eqn:firstorderc">3.8</a>) and (<a
+href="#mjx-eqn:secondorderc">3.9</a>). For this, it will be useful to
+set: <span class="math display">\[\begin{eqnarray}
+\rho=3\phantom{+}\widehat{N}_{0}\,,\quad&amp;\phantom{+}\widehat{N}_{1}=2\rho/3-e\,,&amp;\quad
+j_x=\sqrt{6}\phantom{+}\widehat{N}_{2}\nonumber\\
+j_y=\sqrt{6}\phantom{+}\widehat{N}_{3}\,,\quad&amp;q_x=2\sqrt{3}\phantom{+}\widehat{N}_{4}\,,&amp;\quad
+q_y=2\sqrt{3}\phantom{+}\widehat{N}_{5}\\
+S_{xx}=\phantom{+}\widehat{N}_{6}\,,\quad&amp;S_{xy}=2\phantom{+}\widehat{N}_{7}\,,&amp;\quad\sigma=\phantom{+}\widehat{N}_{8}\nonumber
+\end{eqnarray}\]</span></p>
+<p>The population vector can also be written as: <span
+class="math display">\[\begin{equation}
+\label{vecpopulation}
+{\mathbf{N}}={\rho \over 9}{\mathbf{1}}+\frac{1}{36}({2\rho \over
+3}-e)\, {\mathbf{E}}+{j_x\over
+  6}{\mathbf{C}}_x+{j_y\over
+6}{\mathbf{C}}_y+S_{xx}{\mathbf{Q}}_{xx}+{S_{xy}\over
+4}  {\mathbf{Q}}_{xy}+{q_x\over
+  12}{\mathbf{T}}_{xxy}+{q_y\over 12}{\mathbf{T}}_{yyx}+{\sigma\over
+6}\, {\mathbf{H}}.
+\end{equation}\]</span></p>
+<p>The dynamical equations of the system are written by “unrolling” the
+system consisting of equations (<a href="#mjx-eqn:firstorderc">3.8</a>)
+and (<a href="#mjx-eqn:secondorderc">3.9</a>). By taking the nine
+first-order equations and the three second-order equations we can form a
+closed system. Indeed, only the first three second-order equations are
+needed to close the system and determine the equilibrium quantities
+without bringing in new quantities such as the second-order corrections
+to equilibrium (<span class="math inline">\(\zeta^{(2)}\)</span>).</p>
+<p>We thus have for the first order: <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}\rho+\partial_{x&#39;}j_x+\partial_{y&#39;}j_y=0\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}e^{(0)}+\frac{1}{6}\left(\partial_{x&#39;}\left(5j_x-q^{(0)}_x\right)
+                       +\partial_{y&#39;}\left(5j_y-q^{(0)}_y\right)\right)=-\lambda_ee^{(1)}\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}j_x+\partial_{x&#39;}e^{(0)}+\partial_{x&#39;}S^{(0)}_{xx}+\partial_{y&#39;}S^{(0)}_{xy}=0\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}j_y+\partial_{y&#39;}e^{(0)}+\partial_{x&#39;}S^{(0)}_{xy}-\partial_{y&#39;}S^{(0)}_{xx}=0\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}q^{(0)}_x+\frac{2}{3}\partial_{x&#39;}(2\rho-3e^{(0)})+2\partial_{x&#39;}S^{(0)}_{xx}-2\partial_{x&#39;}\sigma^{(0)}
+-\partial_{y&#39;}S^{(0)}_{xy}=-\lambda_\chi q^{(1)}_x\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}q^{(0)}_y-\partial_{x&#39;}S^{(0)}_{xy}+\frac{2}{3}\partial_{y&#39;}(2\rho-3e^{(0)})
+-2\partial_{y&#39;}S^{(0)}_{xx}-2\partial_{y&#39;}\sigma^{(0)}=-\lambda_\chi
+q^{(1)}_y\\
+\label{sxx}&amp;&amp;\hspace{-0.5in}\partial_{t_1}S^{(0)}_{xx}+\frac{1}{6}\left(\partial_{x&#39;}(j_x+q^{(0)}_x)
+                                           -\partial_{y&#39;}(j_y+q^{(0)}_y)\right)
+=-\lambda_\nu S^{(1)}_{xx}\\
+\label{sxy}&amp;&amp;\hspace{-0.5in}\partial_{t_1}S^{(0)}_{xy}+\frac{1}{3}\left(\partial_{x&#39;}(2j_y-q^{(0)}_y)
+                                           +\partial_{y&#39;}(2j_x-q^{(0)}_x)\right)
+=-\lambda&#39;_\nu S^{(1)}_{xy}\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_1}\sigma^{(0)}-\frac{1}{6}\left(\partial_{x&#39;}q^{(0)}_x+\partial_{y&#39;}q^{(0)}_y\right)
+=-\lambda_\sigma\sigma^{(1)}
+\end{eqnarray}\]</span> and the second order gives <span
+class="math display">\[\begin{eqnarray}
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}\rho=0\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}j_x+\left(1-\frac{\lambda_\nu}{2}\right)\partial_{x&#39;}S^{(1)}_{xx}
+                        +\left(1-\frac{\lambda&#39;_\nu}{2}\right)\partial_{y&#39;}S^{(1)}_{xy}
+                        +\left(1-\frac{\lambda_e}{2}\right)\partial_{x&#39;}e^{(1)}=0\\
+&amp;&amp;\hspace{-0.5in}\partial_{t_2}j_y+\left(1-\frac{\lambda&#39;_\nu}{2}\right)\partial_{x&#39;}S^{(1)}_{xy}
+                        -\left(1-\frac{\lambda_\nu}{2}\right)\partial_{y&#39;}S^{(1)}_{xx}
+                        +\left(1-\frac{\lambda_e}{2}\right)\partial_{y&#39;}e^{(1)}=0
+\end{eqnarray}\]</span></p>
+<p>The dynamical equations are then obtained by collecting the first-
+and second-order equations. <span
+class="math display">\[\begin{eqnarray}
+\label{conta}
+&amp;&amp;\hspace{-2.5em}\partial_t\rho+\partial_xj_x+\partial_yj_y=0\\
+&amp;&amp;\hspace{-2.5em}\partial_tj_x+\partial_xe^{(0)}+\partial_xS^{(0)}_{xx}+\partial_yS^{(0)}_{xy}=\nonumber\\
+&amp;&amp;\hspace{-1em}
+\phantom{+}\frac{1}{6}\left(\frac{1}{\lambda_\nu}-\frac{1}{2}\right)
+\partial_x\left(6\partial_tS^{(0)}_{xx}+\partial_x(j_x+q^{(0)}_x)-\partial_y(j_y+q^{(0)}_y)\right)\nonumber\\
+&amp;&amp;\hspace{-1.4em}
++\frac{1}{3}\left(\frac{1}{\lambda&#39;_\nu}-\frac{1}{2}\right)
+\partial_y\left(3\partial_tS^{(0)}_{xy}+\partial_x(2j_y-q^{(0)}_y)+\partial_y(2j_x-q^{(0)}_x)\right)\nonumber\\
+\label{NSxa}
+&amp;&amp;\hspace{-1.4em}
++\frac{1}{6}\left(\frac{1}{\lambda_e}-\frac{1}{2}\right)
+\partial_x\left(6\partial_te^{(0)}+\partial_x(5j_x-q^{(0)}_x)+\partial_y(5j_y-q^{(0)}_y)\right)\\
+&amp;&amp;\hspace{-2.5em}\partial_tj_y+\partial_ye^{(0)}+\partial_xS^{(0)}_{xy}-\partial_yS^{(0)}_{xx}=\nonumber\\
+&amp;&amp;\hspace{-1em}
+\phantom{-}\frac{1}{3}\left(\frac{1}{\lambda&#39;_\nu}-\frac{1}{2}\right)
+\partial_x\left(3\partial_tS^{(0)}_{xy}+\partial_x(2j_y-q^{(0)}_y)+\partial_y(2j_x-q^{(0)}_x)\right)\nonumber\\
+&amp;&amp;\hspace{-1.4em}
+-\frac{1}{6}\left(\frac{1}{\lambda_\nu}-\frac{1}{2}\right)
+\partial_y\left(6\partial_tS^{(0)}_{xx}+\partial_x(j_x+q^{(0)}_x)-\partial_y(j_y+q^{(0)}_y)\right)\nonumber\\
+\label{NSya}
+&amp;&amp;\hspace{-1.4em}
++\frac{1}{6}\left(\frac{1}{\lambda_e}-\frac{1}{2}\right)
+\partial_y\left(6\partial_te^{(0)}+\partial_x(5j_x-q^{(0)}_x)+\partial_y(5j_y-q^{(0)}_y)\right)
+\end{eqnarray}\]</span></p>
+<h2 id="equilibrium-quantities"><span class="secnum">3.2.3</span> Equilibrium quantities</h2>
+<p>To recover the Navier-Stokes or Stokes equations, in the weakly
+compressible limit, we must specify the equilibrium values of the
+quantities we have just introduced. One thus finds that <span
+class="math inline">\(S^{(0)}_{xx}\)</span> and <span
+class="math inline">\(S^{(0)}_{xy}\)</span> must be given by <span
+class="math display">\[\begin{equation}
+S^{(0)}_{xx}=\frac{g}{2\rho}\left(j_x^2-j_y^2\right)\,,\quad{\mathrm{and}}\quad
+S^{(0)}_{xy}=\frac{g}{\rho}j_xj_y.
+\end{equation}\]</span> We shall take <span
+class="math inline">\(g=1\)</span> to recover the Navier-Stokes
+equations and <span class="math inline">\(g=0\)</span> for the Stokes
+equations. We can then neglect terms of the type <span
+class="math inline">\(\partial_\alpha\partial_{t1}\,S^{(0)}_{xx}\)</span>
+and <span
+class="math inline">\(\partial_\alpha\partial_{t1}\,S^{(0)}_{xy}\)</span>
+because they are of order <span class="math inline">\(\epsilon^2
+u^2\)</span>.</p>
+<p>For simplicity in writing the kinematic viscosity, <span
+class="math inline">\(\nu\)</span>, and the bulk viscosity, <span
+class="math inline">\(\xi\)</span>, it is convenient to choose: <span
+class="math display">\[\begin{equation}
+\lambda_\nu=\lambda_\nu&#39;,
+\end{equation}\]</span> which leads us to take: <span
+class="math display">\[\begin{equation}
+q^{(0)}_x=j_x\,,\quad{\mathrm{and}}\quad
+q^{(0)}_y=j_y,
+\end{equation}\]</span> because we must have: <span
+class="math display">\[\begin{equation}
+{1+q\over 6}\left({1\over\lambda_\nu}-\frac{1}{2}  \right)={2-q\over
+6}\left(
+  {1\over\lambda&#39;_\nu}-\frac{1}{2}  \right),
+\end{equation}\]</span> when <span
+class="math display">\[\begin{equation}
+q^{(0)}_x=q\,j_x\,,\quad{\mathrm{and}}\quad
+q^{(0)}_y=q\,j_y.
+\end{equation}\]</span></p>
+<p>A simplifying choice also dictates that we take: <span
+class="math display">\[\begin{equation}
+\sigma^{(0)}=\rho\,({4-9\,c_s^2 \over 6})-{\alpha \over 2
+\rho}{\mathbf{j}}^2
+\end{equation}\]</span></p>
+<p>One then recovers the Navier-Stokes equations in the weakly
+compressible limit: <span class="math display">\[\begin{eqnarray}
+\label{NStokes}
+&amp;&amp;\partial_t\rho+{\mathbf{\nabla}} . \,{\mathbf{j}}=0\\
+&amp;&amp;\partial_t\,{\mathbf{j}} + {\mathbf{\nabla}} .
+({{\mathbf{j}}:{\mathbf{j}}\over \rho})=-{\mathbf{\nabla}} P +
+{\mathbf{\nabla}}.(\nu\,{\mathbf{\nabla}}
+{\mathbf{j}})+{\mathbf{\nabla}}(\xi\,{\mathbf{\nabla}}.\,{\mathbf{j}}).
+\end{eqnarray}\]</span> We have chosen to give our fluid the equation of
+state <span class="math inline">\(P=c_s^2\, \rho\)</span>. Now, the
+expansion gives us <span class="math inline">\(\displaystyle
+P=e^{(0)}-j^2/2\rho\)</span> as the definition of pressure; this imposes
+the equilibrium value of the energy mode <span
+class="math inline">\(e^{(0)}=c_s^2\,\rho+j^2/2\rho\)</span> to
+eliminate the appearance of a term in velocity squared.</p>
+<p>We have thus corrected several problems appearing in the lattice
+Boltzmann models of the previous generation which were, first, the
+dependence of the pressure on the square of the velocity through <span
+class="math inline">\((j^2)\)</span>; then, Galilean invariance is now
+ensured by the choice <span class="math inline">\(g=1\)</span>, and the
+square of the speed of sound, <span
+class="math inline">\(c_s^2\)</span>, is no longer fixed to <span
+class="math inline">\(1/3\)</span> or <span
+class="math inline">\(1/2\)</span> but has become a free parameter of
+the model.</p>
+<p>Moreover, we obtain <span class="math inline">\(\displaystyle\nu={1
+\over 3}({1 \over \lambda_\nu}
+-{1 \over 2})\)</span> for the kinematic viscosity, and <span
+class="math inline">\(\displaystyle\xi=({2 \over 3}-c_s^2)({1 \over
+\lambda_e}-{1 \over 2})\)</span> for the bulk viscosity.</p>
+<p>By substituting these definitions back into the original basis, the
+population basis, one recovers for the equilibrium quantities: <span
+class="math display">\[\displaystyle N_0={ 3 -5\,c_s^2 \over 3}\left(
+\rho-{2 \over (3-5 \,c_s^2)\,\rho}
+(j_x^2+j_y^2)\right)\]</span> <span class="math display">\[\displaystyle
+N_i=t_p \left( \rho +{j_\alpha c_{i\alpha} \over
+c_s^2}+{j_\alpha\,j_\beta \over 2\,
+\rho\,c_s^2}(3 \,c_{i\alpha}\,c_{i\beta} - \delta_{\alpha
+\beta})\right)\]</span> where the index <span
+class="math inline">\(p\)</span> denotes the square of the speed
+magnitude of direction <span class="math inline">\(i\)</span>, and with
+<span class="math inline">\(\displaystyle t_1={c_s^2 \over 3}\)</span>
+and <span class="math inline">\(\displaystyle t_2={c_s^2 \over
+12}\)</span>. One recovers the distributions given for the B.G.K.
+model [<a href="#ref-BGK">35</a>] when one chooses the free parameters
+<span class="math inline">\(c_s^2=1/3\)</span> and <span
+class="math inline">\(\alpha=1\)</span> as well as the eigenvalues all
+equal to each other.</p>
+<p>The collision matrix in the population basis is then constructed as
+follows:</p>
+<p>let <span class="math inline">\({\mathcal{T}}\)</span> be the matrix
+whose rows are the eigenvectors of <span
+class="math inline">\(\Omega\)</span>, and <span
+class="math display">\[\displaystyle{\widehat
+\Omega}=\mbox{diag}\left(\phantom{-}0,\phantom{-}\lambda_e,\phantom{-}0,\phantom{-}0,\phantom{-}\lambda_\chi,\phantom{-}\lambda_\chi
+,\phantom{-}\lambda_\nu,\phantom{-}\lambda_\nu,\phantom{-}\lambda_\sigma\right)\]</span>
+the diagonal collision matrix in the new basis. The collision matrix
+<span class="math inline">\(\Omega\)</span> is then given by: <span
+class="math display">\[\Omega={\mathcal{T}}^{-1}\,{\widehat
+\Omega}\,{\mathcal{T}}.\]</span></p>
+<p>One can of course construct variants derived from this model by
+conserving, for instance, the energy  [<a href="#ref-AIAA">21</a>] or
+other quantities, as will be seen later.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-AIAA"><span class="refnum">[21]</span> D. d’Humi<span>è</span>res, “Generalized
+Lattice-Boltzmann Equations”, <span><em>AIAA Rarefied Gas Dynamics:
+theory and applications</em></span>, Vol. 159 of Progress in
+Astronautics and Aeronautics (1992) pp. 450–458. <a class="refall" href="bibliography.html#ref-AIAA" title="In the full bibliography">↗</a></li>
+<li id="ref-BGK"><span class="refnum">[35]</span> Y.H. Qian, D. d’Humi<span>è</span>res,and P.
+Lallemand, “Lattice BGK Models for Navier-Stokes Equation,”
+<span><em>Europhysics Letters</em></span>, Vol. 17(6), 1992,
+pp. 479–484. <a class="refall" href="bibliography.html#ref-BGK" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="part1-chapter2.html"><span>Previous</span>Lattice Boltzmann gases</a><a class="next" href="part1-chapter4.html"><span>Next</span>Boundary Conditions at Solid Walls</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>

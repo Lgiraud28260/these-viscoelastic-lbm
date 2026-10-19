@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lattice Boltzmann gases — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => '2.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li class="current"><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+<ul>
+<li><a href="#general-characteristics"
+id="toc-general-characteristics"><span class="secnum">2.1</span> General characteristics</a>
+<ul>
+<li><a href="#boltzmann-hypothesis"
+id="toc-boltzmann-hypothesis"><span class="secnum">2.1.1</span> Boltzmann hypothesis</a></li>
+</ul></li>
+<li><a href="#evolution-equation"
+id="toc-evolution-equation"><span class="secnum">2.2</span> Evolution equation</a>
+<ul>
+<li><a href="#complete-collision-operator"
+id="toc-complete-collision-operator"><span class="secnum">2.2.1</span> Complete collision
+operator</a></li>
+<li><a href="#linearized-equation"
+id="toc-linearized-equation"><span class="secnum">2.2.2</span> Linearized equation</a>
+<ul>
+<li><a href="#hypotheses"
+id="toc-hypotheses"><span class="secnum">2.2.2.1</span> Hypotheses</a></li>
+</ul></li>
+<li><a href="#properties-of-the-collision-matrix"
+id="toc-properties-of-the-collision-matrix"><span class="secnum">2.2.3</span> Properties of the
+collision matrix</a></li>
+</ul></li>
+<li><a href="#the-lattices-used" id="toc-the-lattices-used"><span class="secnum">2.3</span> The
+lattices used</a></li>
+</ul>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Part I · Foundations of the Lattice Boltzmann Method — Chapter 2</p><h1>Lattice Boltzmann gases</h1></header><p>After this introduction, we will address more specifically the model
+we have used, called the <span><em>lattice Boltzmann model</em></span>,
+which is in fact an extension of the previous Boolean models.</p>
+<h1 id="general-characteristics"><span class="secnum">2.1</span> General characteristics</h1>
+<p>One of the problems of Boolean models (and paradoxically one of their
+strengths) is the significant background noise imposed by the use of
+discontinuous quantities. The basic idea of the Boltzmann model is to
+take into account directly the averaged quantities. The basic element
+will no longer be the discrete value <span
+class="math inline">\(n_i\)</span> but its spatial average <span
+class="math inline">\(N_i\)</span> performed over a given number of
+nodes. For the Boltzmann model directly translated from the Boolean
+model, this quantity is continuous, between 0 and 1, and constitutes in
+fact a distribution, or probability of presence of particles in
+direction <span class="math inline">\(i\)</span>.</p>
+<h2 id="boltzmann-hypothesis"><span class="secnum">2.1.1</span> Boltzmann hypothesis</h2>
+<p>The problem is to determine how this set of dis­tri­bu­tions evolves.
+Boltzmann’s molecular chaos hypothesis, coming from statistical
+mechanics, allows us to assume that two distributions associated with
+two different directions are uncorrelated before interaction (a
+collision in the case of interest). Outside the collision step,
+everything thus proceeds as if the distributions were independent.</p>
+<p>The propagation step, and all boundary condition steps, are identical
+to those of a Boolean lattice gas; only the nature of the transported
+quantities varies. The collision step is, on the other hand,
+different.</p>
+<p>The main characteristics of a lattice Boltzmann model can be
+summarized by the following propositions:</p>
+<p>The simulation space is discretized by a regular “crystalline”
+lattice. The distributions can only be located at the nodes of this
+lattice.</p>
+<p>The distributions associated with two different directions are not
+correlated before interaction.</p>
+<p>The distributions possess the same “velocity” and “jump” at each time
+step from one site to one of the nearest neighbor sites.</p>
+<p>The dis­tri­bu­tions located at a single node can interact while
+conserving mass (the probability density) and momentum.</p>
+<h1 id="evolution-equation"><span class="secnum">2.2</span> Evolution equation</h1>
+<p>The evolution equation of a lattice Boltzmann gas is quite simple to
+formulate. It is in fact a spatial average of the
+<span><em>microdynamic</em></span> equation of a Boolean lattice gas,
+performed with the Boltzmann hypothesis, i.e.</p>
+<p><span class="math display">\[\begin{equation}
+\label{mesoscopique}
+N_i(\vec{x}+\vec{c}_i, t + 1) = N_i(\vec{x}, t) + \Delta_i \left[
+{\mathbf{N}}(\vec{x},
+t) \right].
+\end{equation}\]</span></p>
+<p>The problem is however to express the collision operator <span
+class="math inline">\(\Delta\)</span>.</p>
+<h2 id="complete-collision-operator"><span class="secnum">2.2.1</span> Complete collision
+operator</h2>
+<p>The most direct way is to take the formulation of section <a
+href="part1-chapter1.html#operateurbooleen">1.7</a>. Indeed, one can
+note that the collision operator resulting from the averaging of the
+Boolean operator can be written in the same way as it by the Boltzmann
+hypothesis  [<a href="#ref-FHHLPR">22</a>]. It is then a matter of
+replacing in the expressions <span class="math inline">\(n_i\)</span> by
+<span class="math inline">\(N_i\)</span>. The result for each
+configuration is a real number between 0 and 1 (contrary to the discrete
+values -1 and 1 of the collision operator of Boolean models).</p>
+<p>One thus obtains, in the same way, an operator acting on
+dis­tri­bu­tions, corresponding to particular microscopic collision
+configurations.</p>
+<p>This method is simple to apply when the number of directions is
+small. However, if one uses a more complex lattice (FCHC for example)
+the number of possible combinations (<span
+class="math inline">\(2^{24}\)</span>) makes the direct expression of
+the collision operator difficult.</p>
+<h2 id="linearized-equation"><span class="secnum">2.2.2</span> Linearized equation</h2>
+<p>A simple solution consists in making a hypothesis of spatial and
+temporal quasi-equilibrium  [<a href="#ref-HSB">19</a>]. Placing oneself
+at low Mach number and low Knudsen number, one can consider
+small-amplitude perturbations. This allows one to decompose the
+distribution vector into an equilibrium term and an out-of-equilibrium
+term, that is</p>
+<p><span class="math display">\[\begin{equation}
+{\mathbf{N}} = {\mathbf{N}}^{eq} + {\mathbf{N}}^{neq}
+\end{equation}\]</span></p>
+<p>In the low-velocity hypothesis, one can perform a Taylor expansion of
+<span class="math inline">\({\mathbf{N}}\)</span> at equilibrium as a
+function of a small parameter which will here be the velocity <span
+class="math inline">\(u\)</span>; one then has:</p>
+<p><span class="math display">\[\begin{equation}
+{\mathbf{N}}^{eq} =
+{\mathbf{N}}_0^{eq}+{\mathbf{N}}_1^{eq}+{\mathbf{N}}_2^{eq}+\dots+{\mathbf{N}}_k^{eq}+{\mathcal{O}}(u^{k+1})
+\end{equation}\]</span></p>
+<p>Expanding the collision operator in the same way, one obtains, at
+order 2 in velocity,</p>
+<p><span class="math display">\[\begin{equation}
+\label{celleaudessus}
+\Delta({\mathbf{N}}) = \Delta({\mathbf{N}}_0^{eq}) +
+\left( \frac{\partial \Delta}{\partial {\mathbf{N}}} \right
+)_{{\mathbf{N}}_0^{eq}}
+\left( {\mathbf{N}}_1^{eq} + {\mathbf{N}}_2^{eq} + {\mathbf{N}}^{neq}
+\right) +
+\frac{1}{2}{\mathbf{N}}_1^{eq}\left(
+\frac{\partial^2\Delta}{\partial{\mathbf{N}}^2}\right)_{{\mathbf{N}}_0^{eq}}{\mathbf{N}}_1^{eq}
++ \dots
+\end{equation}\]</span></p>
+<p>By definition, at equilibrium the system is stationary; one therefore
+has</p>
+<p><span class="math display">\[\begin{equation}
+\Delta({\mathbf{N}}^{eq}) = 0 = \Delta^{(0)} +
+\Delta^{(1)}\left({\mathbf{N}}_1^{eq} + ({\mathbf{N}}_2^{eq} + 0)
+\right)+ \frac{1}{2}{\mathbf{N}}_1^{eq}\Delta^{(2)}{\mathbf{N}}_1^{eq}
++ \dots
+\end{equation}\]</span> with by definition <span
+class="math display">\[\Delta^{(i)}=(\partial^i\Delta)/(\partial{\mathbf{N}}^i),\]</span>
+substituting in (<a href="#mjx-eqn:celleaudessus">2.4</a>), one obtains
+<span class="math inline">\(\Delta({\mathbf{N}}) =
+\Delta^{(1)}{\mathbf{N}}^{neq}\)</span>.</p>
+<p>Let us take by definition, with the sign conventions allowing one to
+choose positive eigenvalues of the matrix <span
+class="math inline">\(\Omega\)</span>:</p>
+<p><span class="math display">\[\begin{equation}
+\Omega_{ij} = -\left(\frac{\partial \Delta_i}{\partial
+N_j}\right)_{N_i^{eq}}
+\end{equation}\]</span></p>
+<p>The evolution equation (<a href="#mjx-eqn:mesoscopique">2.1</a>) then
+becomes the <span><em>linearized</em></span> evolution equation</p>
+<p><span class="math display">\[\begin{equation}
+\label{linearisee}
+N_i(\vec{x} + \vec{c}_i, t + 1) = N_i(\vec{x}, t) - \sum_{j = 0}^{b}
+\Omega_{ij}N_j^{neq}(\vec{x},
+t)
+\end{equation}\]</span></p>
+<p>with <span class="math inline">\(b\)</span> the number of directions
+of the lattice used, <span class="math inline">\(N_j^{neq} = N_j -
+N_j^{eq}\)</span>.</p>
+<p>The matrix <span class="math inline">\(\Omega\)</span> is called the
+collision matrix.</p>
+<h3 id="hypotheses"><span class="secnum">2.2.2.1</span> Hypotheses</h3>
+<p>The hypotheses made to arrive at this result are:</p>
+<ol>
+<li><p>Non-correlation of distributions before interaction
+(Boltzmann).</p></li>
+<li><p>Local quasi-equilibrium.</p>
+<ul>
+<li><p>Low Mach and Knudsen numbers.</p></li>
+<li><p>Small density and velocity gradients.</p></li>
+</ul></li>
+<li><p>Continuity of the functions and their derivatives.</p></li>
+</ol>
+<h2 id="properties-of-the-collision-matrix"><span class="secnum">2.2.3</span> Properties of the
+collision matrix</h2>
+<p>In the same way as the collision operator <span
+class="math inline">\(\Delta\)</span>, the collision matrix <span
+class="math inline">\(\Omega\)</span> must ensure the verification of
+the conservation principles.</p>
+<ul>
+<li><p>Conservation of mass</p>
+<p>The probability density must be conserved. That is <span
+class="math display">\[\begin{equation}
+\sum_i\sum_j\Omega_{ij}N_j^{neq} = 0, \quad \forall {\mathbf{N}}^{neq}
+\end{equation}\]</span> That is <span
+class="math display">\[\begin{equation}
+\sum_i\Omega_{ij} = 0, \quad \forall j
+\end{equation}\]</span></p></li>
+<li><p>Conservation of momentum</p>
+<p>Similarly <span class="math display">\[\begin{equation}
+\sum_i\vec{c}_i\sum_j\Omega_{ij}N_j^{neq} = \vec{0}, \quad \forall
+{\mathbf{N}}^{neq}
+\end{equation}\]</span> That is <span
+class="math display">\[\begin{equation}
+\sum_i\Omega_{ij}\vec{c}_i = \vec{0}, \quad \forall j
+\end{equation}\]</span></p></li>
+</ul>
+<p>These will be, in practice, the main constraints, and often the only
+ones, that we will have to respect to construct the collision matrices.
+One may consider energy conservation by adding an additional
+conservation law [<a href="#ref-AIAA">21</a>], but we will not treat
+this case here.</p>
+<p>The procedure for constructing the collision matrix indicated in  [<a
+href="#ref-BSV">39</a>] or  [<a href="#ref-HJ">30</a>] is today
+abandoned in favor of a method where the collision matrix is built in a
+basis in which it is diagonal. We will detail this method for the
+construction of a two-dimensional model in the following chapter.</p>
+<h1 id="the-lattices-used"><span class="secnum">2.3</span> The lattices used</h1>
+<p>The Boltzmann method is built, as we have just seen, on a regular
+lattice. Starting from lattice gases, two types of lattices have been
+defined, the hexagonal lattice in two dimensions and the face-centered
+hyper-cubic lattice (FCHC) in four dimensions. These models are called
+single-speed models because their velocity modulus <span
+class="math inline">\(|c_i|\)</span> is constant. As an extension of the
+previous models, more complex multi-speed models have therefore been
+introduced. One may naturally wonder whether the projections of the FCHC
+model are single-speed or multi-speed models. Indeed, the FCHC model
+projected in two dimensions possesses nine velocities, see Fig (<a
+href="part1-chapter1.html#FCHCprojeteen2D">1.7</a>), one with zero
+modulus, four with unit modulus, and finally four with modulus equal to
+the square root of two. Yet the FCHC model possesses twenty-four
+velocities of single modulus equal to the square root of two. In this
+section we will set up a formalism that will allow us to avoid these
+delicate questions. There are two types of two-dimensional lattices,
+triangular-based lattices and square-based lattices. Throughout the
+remainder of this study, we will consider only square-based
+lattices.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-HSB"><span class="refnum">[19]</span> F. Higuera, S. Succi, and R. Benzi, “Lattice Gas
+Dynamics with Enhanced Collisions”, <span><em>Europhys.
+Lett.</em></span>, Vol. 9(7), 1989, pp. 663–668. <a class="refall" href="bibliography.html#ref-HSB" title="In the full bibliography">↗</a></li>
+<li id="ref-AIAA"><span class="refnum">[21]</span> D. d’Humi<span>è</span>res, “Generalized
+Lattice-Boltzmann Equations”, <span><em>AIAA Rarefied Gas Dynamics:
+theory and applications</em></span>, Vol. 159 of Progress in
+Astronautics and Aeronautics (1992) pp. 450–458. <a class="refall" href="bibliography.html#ref-AIAA" title="In the full bibliography">↗</a></li>
+<li id="ref-FHHLPR"><span class="refnum">[22]</span> U. Frisch, D. d’Humi<span>è</span>res, B. Hasslacher,
+P. Lallemand, Y. Pomeau, J.P. Rivet, “Lattice gas hydrodynamics in 2 and
+3 dimensions”, <span><em>Complex Systems</em></span>
+<span><strong>1</strong></span> (1987) pp. 648-707 <a class="refall" href="bibliography.html#ref-FHHLPR" title="In the full bibliography">↗</a></li>
+<li id="ref-HJ"><span class="refnum">[30]</span> F.J. Higera, J. Jimenez “Boltzmann Approch to L.G.
+Simulation”, <span><em>Europhys.Lett.</em></span>
+<span><strong>9</strong></span> (7) pp. 663-668 (1989) <a class="refall" href="bibliography.html#ref-HJ" title="In the full bibliography">↗</a></li>
+<li id="ref-BSV"><span class="refnum">[39]</span> R. Benzi, S. Succi and M. Vergassola, “The lattice
+Boltzmann equation: theory and applications,” <span><em>Physics
+Reports,</em></span> <span><strong>222</strong></span>, (1992),
+pp. 145-197. <a class="refall" href="bibliography.html#ref-BSV" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="part1-chapter1.html"><span>Previous</span>Lattice gases</a><a class="next" href="part1-chapter3.html"><span>Next</span>Construction of the Models</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>
