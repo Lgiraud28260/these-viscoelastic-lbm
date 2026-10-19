@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numerical Measurement of the Speed of Sound — Viscoelastic Fluids with the Lattice Boltzmann Method</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/tagformat'] },
+  tex: { packages: { '[+]': ['tagformat'] }, tags: 'ams', tagformat: { number: n => 'S.' + (n + 0) } },
+  options: { renderActions: { addMenu: [] } },
+  startup: { pageReady: () => MathJax.startup.defaultPageReady().then(() => {
+    if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+  }) }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="toc-toggle" aria-label="Table of contents" onclick="document.body.classList.toggle('toc-open')">☰</button>
+  <a class="thesis-title" href="index.html">Viscoelastic Fluids with the Lattice Boltzmann Method</a>
+  <span class="author">Laurent Giraud · 1997</span>
+</header>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<a class="nav-home" href="index.html">Contents</a>
+<ol class="nav-tree">
+<li><a href="introduction.html">General Introduction</a>
+</li>
+<li class="nav-part">Part I · Foundations of the Lattice Boltzmann Method</li>
+<li><a href="part1-chapter1.html"><span class="secnum">1</span> Lattice gases</a>
+</li>
+<li><a href="part1-chapter2.html"><span class="secnum">2</span> Lattice Boltzmann gases</a>
+</li>
+<li><a href="part1-chapter3.html"><span class="secnum">3</span> Construction of the Models</a>
+</li>
+<li><a href="part1-chapter4.html"><span class="secnum">4</span> Boundary Conditions at Solid Walls</a>
+</li>
+<li class="nav-part">Part II · Viscoelasticity</li>
+<li><a href="part2-chapter1.html">Characterization of a Viscoelastic Fluid</a>
+</li>
+<li class="nav-part">Part III · Modeling of Viscoelasticity with the Lattice Boltzmann Method</li>
+<li><a href="part3-introduction.html">Introduction</a>
+</li>
+<li><a href="part3-chapter1.html"><span class="secnum">1</span> Basic principles</a>
+</li>
+<li><a href="part3-chapter2.html"><span class="secnum">2</span> Implementation and isotropy</a>
+</li>
+<li><a href="part3-chapter3.html"><span class="secnum">3</span> Isotropic fifteen-velocity model</a>
+</li>
+<li><a href="part3-chapter4.html"><span class="secnum">4</span> Numerical Simulations</a>
+</li>
+<li><a href="part3-chapter5.html"><span class="secnum">5</span> Constitutive equation</a>
+</li>
+<li><a href="conclusion.html">Conclusion</a>
+</li>
+<li class="nav-part">Appendices</li>
+<li><a href="appendix-a.html"><span class="secnum">A</span> Definitions on Viscoelasticity</a>
+</li>
+<li><a href="appendix-b.html"><span class="secnum">B</span> Introduction of Objective Derivatives</a>
+</li>
+<li><a href="appendix-c.html"><span class="secnum">C</span> Introduction of a Passive Scalar - Modeling of Miscible Fluids</a>
+</li>
+<li class="nav-part">Supplement (web edition, 2026)</li>
+<li class="current"><a href="supplement-speed-of-sound.html"><span class="secnum">S</span> Numerical Measurement of the Speed of Sound</a>
+<ul>
+<li><a href="#s.1motivation"
+id="toc-s.1motivation"><span class="secnum">S.1</span> Motivation</a></li>
+<li><a href="#s.2the-model-as-simulated"
+id="toc-s.2the-model-as-simulated"><span class="secnum">S.2</span> The model as simulated</a></li>
+<li><a href="#s.3first-experiment-a-standing-sound-wave"
+id="toc-s.3first-experiment-a-standing-sound-wave"><span class="secnum">S.3</span> First
+experiment: a standing sound wave</a>
+<ul>
+<li><a href="#s.3.1theory" id="toc-s.3.1theory"><span class="secnum">S.3.1</span> Theory</a></li>
+<li><a href="#s.3.2set-up" id="toc-s.3.2set-up"><span class="secnum">S.3.2</span> Set-up</a></li>
+<li><a href="#s.3.3results"
+id="toc-s.3.3results"><span class="secnum">S.3.3</span> Results</a></li>
+</ul></li>
+<li><a href="#s.4second-experiment-hydrostatic-equilibrium"
+id="toc-s.4second-experiment-hydrostatic-equilibrium"><span class="secnum">S.4</span> Second
+experiment: hydrostatic equilibrium</a>
+<ul>
+<li><a href="#s.4.1theory" id="toc-s.4.1theory"><span class="secnum">S.4.1</span> Theory</a></li>
+<li><a href="#s.4.2set-up" id="toc-s.4.2set-up"><span class="secnum">S.4.2</span> Set-up</a></li>
+<li><a href="#s.4.3a-trap-slow-convergence"
+id="toc-s.4.3a-trap-slow-convergence"><span class="secnum">S.4.3</span> A trap: slow
+convergence</a></li>
+<li><a href="#s.4.4results"
+id="toc-s.4.4results"><span class="secnum">S.4.4</span> Results</a></li>
+</ul></li>
+<li><a href="#sec-cs2-summary" id="toc-sec-cs2-summary"><span class="secnum">S.5</span> Summary of
+the measurements</a></li>
+<li><a href="#sec-cs2-dispersion"
+id="toc-sec-cs2-dispersion"><span class="secnum">S.6</span> Lattice dispersion</a></li>
+<li><a href="#s.7conclusion"
+id="toc-s.7conclusion"><span class="secnum">S.7</span> Conclusion</a></li>
+</ul>
+</li>
+<li class="nav-part"></li><li><a href="bibliography.html">Bibliography</a></li>
+</ol>
+</nav>
+<main class="content">
+<header class="chapter-head"><p class="eyebrow">Supplement</p><h1>Numerical Measurement of the Speed of Sound</h1></header><p><span><em>This supplement was added to the web edition of the thesis
+in October 2026. It is not part of the thesis defended in 1997. The
+numerical experiments it reports were designed, run and written up with
+the help of an AI assistant (Claude, Anthropic). They can be reproduced
+with the script <a href="supplement/mesure_cs2.py">mesure_cs2.py</a>,
+which runs in about thirty seconds.</em></span></p>
+<h1 id="s.1motivation"><span class="secnum">S.1</span> Motivation</h1>
+<p>At the end of chapter <a href="part1-chapter3.html">3</a> of the
+first part, we noted that with the model built there, the square of the
+speed of sound, <span class="math inline">\(c_s^2\)</span>, “is no
+longer fixed to <span class="math inline">\(1/3\)</span> or <span
+class="math inline">\(1/2\)</span> but has become a free parameter of
+the model”. This statement follows from the Chapman-Enskog expansion:
+choosing the equilibrium value of the energy mode as <span
+class="math inline">\(e^{(0)}=c_s^2\,\rho+j^2/2\rho\)</span> gives the
+macroscopic equations (<a
+href="part1-chapter3.html#mjx-eqn:NStokes">3.33</a>) with the equation
+of state <span class="math display">\[\begin{equation}
+\label{eos-supp}
+P=c_s^2\,\rho .
+\end{equation}\]</span> An expansion only tells us what the model should
+do, though. The aim of this supplement is to check numerically that the
+model actually does it, by <span><em>measuring</em></span> <span
+class="math inline">\(c_s^2\)</span> in simulations where it was imposed
+at different values.</p>
+<p>The quantity <span class="math inline">\(c_s^2\)</span> enters the
+macroscopic behavior of the fluid in two distinct ways, which give two
+independent measurements:</p>
+<ul>
+<li><p><span><strong>thermodynamically</strong></span>, through the
+equation of state (<a href="#mjx-eqn:eos-supp">S.1</a>), which fixes how
+the density responds to a pressure gradient;</p></li>
+<li><p><span><strong>dynamically</strong></span>, as the square of the
+speed at which density perturbations propagate.</p></li>
+</ul>
+<p>The first measurement uses a fluid at rest and the second a fluid in
+motion, so their agreement with the imposed value is a real test of the
+model, and not a re-reading of the input parameter.</p>
+<h1 id="s.2the-model-as-simulated"><span class="secnum">S.2</span> The model as simulated</h1>
+<p>The simulated model is exactly the nine-velocity model D2C1.2 (D2Q9)
+of chapter <a href="part1-chapter3.html">3</a>, figure <a
+href="part1-chapter3.html#d2q9">3.1</a>:</p>
+<ul>
+<li><p>the collision matrix is diagonal in the orthogonal basis of
+moments (<a href="part1-chapter3.html#mjx-eqn:vectorlist">3.6</a>),
+<span
+class="math inline">\(\Omega={\mathcal{T}}^{-1}\,\widehat\Omega\,{\mathcal{T}}\)</span>,
+with eigenvalues <span
+class="math inline">\((0,\lambda_e,0,0,\lambda_\chi,\lambda_\chi,\lambda_\nu,\lambda_\nu,\lambda_\sigma)\)</span>;</p></li>
+<li><p>the equilibrium populations are those given at the end of
+chapter <a href="part1-chapter3.html">3</a>: <span
+class="math display">\[\begin{equation}
+N_0^{\mathrm{eq}}={3-5\,c_s^2\over
+3}\left(\rho-{2\,j^2\over(3-5\,c_s^2)\,\rho}\right),\qquad
+N_i^{\mathrm{eq}}=t_p\left(\rho+{j_\alpha c_{i\alpha}\over c_s^2}
++{j_\alpha j_\beta\over
+2\rho\,c_s^2}\left(3\,c_{i\alpha}c_{i\beta}-\delta_{\alpha\beta}\right)\right),
+\end{equation}\]</span> with <span
+class="math inline">\(t_1=c_s^2/3\)</span> and <span
+class="math inline">\(t_2=c_s^2/12\)</span>.</p></li>
+</ul>
+<p>We used <span
+class="math inline">\(\lambda_\nu=\lambda_\chi=\lambda_\sigma=1.2\)</span>
+and <span class="math inline">\(\lambda_e=1\)</span>, that is a
+kinematic viscosity <span
+class="math inline">\(\nu=(1/\lambda_\nu-1/2)/3\approx0.111\)</span> and
+a bulk viscosity <span
+class="math inline">\(\xi=(2/3-c_s^2)(1/\lambda_e-1/2)\)</span>. When a
+body force <span class="math inline">\(\rho\,F\)</span> is applied, it
+is introduced as in chapter <a href="part1-chapter4.html">4</a>, by
+adding <span class="math inline">\(t_p\,\rho\,{\vec
+F}.\vec{c}_i/c_s^2\)</span> to the populations at each time step, with
+the corrected definition of momentum <span
+class="math inline">\({\mathbf{j}}=\sum_i N_i\,\vec{c}_i+\rho\,{\vec
+F}/2\)</span>. Solid walls use the bounce-back.</p>
+<p>The parameter <span class="math inline">\(c_s^2\)</span> is free, but
+not without limits. The rest population must stay positive, <span
+class="math inline">\(N_0^{\mathrm{eq}}\geq0\)</span>, which requires
+<span class="math inline">\(c_s^2&lt;3/5\)</span>, and the bulk
+viscosity must stay positive, which requires <span
+class="math inline">\(c_s^2&lt;2/3\)</span>. We therefore tested five
+values covering most of the admissible range: <span
+class="math inline">\(c_s^2=0.2\)</span>, <span
+class="math inline">\(0.25\)</span>, <span
+class="math inline">\(1/3\)</span>, <span
+class="math inline">\(0.4\)</span> and <span
+class="math inline">\(0.5\)</span>.</p>
+<h1 id="s.3first-experiment-a-standing-sound-wave"><span class="secnum">S.3</span> First
+experiment: a standing sound wave</h1>
+<h2 id="s.3.1theory"><span class="secnum">S.3.1</span> Theory</h2>
+<p>Linearizing equations (<a
+href="part1-chapter3.html#mjx-eqn:NStokes">3.33</a>) around a fluid at
+rest of density <span class="math inline">\(\rho_0\)</span>, for a
+perturbation depending only on <span class="math inline">\(x\)</span>,
+gives <span class="math display">\[\begin{equation}
+\partial_t\rho+\partial_xj_x=0,\qquad
+\partial_tj_x=-c_s^2\,\partial_x\rho+(\nu+\xi)\,\partial_{x^2}j_x.
+\end{equation}\]</span> The Fourier component <span
+class="math inline">\(\hat\rho_k(t)\)</span> of the density then obeys a
+damped oscillator equation, <span
+class="math display">\[\begin{equation}
+\ddot{\hat\rho}_k+(\nu+\xi)\,k^2\,\dot{\hat\rho}_k+c_s^2k^2\,\hat\rho_k=0,
+\end{equation}\]</span> whose solution is <span
+class="math display">\[\begin{equation}
+\label{damped-wave}
+\hat\rho_k(t)=A\,e^{-\Gamma t}\cos(\omega t+\varphi),\qquad
+\Gamma={(\nu+\xi)\,k^2\over2},\qquad \omega^2=c_s^2k^2-\Gamma^2 .
+\end{equation}\]</span> Measuring the frequency <span
+class="math inline">\(\omega\)</span> and the damping rate <span
+class="math inline">\(\Gamma\)</span> of a standing wave therefore gives
+<span class="math inline">\(c_s^2=(\omega^2+\Gamma^2)/k^2\)</span>,
+whatever the values of the viscosities.</p>
+<h2 id="s.3.2set-up"><span class="secnum">S.3.2</span> Set-up</h2>
+<p>The domain is periodic, <span class="math inline">\(200\)</span>
+nodes long, and the wave number is <span
+class="math inline">\(k=2\pi/200\approx0.031\)</span>. The fluid starts
+at rest, with populations at equilibrium and density <span
+class="math inline">\(\rho=1+10^{-3}\cos(kx)\)</span>; the small
+amplitude keeps the flow in the linear regime. We record <span
+class="math inline">\(\hat\rho_k(t)\)</span> over about five acoustic
+periods, then fit the four parameters <span
+class="math inline">\(A\)</span>, <span
+class="math inline">\(\Gamma\)</span>, <span
+class="math inline">\(\omega\)</span> and <span
+class="math inline">\(\varphi\)</span> of (<a
+href="#mjx-eqn:damped-wave">S.5</a>).</p>
+<figure id="fig-cs2-wave">
+<img src="figures/cs2-sound-wave.svg" />
+<figcaption>Figure S.1: Standing sound wave: amplitude of the Fourier
+mode <span class="math inline">\(\hat\rho_k(t)\)</span> for the five
+imposed values of <span class="math inline">\(c_s^2\)</span>. The higher
+<span class="math inline">\(c_s^2\)</span>, the faster the
+oscillation</figcaption>
+</figure>
+<h2 id="s.3.3results"><span class="secnum">S.3.3</span> Results</h2>
+<p>The signals of figure <a href="#fig-cs2-wave">S.1</a> are damped
+cosines, as predicted. The values of <span
+class="math inline">\(c_s^2\)</span> deduced from the fits are given in
+table form in section <a href="#sec-cs2-summary">S.5</a>: they coincide
+with the imposed values to better than <span
+class="math inline">\(10^{-4}\)</span> in relative terms. The tiny
+remaining deviation, always positive, is explained by the lattice
+dispersion studied in section <a href="#sec-cs2-dispersion">S.6</a>.</p>
+<h1 id="s.4second-experiment-hydrostatic-equilibrium"><span class="secnum">S.4</span> Second
+experiment: hydrostatic equilibrium</h1>
+<h2 id="s.4.1theory"><span class="secnum">S.4.1</span> Theory</h2>
+<p>We now return to the closed-box experiment of chapter <a
+href="part1-chapter4.html">4</a> (figure <a
+href="part1-chapter4.html#closebox">4.1</a>): a fluid between two walls,
+subject to a uniform body force <span class="math inline">\(F\)</span>
+directed along <span class="math inline">\(-y\)</span>. In the steady
+state the fluid is at rest, <span
+class="math inline">\({\mathbf{j}}=0\)</span>, and the momentum equation
+reduces to the balance between the pressure gradient and the force,
+<span class="math inline">\(\partial_yP=-\rho\,F\)</span>. With the
+equation of state (<a href="#mjx-eqn:eos-supp">S.1</a>), this gives
+<span class="math display">\[\begin{equation}
+\label{hydro-profile}
+c_s^2\,\partial_y\rho=-\rho\,F
+\qquad\Longrightarrow\qquad
+\ln{\rho(y)\over\rho(y_0)}=-{F\over c_s^2}\,(y-y_0).
+\end{equation}\]</span> The logarithm of the density is linear in <span
+class="math inline">\(y\)</span>, and its slope gives <span
+class="math inline">\(c_s^2\)</span> directly. Unlike the first
+experiment, this measurement involves neither the viscosities nor the
+dynamics: it tests the equation of state alone.</p>
+<h2 id="s.4.2set-up"><span class="secnum">S.4.2</span> Set-up</h2>
+<p>The channel is <span class="math inline">\(60\)</span> nodes high
+between two bounce-back walls (and periodic, one node wide, along <span
+class="math inline">\(x\)</span>), with <span
+class="math inline">\(F=2\times10^{-4}\)</span>. The fluid starts at
+rest with a uniform density <span class="math inline">\(\rho=1\)</span>.
+Once the steady state is reached, we fit a straight line through <span
+class="math inline">\(\ln\rho(y)\)</span>, leaving out the three nodes
+nearest each wall.</p>
+<figure id="fig-cs2-hydro">
+<img src="figures/cs2-hydrostatic.svg" />
+<figcaption>Figure S.2: Hydrostatic density profiles in the steady
+state. The slopes are <span
+class="math inline">\(-F/c_s^2\)</span></figcaption>
+</figure>
+<h2 id="s.4.3a-trap-slow-convergence"><span class="secnum">S.4.3</span> A trap: slow
+convergence</h2>
+<p>When the force is switched on, the fluid is not at rest: it sets off
+a sound wave that bounces between the walls, and the only thing that
+damps it is the viscosity. According to (<a
+href="#mjx-eqn:damped-wave">S.5</a>), its amplitude decays as <span
+class="math inline">\(e^{-\Gamma t}\)</span> with <span
+class="math inline">\(k\approx\pi/L\)</span> for the fundamental mode of
+a channel of height <span class="math inline">\(L\)</span>. For <span
+class="math inline">\(c_s^2=0.4\)</span> and <span
+class="math inline">\(L\approx58\)</span>, this gives <span
+class="math inline">\(\Gamma\approx3.6\times10^{-4}\)</span> per time
+step, close to the rate of about <span
+class="math inline">\(4\times10^{-4}\)</span> observed in figure <a
+href="#fig-cs2-convergence">S.3</a>. Reaching the hydrostatic state to
+within <span class="math inline">\(10^{-6}\)</span> therefore takes some
+<span class="math inline">\(35\,000\)</span> time steps.</p>
+<p>A first run stopped after <span class="math inline">\(6\,000\)</span>
+time steps (dashed line in figure <a
+href="#fig-cs2-convergence">S.3</a>) gave errors of up to <span
+class="math inline">\(11\%\)</span> on <span
+class="math inline">\(c_s^2\)</span>, of either sign depending on the
+phase of the residual oscillation. The results below were obtained after
+<span class="math inline">\(40\,000\)</span> time steps; the program
+also checks that the residual velocity has fallen below <span
+class="math inline">\(10^{-3}\)</span> of its initial scale before
+measuring.</p>
+<figure id="fig-cs2-convergence">
+<img src="figures/cs2-hydrostatic-convergence.svg" />
+<figcaption>Figure S.3: Convergence to hydrostatic equilibrium for <span
+class="math inline">\(c_s^2=0.4\)</span>: relative error on the measured
+<span class="math inline">\(c_s^2\)</span> and residual momentum. The
+oscillations are those of the sound wave trapped between the
+walls</figcaption>
+</figure>
+<h2 id="s.4.4results"><span class="secnum">S.4.4</span> Results</h2>
+<p>The profiles of figure <a href="#fig-cs2-hydro">S.2</a> are straight
+lines, as predicted by (<a href="#mjx-eqn:hydro-profile">S.6</a>), and
+their slopes give <span class="math inline">\(c_s^2\)</span> to within
+<span class="math inline">\(2\times10^{-6}\)</span> in relative terms.
+The equation of state <span class="math inline">\(P=c_s^2\rho\)</span>
+is therefore satisfied to the accuracy of the simulation, for every
+imposed value.</p>
+<h1 id="sec-cs2-summary"><span class="secnum">S.5</span> Summary of the measurements</h1>
+<p>The table below gathers the two measurements. Figure <a
+href="#fig-cs2-summary">S.4</a> shows them against the imposed
+value.</p>
+<div class="center">
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">imposed <span
+class="math inline">\(c_s^2\)</span></th>
+<th style="text-align: center;">sound wave</th>
+<th style="text-align: center;">deviation</th>
+<th style="text-align: center;">hydrostatics</th>
+<th style="text-align: center;">deviation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><span
+class="math inline">\(0.2\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.200017\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(+0.009\%\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.2000000\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.0001\%\)</span></td>
+</tr>
+<tr>
+<td style="text-align: center;"><span
+class="math inline">\(0.25\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.250019\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(+0.008\%\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.2500000\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.0001\%\)</span></td>
+</tr>
+<tr>
+<td style="text-align: center;"><span
+class="math inline">\(1/3\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.333355\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(+0.006\%\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.3333330\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.0001\%\)</span></td>
+</tr>
+<tr>
+<td style="text-align: center;"><span
+class="math inline">\(0.4\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.400021\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(+0.005\%\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.3999992\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.0002\%\)</span></td>
+</tr>
+<tr>
+<td style="text-align: center;"><span
+class="math inline">\(0.5\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.500018\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(+0.004\%\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.4999997\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.0001\%\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure id="fig-cs2-summary">
+<img src="figures/cs2-measured-vs-imposed.svg" />
+<figcaption>Figure S.4: Measured versus imposed <span
+class="math inline">\(c_s^2\)</span>. The two independent measurements
+fall on the diagonal</figcaption>
+</figure>
+<h1 id="sec-cs2-dispersion"><span class="secnum">S.6</span> Lattice dispersion</h1>
+<p>The Chapman-Enskog expansion is valid for wavelengths that are large
+compared with the lattice spacing. To see where this approximation stops
+holding, we repeated the sound-wave measurement on shorter and shorter
+domains, from <span class="math inline">\(400\)</span> down to <span
+class="math inline">\(10\)</span> nodes, that is for wave numbers <span
+class="math inline">\(k\)</span> from <span
+class="math inline">\(0.016\)</span> to <span
+class="math inline">\(0.63\)</span> (dispersion effects of this kind in
+lattice gases are discussed in [<a href="#ref-grosfils">24</a>]). We
+call apparent speed of sound the value <span
+class="math inline">\(c_s^2{}_{\mathrm{app}}=(\omega^2+\Gamma^2)/k^2\)</span>
+obtained in this way.</p>
+<figure id="fig-cs2-dispersion">
+<img src="figures/cs2-dispersion.svg" />
+<figcaption>Figure S.5: Relative deviation of the apparent speed of
+sound from the imposed value, as a function of <span
+class="math inline">\(k^2\)</span></figcaption>
+</figure>
+<p>Figure <a href="#fig-cs2-dispersion">S.5</a> shows that the relative
+deviation grows as <span class="math inline">\(k^2\)</span>: <span
+class="math display">\[\begin{equation}
+{c_s^2{}_{\mathrm{app}}-c_s^2\over c_s^2}\simeq a\,k^2,
+\end{equation}\]</span> with <span
+class="math inline">\(a\approx0.087\)</span> for <span
+class="math inline">\(c_s^2=0.2\)</span>, <span
+class="math inline">\(a\approx0.066\)</span> for <span
+class="math inline">\(c_s^2=1/3\)</span> and <span
+class="math inline">\(a\approx0.037\)</span> for <span
+class="math inline">\(c_s^2=0.5\)</span>. This is the expected behavior
+of a scheme whose truncation errors are of second order. It also
+accounts for the deviations of the first experiment: with <span
+class="math inline">\(k\approx0.031\)</span>, <span
+class="math inline">\(a\,k^2\)</span> is of the order of <span
+class="math inline">\(10^{-4}\)</span>. In practice, a wave resolved by
+about twenty nodes per wavelength (<span
+class="math inline">\(k\approx0.3\)</span>) already propagates at the
+right speed to within <span class="math inline">\(1\%\)</span>.</p>
+<h1 id="s.7conclusion"><span class="secnum">S.7</span> Conclusion</h1>
+<p>Two independent measurements, one dynamic and one thermodynamic,
+confirm the statement of chapter <a href="part1-chapter3.html">3</a>: in
+this model, <span class="math inline">\(c_s^2\)</span> is a genuine free
+parameter. The density of a fluid at rest obeys the equation of state
+<span class="math inline">\(P=c_s^2\rho\)</span> with the imposed value,
+and density perturbations propagate at the speed <span
+class="math inline">\(c_s\)</span>, for every value tested between <span
+class="math inline">\(0.2\)</span> and <span
+class="math inline">\(0.5\)</span>. The only limits are those of the
+model itself (<span class="math inline">\(c_s^2&lt;3/5\)</span>) and the
+lattice dispersion, which is negligible as soon as wavelengths are
+resolved by a few tens of nodes.</p>
+<p>This freedom has a practical use: for a given flow velocity,
+increasing <span class="math inline">\(c_s^2\)</span> lowers the Mach
+number, and hence the compressibility errors of a model meant to
+simulate an incompressible fluid. The second experiment also shows that,
+in a confined domain, these waves are damped only by the viscosities:
+reaching a steady state can take far longer than the hydrodynamic time
+scales suggest.</p><section class="references"><h2>References cited in this chapter</h2><ol><li id="ref-grosfils"><span class="refnum">[24]</span> P. Grosfils and P. Lallemand, “Dispersion effects in
+lattice gases with internal and translational mode coupling”,
+<span><em>Europhys. Lett.</em></span>, Vol. 24, 1993, pp. 473–478. <a class="refall" href="bibliography.html#ref-grosfils" title="In the full bibliography">↗</a></li></ol></section><nav class="pager"><a class="prev" href="appendix-c.html"><span>Previous</span>Introduction of a Passive Scalar - Modeling of Miscible Fluids</a><a class="next" href="bibliography.html"><span>Next</span>Bibliography</a></nav>
+</main>
+</div>
+<script>
+document.querySelector('.toc').addEventListener('click', e => { if (e.target.closest('a')) document.body.classList.remove('toc-open'); });
+const cur = document.querySelector('.toc .current'); if (cur) cur.scrollIntoView({ block: 'center' });
+</script>
+</body>
+</html>
