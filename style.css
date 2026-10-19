@@ -164,3 +164,13 @@ td, th { padding: 0.3rem 0.8rem; border-bottom: 1px solid var(--rule); }
   .content { padding: 1.5rem 1rem 4rem; }
   h1 { font-size: 1.7rem; }
 }
+
+/* Notes ajoutées à l'édition web (postérieures à 1997) */
+.web-note {
+  margin: 1.5rem 0; padding: 0.9rem 1.1rem;
+  background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+  font-size: 0.97rem;
+}
+.web-note p { margin: 0; text-align: left; }
+.web-note p + p { margin-top: 0.4rem; }
+.web-note-label { font: 600 0.72rem/1.4 Inter, system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
