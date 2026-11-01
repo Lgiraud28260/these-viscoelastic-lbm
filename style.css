@@ -133,6 +133,14 @@ figure img {
   border: 1px solid var(--rule);
 }
 figcaption { margin-top: 0.6rem; font: 0.9rem/1.5 Inter, system-ui, sans-serif; color: var(--muted); }
+.title-sheet { margin: 1rem 0 2.5rem; }
+.title-sheet img {
+  max-width: min(100%, 22rem);
+  background: #fff; padding: 0.35rem;
+  border: 1px solid var(--rule); border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.title-sheet a { display: inline-block; line-height: 0; }
 :target { animation: flash 1.6s ease-out; }
 @keyframes flash { from { background: color-mix(in srgb, var(--accent) 18%, transparent); } }
 
